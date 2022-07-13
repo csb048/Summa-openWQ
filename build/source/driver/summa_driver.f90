@@ -106,7 +106,7 @@ if(err/=0) call stop_program(1, 'problem allocating openWQ progStruct for saving
 ! * model simulation
 ! *****************************************************************************
 ! loop through time
-do modelTimeStep=1,3
+do modelTimeStep=1,numtim
 
  ! read model forcing data
  call summa_readForcing(modelTimeStep, summa1_struc(n), err, message)
