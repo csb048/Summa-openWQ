@@ -35,4 +35,4 @@ Makefile-*
 *.backup
 # site directory from mkdocs
 site/
-build/source/interface/openwq
+build/source/openwq/openwq
