@@ -86,12 +86,14 @@ int ClassWQ_OpenWQ::run_time_start(int numHRU, int simtime_summa[],
     time_t simtime = convert_time(simtime_summa[0], simtime_summa[1], simtime_summa[2], simtime_summa[3], simtime_summa[4]);
 
     for (int i = 0; i < numHRU; i++) {
+        // Updating Chemistry dependencies
         (*OpenWQ_hostModelconfig_ref->SM)   (i,0,0) = soilMoisture[i]; 
         (*OpenWQ_hostModelconfig_ref->Tair) (i,0,0) = airTemp[i];
         (*OpenWQ_hostModelconfig_ref->Tsoil)(i,0,0) = soilTemp[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = SWE_vol[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = canopyWat[i];
-        // (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[2](i,0,0) = matricHead_vol[i];
+        // Updating water volumes
+        //(*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = SWE_vol[i];
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = canopyWat[i];
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = matricHead_vol[i];
         (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[2](i,0,0) = aquiferStorage[i];
     }
 
