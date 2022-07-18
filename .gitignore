@@ -36,3 +36,6 @@ Makefile-*
 # site directory from mkdocs
 site/
 build/source/openwq/openwq
+build/source/openwq/build/
+output/
+test_cases/
