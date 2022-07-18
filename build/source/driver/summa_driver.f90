@@ -69,6 +69,10 @@ integer(i4b)                       :: modelTimeStep              ! index of mode
 integer(i4b)                       :: err=0                      ! error code
 character(len=1024)                :: message=''                 ! error message
 integer(i4b)                       :: hruCount
+integer(i4b)                       :: num_layers_canopy
+integer(i4b)                       :: num_layers_matricHead
+integer(i4b)                       :: num_layers_aquifer
+integer(i4b)                       :: num_layers_volFracWat
 
 
 ! *****************************************************************************
@@ -95,9 +99,15 @@ call summa_readRestart(summa1_struc(n), err, message)
 call handle_err(err, message)
 
 ! ---------------------OPENWQ------------------------------------
+openwq_obj = ClassWQ_OpenWQ() ! initalize openWQ object
+
 hruCount = sum( gru_struc(:)%hruCount )
-openwq_obj = ClassWQ_OpenWQ(hruCount) ! initalize openWQ object
-err=openwq_obj%decl()  ! intialize openWQ
+num_layers_canopy = 1
+num_layers_matricHead = 1
+num_layers_volFracWat = 1
+num_layers_aquifer = 1
+
+err=openwq_obj%decl(hruCount, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat)  ! intialize openWQ
 call allocGlobal(prog_meta, progStruct_timestep_start, err, message) ! initalize structure to hold state information
 if(err/=0) call stop_program(1, 'problem allocating openWQ progStruct for saving state information')
 ! ---------------------OPENWQ------------------------------------

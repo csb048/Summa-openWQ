@@ -24,19 +24,25 @@ module openwq
     procedure create_openwq
  end interface
  contains
-    function create_openwq(num)
+    function create_openwq()
         implicit none
         type(ClassWQ_OpenWQ) :: create_openwq
-        integer, intent(in) :: num
-        create_openwq%ptr = create_openwq_c(num)
+        create_openwq%ptr = create_openwq_c()
     end function
 
     ! supposed to be decl but needed to openWQ_decl in the interface file
     ! returns integer of either a failure(-1) or success(0)
-   integer function openWQ_init(this)
+   integer function openWQ_init(this,num_hru,num_layers_canopy, num_layers_matricHead, &
+      num_layers_aquifer, num_layers_volFracWat)
       implicit none
       class(ClassWQ_OpenWQ) :: this
-      openWQ_init = openwq_decl_c(this%ptr)
+      integer(i4b), intent(in) :: num_hru
+      integer(i4b), intent(in) :: num_layers_canopy
+      integer(i4b), intent(in) :: num_layers_matricHead
+      integer(i4b), intent(in) :: num_layers_aquifer
+      integer(i4b), intent(in) :: num_layers_volFracWat
+      openWQ_init = openwq_decl_c(this%ptr,num_hru,num_layers_canopy, num_layers_matricHead, &
+      num_layers_aquifer, num_layers_volFracWat)
     end function
 !  ! Globaly accessible variable
 

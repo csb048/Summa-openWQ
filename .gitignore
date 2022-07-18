@@ -36,3 +36,9 @@ Makefile-*
 # site directory from mkdocs
 site/
 build/source/openwq/openwq
+build/source/interface
+build/source/openwq/build
+test_cases/
+synthetic_tests/
+output/runinfo.txt
+output/

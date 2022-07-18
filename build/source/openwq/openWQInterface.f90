@@ -1,16 +1,21 @@
 interface
-    function create_openwq_c(num) bind(C, name="create_openwq")
+    function create_openwq_c() bind(C, name="create_openwq")
         use iso_c_binding
         implicit none
         type(c_ptr) :: create_openwq_c
-        integer(c_int), value :: num
     end function
 
-    function openwq_decl_c(openWQ) bind(C, name="openwq_decl")
+    function openwq_decl_c(openWQ, num_hru, num_layers_canopy, num_layers_matricHead, &
+        num_layers_aquifer, num_layers_volFracWat) bind(C, name="openwq_decl")
         use iso_c_binding
         implicit none
         integer(c_int) :: openwq_decl_c ! returns a return value of 0 (success) or -1 (failure)
         type(c_ptr), intent(in), value :: openWQ
+        integer(c_int), intent(in), value  :: num_hru
+        integer(c_int), intent(in), value  :: num_layers_canopy
+        integer(c_int), intent(in), value  :: num_layers_matricHead
+        integer(c_int), intent(in), value  :: num_layers_aquifer
+        integer(c_int), intent(in), value  :: num_layers_volFracWat
     end function
 
     function openwq_run_time_start_c(openWQ, numHRU, simtime, &
