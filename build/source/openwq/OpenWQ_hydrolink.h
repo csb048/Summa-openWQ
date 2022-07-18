@@ -51,7 +51,7 @@ class ClassWQ_OpenWQ
 
     // Constructor
     public:
-        ClassWQ_OpenWQ(int numHRU);
+        ClassWQ_OpenWQ();
         ~ClassWQ_OpenWQ();
     
     // Methods
@@ -59,7 +59,7 @@ class ClassWQ_OpenWQ
         std::cout << "num = " << this->numHRU << std::endl;
     }
 
-    int decl();
+    int decl(int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat);
 
     int run_time_start(int numHRU, int simtime_summa[], 
         double soilMoisture[], double soilTemp[], double airTemp[],
@@ -91,13 +91,13 @@ extern "C" {
     #endif
 
     // Create OpenWQ Object
-    CLASSWQ_OPENWQ* create_openwq(int num);
+    CLASSWQ_OPENWQ* create_openwq();
 
     // Delete OpenWQ Object
     void delete_openwq(CLASSWQ_OPENWQ* openWQ);
 
     // OpenWQ initalization method
-    int openwq_decl(CLASSWQ_OPENWQ *openWQ);
+    int openwq_decl(CLASSWQ_OPENWQ *openWQ,int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat);
 
     int openwq_run_time_start(CLASSWQ_OPENWQ *openWQ, int numHRU, int simtime_summa[],
         double soilMoisture[], double soilTemp[], double airTemp[], double SWE_vol[], double canopyWat[], double matricHead_vol[], double aquiferStorage[]);
