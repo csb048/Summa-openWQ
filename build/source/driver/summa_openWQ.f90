@@ -66,16 +66,16 @@ subroutine run_time_start(openWQ_obj, summa1_struc)
         
         ! **************  
         ! Storage Volumes
-        ! openwq unit for volume = m3 (summa-to-openw units needed)
+        ! openwq unit for volume = m3 (summa-to-openwq unit conversions needed)
         !************** 
         
         ! snow
-        ! scalarSWE (m) converting to m3 (multiplying by hru area)
+        ! scalarSWE [m] converting to m3 (multiplying by hru area [m2])
         swe_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarSWE)%dat(1) &
           * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
 
         ! vegetation
-        ! scalarCanopyWat (m) converting to m3 (multiplying by hru area)
+        ! scalarCanopyWat [m] converting to m3 (multiplying by hru area [m2])
         canopyWat_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1) &
           * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
         
@@ -84,7 +84,7 @@ subroutine run_time_start(openWQ_obj, summa1_struc)
             size(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:))
         
         ! aquifer
-        ! scalarAquiferStorage (m) converting to m3 (multiplying by hru area)
+        ! scalarAquiferStorage [m] converting to m3 (multiplying by hru area [m2])
         aquiferStorage_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
           * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
         

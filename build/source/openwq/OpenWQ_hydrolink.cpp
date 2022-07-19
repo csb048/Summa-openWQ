@@ -59,7 +59,7 @@ int ClassWQ_OpenWQ::decl() {
         OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
         
         // Master Json
-        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/openwq-summa/synthetic_tests/9_batch_singleSp_1storder/summa/openWQ_master.json";
+        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
 
 
         OpenWQ_couplercalls_ref->InitialConfig(
