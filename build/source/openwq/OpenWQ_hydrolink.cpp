@@ -36,7 +36,7 @@ time_t ClassWQ_OpenWQ::convert_time(int year, int month, int day, int hour, int 
     return sim_time;
 }
 
-int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat) {
+int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat, int y_direction) {
     OpenWQ_hostModelconfig_ref = new OpenWQ_hostModelconfig(); // Initalize hostModelconfig
     OpenWQ_couplercalls_ref = new OpenWQ_couplercalls();
     OpenWQ_json_ref = new OpenWQ_json();
@@ -54,10 +54,10 @@ int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matri
 
     if (OpenWQ_hostModelconfig_ref->HydroComp.size()==0) {
         // Make sure to use capital letters for compartment names
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",numHRU,num_layers_canopy,1));
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERMATRICHEAD",numHRU,num_layers_matricHead,1));
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"SCALARAQUIFER",numHRU,num_layers_aquifer,1));
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"MLAYERVOLFRACWAT",numHRU,num_layers_volFracWat,1));
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",numHRU,y_direction,num_layers_canopy));
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERMATRICHEAD",numHRU,y_direction,num_layers_matricHead));
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"SCALARAQUIFER",numHRU,y_direction,num_layers_aquifer));
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"MLAYERVOLFRACWAT",numHRU,y_direction,num_layers_volFracWat));
 
         OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
         
@@ -198,9 +198,9 @@ void delete_openwq(CLASSWQ_OPENWQ* openWQ) {
     delete openWQ;
 }
 
-int openwq_decl(ClassWQ_OpenWQ *openWQ, int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat) {
+int openwq_decl(ClassWQ_OpenWQ *openWQ, int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat, int y_direction) {
     std::cout << "C API, Decl" << std::endl;
-    return openWQ->decl(numHRU, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat);
+    return openWQ->decl(numHRU, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat, y_direction);
 }
 
 

@@ -33,7 +33,7 @@ module openwq
     ! supposed to be decl but needed to openWQ_decl in the interface file
     ! returns integer of either a failure(-1) or success(0)
    integer function openWQ_init(this,num_hru,num_layers_canopy, num_layers_matricHead, &
-      num_layers_aquifer, num_layers_volFracWat)
+      num_layers_aquifer, num_layers_volFracWat, y_direction)
       implicit none
       class(ClassWQ_OpenWQ) :: this
       integer(i4b), intent(in) :: num_hru
@@ -41,8 +41,9 @@ module openwq
       integer(i4b), intent(in) :: num_layers_matricHead
       integer(i4b), intent(in) :: num_layers_aquifer
       integer(i4b), intent(in) :: num_layers_volFracWat
+      integer(i4b), intent(in) :: y_direction
       openWQ_init = openwq_decl_c(this%ptr,num_hru,num_layers_canopy, num_layers_matricHead, &
-      num_layers_aquifer, num_layers_volFracWat)
+      num_layers_aquifer, num_layers_volFracWat, y_direction)
     end function
 !  ! Globaly accessible variable
 

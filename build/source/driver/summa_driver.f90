@@ -73,6 +73,8 @@ integer(i4b)                       :: num_layers_canopy
 integer(i4b)                       :: num_layers_matricHead
 integer(i4b)                       :: num_layers_aquifer
 integer(i4b)                       :: num_layers_volFracWat
+integer(i4b)                       :: y_direction
+
 
 
 ! *****************************************************************************
@@ -102,12 +104,12 @@ call handle_err(err, message)
 openwq_obj = ClassWQ_OpenWQ() ! initalize openWQ object
 
 hruCount = sum( gru_struc(:)%hruCount )
-num_layers_canopy = 1
-num_layers_matricHead = 1
-num_layers_volFracWat = 1
-num_layers_aquifer = 1
-
-err=openwq_obj%decl(hruCount, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat)  ! intialize openWQ
+num_layers_canopy = 1 ! To-do: FInd this value
+num_layers_matricHead = 1 ! To-do: FInd this value
+num_layers_volFracWat = 1! To-do: FInd this value
+num_layers_aquifer = 1 ! To-do: FInd this value
+y_direction = 1
+err=openwq_obj%decl(hruCount, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat, y_direction)  ! intialize openWQ
 call allocGlobal(prog_meta, progStruct_timestep_start, err, message) ! initalize structure to hold state information
 if(err/=0) call stop_program(1, 'problem allocating openWQ progStruct for saving state information')
 ! ---------------------OPENWQ------------------------------------

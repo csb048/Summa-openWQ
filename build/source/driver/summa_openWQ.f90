@@ -22,6 +22,7 @@ subroutine run_time_start(openWQ_obj, summa1_struc)
   USE globalData, only:gru_struc
   USE var_lookup, only: iLookPROG  ! named variables for state variables
   USE var_lookup, only: iLookTIME  ! named variables for time data structure
+  USE var_lookup, only: iLookATTR  ! named variables for real valued attribute data structure
 
   implicit none
 
@@ -46,7 +47,8 @@ subroutine run_time_start(openWQ_obj, summa1_struc)
 
   summaVars: associate(&
       progStruct     => summa1_struc%progStruct             , &
-      timeStruct     => summa1_struc%timeStruct               &
+      timeStruct     => summa1_struc%timeStruct             , &
+      attrStruct     => summa1_struc%attrStruct               &
   )
 
   ! Assemble the data to send to openWQ
@@ -57,19 +59,41 @@ subroutine run_time_start(openWQ_obj, summa1_struc)
         soilMoisture(openWQArrayIndex) = 0     ! TODO: Find the value for this varaibles
 
         soilTemp(openWQArrayIndex) = sum(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(:)) / &
-            size(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(:)) 
+          size(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(:)) 
         
-        airTemp(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1)
+        airTemp(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1) &
+          * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
         
-        swe_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarSWE)%dat(1)
+        ! **************  
+        ! Storage Volumes
+        ! openwq unit for volume = m3 (summa-to-openwq unit conversions needed)
+        !************** 
+        
+        ! snow
+        ! scalarSWE [m] converting to m3 (multiplying by hru area [m2])
+        swe_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarSWE)%dat(1) &
+          * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
 
-        canopyWat_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1)
+        ! vegetation
+        ! scalarCanopyWat [m] converting to m3 (multiplying by hru area [m2])
+        canopyWat_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1) &
+          * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
+        
+        ! soil (TODO: still needs fixing)
+        matricHead_vol(openWQArrayIndex) = sum(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:)) / &
+            size(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:))
+        
+        ! aquifer
+        ! scalarAquiferStorage [m] converting to m3 (multiplying by hru area [m2])
+        aquiferStorage_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
+          * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
+        
+        ! **************  
+        ! Fluxes
+        !************** 
 
-        matricHead_vol(openWQArrayIndex) = sum(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerMatricHead)%dat(:)) / &
-            size(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerMatricHead)%dat(:))
-        
-        aquiferStorage_vol(openWQArrayIndex) = progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1)
-        
+        ! TODO
+
         ! Copy the prog structure
         do iVar = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var)
           do iDat = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat)
