@@ -46,7 +46,7 @@ int ClassWQ_OpenWQ::decl() {
     OpenWQ_initiate_ref = new OpenWQ_initiate();
     OpenWQ_watertransp_ref = new OpenWQ_watertransp();
     OpenWQ_chem_ref = new OpenWQ_chem();
-    OpenWQ_sinksource_ref = new OpenWQ_sinksource();
+    OpenWQ_extwatflux_ss_ref = new OpenWQ_extwatflux_ss();
     OpenWQ_output_ref = new OpenWQ_output();
 
     if (OpenWQ_hostModelconfig_ref->HydroComp.size()==0) {
@@ -72,7 +72,7 @@ int ClassWQ_OpenWQ::decl() {
             *OpenWQ_initiate_ref,            // initiate modules
             *OpenWQ_watertransp_ref,         // transport modules
             *OpenWQ_chem_ref,                // biochemistry modules
-            *OpenWQ_sinksource_ref,          // sink and source modules)
+            *OpenWQ_extwatflux_ss_ref,          // sink and source modules)
             *OpenWQ_output_ref);
     }
     return 0;
@@ -109,7 +109,7 @@ int ClassWQ_OpenWQ::run_time_start(int numHRU, int simtime_summa[],
         *OpenWQ_initiate_ref,            // initiate modules
         *OpenWQ_watertransp_ref,         // transport modules
         *OpenWQ_chem_ref,                // biochemistry modules
-        *OpenWQ_sinksource_ref,          // sink and source modules)
+        *OpenWQ_extwatflux_ss_ref,          // sink and source modules)
         *OpenWQ_solver_ref,
         *OpenWQ_output_ref,
         simtime);
@@ -135,7 +135,7 @@ int ClassWQ_OpenWQ::run_space(int simtime_summa[], int source, int ix_s, int iy_
         *OpenWQ_initiate_ref,            // initiate modules
         *OpenWQ_watertransp_ref,         // transport modules
         *OpenWQ_chem_ref,                // biochemistry modules
-        *OpenWQ_sinksource_ref,          // sink and source modules)
+        *OpenWQ_extwatflux_ss_ref,          // sink and source modules
         *OpenWQ_solver_ref,
         *OpenWQ_output_ref,
         simtime,
@@ -168,7 +168,7 @@ int ClassWQ_OpenWQ::run_time_end(int simtime_summa[]) {
         *OpenWQ_initiate_ref,            // initiate modules
         *OpenWQ_watertransp_ref,         // transport modules
         *OpenWQ_chem_ref,                // biochemistry modules
-        *OpenWQ_sinksource_ref,          // sink and source modules)
+        *OpenWQ_extwatflux_ss_ref,          // sink and source modules)
         *OpenWQ_solver_ref,
         *OpenWQ_output_ref,
         simtime);
