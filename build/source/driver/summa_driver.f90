@@ -47,12 +47,10 @@ USE globalData,only:gru_struc                               ! gru-hru mapping st
 
 ! OpenWQ coupling 
 USE globalData,only:openWQ_obj
+USE summa_openWQ,only:init_openwq
 USE summa_openWQ,only:run_time_start
 USE summa_openWQ,only:run_time_end
-USE summa_openWQ,only:progStruct_timestep_start
-USE openWQ
-USE allocspace_module,only:allocGlobal                      ! module to allocate space for global data structures
-USE globalData,only:prog_meta
+
 USE, intrinsic :: iso_c_binding
 implicit none
 
@@ -68,16 +66,8 @@ integer(i4b)                       :: modelTimeStep              ! index of mode
 ! error control
 integer(i4b)                       :: err=0                      ! error code
 character(len=1024)                :: message=''                 ! error message
-integer(i4b)                       :: hruCount
-integer(i4b)                       :: num_layers_canopy
-integer(i4b)                       :: num_layers_matricHead
-integer(i4b)                       :: num_layers_aquifer
-integer(i4b)                       :: num_layers_volFracWat
-integer(i4b)                       :: y_direction
 
-
-
-! *****************************************************************************
+!*****************************************************************************
 ! * preliminaries
 ! *****************************************************************************
 ! allocate space for the master summa structure
@@ -100,24 +90,15 @@ call handle_err(err, message)
 call summa_readRestart(summa1_struc(n), err, message)
 call handle_err(err, message)
 
-! ---------------------OPENWQ------------------------------------
-openwq_obj = ClassWQ_OpenWQ() ! initalize openWQ object
-
-hruCount = sum( gru_struc(:)%hruCount )
-num_layers_canopy = 1 ! To-do: FInd this value
-num_layers_matricHead = 1 ! To-do: FInd this value
-num_layers_volFracWat = 1! To-do: FInd this value
-num_layers_aquifer = 1 ! To-do: FInd this value
-y_direction = 1
-err=openwq_obj%decl(hruCount, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat, y_direction)  ! intialize openWQ
-call allocGlobal(prog_meta, progStruct_timestep_start, err, message) ! initalize structure to hold state information
+! Init openWQ object
+call init_openwq(err, message)
 if(err/=0) call stop_program(1, 'problem allocating openWQ progStruct for saving state information')
-! ---------------------OPENWQ------------------------------------
+
 
 ! *****************************************************************************
-! * model simulation
-! *****************************************************************************
-! loop through time
+! ! * model simulation
+! ! *****************************************************************************
+! ! loop through time
 do modelTimeStep=1,numtim
 
  ! read model forcing data
@@ -138,11 +119,13 @@ do modelTimeStep=1,numtim
  call summa_writeOutputFiles(modelTimeStep, summa1_struc(n), err, message)
  call handle_err(err, message)
 
- ! *** OPENWQ Run_Time_End ***
+!  *** OPENWQ Run_Time_End ***
  call run_time_end(openwq_obj, summa1_struc(n))
 
 end do  ! looping through time
 
-! successful end
+! call sleep(5)
+
+! ! successful end
 call stop_program(0, 'finished simulation successfully.')
 end program summa_driver

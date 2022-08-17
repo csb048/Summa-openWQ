@@ -5,6 +5,7 @@ module summa_openWQ
   implicit none
   private
   ! Subroutines
+  public :: init_openwq
   public :: run_time_start
   public :: run_space
   public :: run_time_end
@@ -14,6 +15,43 @@ module summa_openWQ
 
 
   contains
+
+  ! Subroutine to initalize the openWQ object
+  ! putting it here to keep the SUMMA_Driver clean
+subroutine init_openwq(err, message)
+  USE globalData,only:openWQ_obj
+  USE globalData,only:gru_struc                               ! gru-hru mapping structures
+  USE globalData,only:prog_meta
+  USE allocspace_module,only:allocGlobal                      ! module to allocate space for global data structures
+
+  implicit none
+
+  integer(i4b),intent(inout)                      :: err
+  character(*),intent(inout)                      :: message         ! error messgage
+  integer(i4b)                                    :: hruCount
+  integer(i4b)                                    :: num_layers_canopy
+  integer(i4b)                                    :: num_layers_matricHead
+  integer(i4b)                                    :: num_layers_aquifer
+  integer(i4b)                                    :: num_layers_volFracWat
+  integer(i4b)                                    :: y_direction
+
+  openwq_obj = ClassWQ_OpenWQ() ! initalize openWQ object
+
+  hruCount = sum( gru_struc(:)%hruCount )
+  num_layers_canopy = 1 ! To-do: FInd this value
+  num_layers_matricHead = 1 ! To-do: FInd this value
+  num_layers_volFracWat = 1! To-do: FInd this value
+  num_layers_aquifer = 1 ! To-do: FInd this value
+  y_direction = 1
+  err=openwq_obj%decl(hruCount, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat, y_direction)  ! intialize openWQ
+  
+  ! Create copy of state information, needed for passing to openWQ with fluxes that require
+  ! the previous time_steps volume
+  call allocGlobal(prog_meta, progStruct_timestep_start, err, message) 
+end subroutine init_openwq
+  
+
+
 
   ! Subroutine that SUMMA calls to pass varialbes that need to go to
   ! openWQ
