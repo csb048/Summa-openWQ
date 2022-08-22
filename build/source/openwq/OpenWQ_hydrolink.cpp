@@ -40,19 +40,21 @@ int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matri
     OpenWQ_hostModelconfig_ref = new OpenWQ_hostModelconfig(); // Initalize hostModelconfig
     OpenWQ_couplercalls_ref = new OpenWQ_couplercalls();
     OpenWQ_json_ref = new OpenWQ_json();
-    OpenWQ_wqconfig_ref = new OpenWQ_wqconfig(); // This is 11 because the OpenWQ_global.h says it should be in the class definition
+    OpenWQ_wqconfig_ref = new OpenWQ_wqconfig();
     OpenWQ_units_ref = new OpenWQ_units();
     OpenWQ_readjson_ref = new OpenWQ_readjson();
     OpenWQ_initiate_ref = new OpenWQ_initiate();
     OpenWQ_watertransp_ref = new OpenWQ_watertransp();
     OpenWQ_chem_ref = new OpenWQ_chem();
-    OpenWQ_sinksource_ref = new OpenWQ_sinksource();
+    OpenWQ_extwatflux_ss_ref = new OpenWQ_extwatflux_ss();
     OpenWQ_output_ref = new OpenWQ_output();
     
     this->numHRU = numHRU;
 
 
     if (OpenWQ_hostModelconfig_ref->HydroComp.size()==0) {
+
+        // Compartment names
         // Make sure to use capital letters for compartment names
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",numHRU,y_direction,num_layers_canopy));
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERMATRICHEAD",numHRU,y_direction,num_layers_matricHead));
@@ -60,22 +62,32 @@ int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matri
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"MLAYERVOLFRACWAT",numHRU,y_direction,num_layers_volFracWat));
 
         OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
-        
+
+        // External fluxes
+        // Make sure to use capital letters for external fluxes
+        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP",numHRU,1,1));
+
+        // Dependencies
+        // to expand BGC modelling options
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",numHRU,1,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair",numHRU,1,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil",numHRU,1,1));
+
         // Master Json
-        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/Summa-OpenWQ/synthetic_tests/9_batch_singleSp_1storder/summa/openWQ_master.json";
+        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
 
 
         OpenWQ_couplercalls_ref->InitialConfig(
             *OpenWQ_hostModelconfig_ref,
-            *OpenWQ_json_ref,                    // create OpenWQ_json object
+            *OpenWQ_json_ref,                // create OpenWQ_json object
             *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
-            *OpenWQ_units_ref,                  // functions for unit conversion
+            *OpenWQ_units_ref,               // functions for unit conversion
             *OpenWQ_readjson_ref,            // read json files
             *OpenWQ_vars_ref,
             *OpenWQ_initiate_ref,            // initiate modules
-            *OpenWQ_watertransp_ref,      // transport modules
-            *OpenWQ_chem_ref,                   // biochemistry modules
-            *OpenWQ_sinksource_ref,        // sink and source modules)
+            *OpenWQ_watertransp_ref,         // transport modules
+            *OpenWQ_chem_ref,                // biochemistry modules
+            *OpenWQ_extwatflux_ss_ref,       // sink and source modules)
             *OpenWQ_output_ref);
     }
     return 0;
@@ -90,9 +102,9 @@ int ClassWQ_OpenWQ::run_time_start(int numHRU, int simtime_summa[],
 
     for (int i = 0; i < numHRU; i++) {
         // Updating Chemistry dependencies
-        (*OpenWQ_hostModelconfig_ref->SM)   (i,0,0) = soilMoisture[i]; 
-        (*OpenWQ_hostModelconfig_ref->Tair) (i,0,0) = airTemp[i];
-        (*OpenWQ_hostModelconfig_ref->Tsoil)(i,0,0) = soilTemp[i];
+        (*OpenWQ_hostModelconfig_ref->dependVar)[0](i,0,0) = soilMoisture[i]; 
+        (*OpenWQ_hostModelconfig_ref->dependVar)[1](i,0,0) = airTemp[i];
+        (*OpenWQ_hostModelconfig_ref->dependVar)[2](i,0,0) = soilTemp[i];
         // Updating water volumes
         //(*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = SWE_vol[i];
         (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = canopyWat[i];
@@ -106,13 +118,13 @@ int ClassWQ_OpenWQ::run_time_start(int numHRU, int simtime_summa[],
         *OpenWQ_hostModelconfig_ref,
         *OpenWQ_json_ref,
         *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
-        *OpenWQ_units_ref,                  // functions for unit conversion
+        *OpenWQ_units_ref,               // functions for unit conversion
         *OpenWQ_readjson_ref,            // read json files
         *OpenWQ_vars_ref,
         *OpenWQ_initiate_ref,            // initiate modules
-        *OpenWQ_watertransp_ref,      // transport modules
-        *OpenWQ_chem_ref,                   // biochemistry modules
-        *OpenWQ_sinksource_ref,        // sink and source modules)
+        *OpenWQ_watertransp_ref,         // transport modules
+        *OpenWQ_chem_ref,                // biochemistry modules
+        *OpenWQ_extwatflux_ss_ref,          // sink and source modules)
         *OpenWQ_solver_ref,
         *OpenWQ_output_ref,
         simtime);
@@ -132,13 +144,13 @@ int ClassWQ_OpenWQ::run_space(int simtime_summa[], int source, int ix_s, int iy_
         *OpenWQ_hostModelconfig_ref,
         *OpenWQ_json_ref,
         *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
-        *OpenWQ_units_ref,                  // functions for unit conversion
+        *OpenWQ_units_ref,               // functions for unit conversion
         *OpenWQ_readjson_ref,            // read json files
         *OpenWQ_vars_ref,
         *OpenWQ_initiate_ref,            // initiate modules
-        *OpenWQ_watertransp_ref,      // transport modules
-        *OpenWQ_chem_ref,                   // biochemistry modules
-        *OpenWQ_sinksource_ref,        // sink and source modules)
+        *OpenWQ_watertransp_ref,         // transport modules
+        *OpenWQ_chem_ref,                // biochemistry modules
+        *OpenWQ_extwatflux_ss_ref,       // sink and source modules
         *OpenWQ_solver_ref,
         *OpenWQ_output_ref,
         simtime,
@@ -165,13 +177,13 @@ int ClassWQ_OpenWQ::run_time_end(int simtime_summa[]) {
         *OpenWQ_hostModelconfig_ref,
         *OpenWQ_json_ref,
         *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
-        *OpenWQ_units_ref,                  // functions for unit conversion
+        *OpenWQ_units_ref,               // functions for unit conversion
         *OpenWQ_readjson_ref,            // read json files
         *OpenWQ_vars_ref,
         *OpenWQ_initiate_ref,            // initiate modules
-        *OpenWQ_watertransp_ref,      // transport modules
-        *OpenWQ_chem_ref,                   // biochemistry modules
-        *OpenWQ_sinksource_ref,        // sink and source modules)
+        *OpenWQ_watertransp_ref,         // transport modules
+        *OpenWQ_chem_ref,                // biochemistry modules
+        *OpenWQ_extwatflux_ss_ref,          // sink and source modules)
         *OpenWQ_solver_ref,
         *OpenWQ_output_ref,
         simtime);

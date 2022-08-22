@@ -20,7 +20,7 @@
 #include "OpenWQ_initiate.h"
 #include "OpenWQ_chem.h"
 #include "OpenWQ_watertransp.h"
-#include "OpenWQ_sinksource.h"
+#include "OpenWQ_extwatflux_ss.h"
 #include "OpenWQ_units.h"
 #include "OpenWQ_solver.h"
 #include "OpenWQ_output.h"
@@ -42,7 +42,7 @@ class ClassWQ_OpenWQ
         OpenWQ_initiate *OpenWQ_initiate_ref;
         OpenWQ_watertransp *OpenWQ_watertransp_ref;
         OpenWQ_chem *OpenWQ_chem_ref;            
-        OpenWQ_sinksource *OpenWQ_sinksource_ref;
+        OpenWQ_extwatflux_ss *OpenWQ_extwatflux_ss_ref;
         OpenWQ_solver *OpenWQ_solver_ref;
         OpenWQ_output *OpenWQ_output_ref;
 
