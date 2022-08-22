@@ -63,7 +63,13 @@ int ClassWQ_OpenWQ::decl() {
         // External fluxes
         // Make sure to use capital letters for external fluxes
         OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP",numHRU,1,1));
-        
+
+        // Dependencies
+        // to expand BGC modelling options
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",numHRU,1,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair",numHRU,1,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil",numHRU,1,1));
+
         // Master Json
         OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
 
@@ -78,7 +84,7 @@ int ClassWQ_OpenWQ::decl() {
             *OpenWQ_initiate_ref,            // initiate modules
             *OpenWQ_watertransp_ref,         // transport modules
             *OpenWQ_chem_ref,                // biochemistry modules
-            *OpenWQ_extwatflux_ss_ref,          // sink and source modules)
+            *OpenWQ_extwatflux_ss_ref,       // sink and source modules)
             *OpenWQ_output_ref);
     }
     return 0;
@@ -93,9 +99,9 @@ int ClassWQ_OpenWQ::run_time_start(int numHRU, int simtime_summa[],
 
     for (int i = 0; i < numHRU; i++) {
         // Updating Chemistry dependencies
-        (*OpenWQ_hostModelconfig_ref->SM)   (i,0,0) = soilMoisture[i]; 
-        (*OpenWQ_hostModelconfig_ref->Tair) (i,0,0) = airTemp[i];
-        (*OpenWQ_hostModelconfig_ref->Tsoil)(i,0,0) = soilTemp[i];
+        (*OpenWQ_hostModelconfig_ref->dependVar)[0](i,0,0) = soilMoisture[i]; 
+        (*OpenWQ_hostModelconfig_ref->dependVar)[1](i,0,0) = airTemp[i];
+        (*OpenWQ_hostModelconfig_ref->dependVar)[2](i,0,0) = soilTemp[i];
         // Updating water volumes
         //(*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = SWE_vol[i];
         (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = canopyWat[i];
@@ -141,7 +147,7 @@ int ClassWQ_OpenWQ::run_space(int simtime_summa[], int source, int ix_s, int iy_
         *OpenWQ_initiate_ref,            // initiate modules
         *OpenWQ_watertransp_ref,         // transport modules
         *OpenWQ_chem_ref,                // biochemistry modules
-        *OpenWQ_extwatflux_ss_ref,          // sink and source modules
+        *OpenWQ_extwatflux_ss_ref,       // sink and source modules
         *OpenWQ_solver_ref,
         *OpenWQ_output_ref,
         simtime,
