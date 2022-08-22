@@ -16,6 +16,7 @@ module openwq
     procedure :: decl => openWQ_init
     procedure :: run_time_start => openWQ_run_time_start
     procedure :: run_space => openWQ_run_space
+    procedure :: run_space_in => openWQ_run_space_in
     procedure :: run_time_end => openWQ_run_time_end
 
  end type
@@ -80,6 +81,18 @@ module openwq
       real(rkind),  intent(in)   :: wflux_s2r
       real(rkind),  intent(in)   :: wmass_source
       openWQ_run_space = openwq_run_space_c(this%ptr,simtime,source,ix_s,iy_s,iz_s,recipient,ix_r,iy_r,iz_r,wflux_s2r,wmass_source)
+   end function
+
+   integer function openWQ_run_space_in(this,simtime,recipient,ix_r,iy_r,iz_r,wflux_s2r)
+      implicit none
+      class(ClassWQ_OpenWQ)      :: this
+      integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
+      integer(i4b), intent(in)   :: recipient
+      integer(i4b), intent(in)   :: ix_r
+      integer(i4b), intent(in)   :: iy_r
+      integer(i4b), intent(in)   :: iz_r
+      real(rkind),  intent(in)   :: wflux_s2r
+      openWQ_run_space_in = openwq_run_space_in_c(this%ptr,simtime,recipient,ix_r,iy_r,ix_r,wflux_s2r)
    end function
 
 

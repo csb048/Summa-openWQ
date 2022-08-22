@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "OpenWQ_hydrolink.h"
+#include "OpenWQ_interface.h"
 
 
 // Constructor
@@ -188,51 +189,5 @@ int ClassWQ_OpenWQ::run_time_end(int simtime_summa[]) {
         *OpenWQ_output_ref,
         simtime);
     return 0;
-}
-
-
-
-
-/**
- * Below is the implementation of the C interface for SUMMA. When Summa calls a function 
- * the functions below are the ones that are invoked first. 
- * The openWQ object is then passed from Fortran to these functions so that the OpenWQ object
- * can be called. The openWQ object methods are defined above.
- */
-// Interface functions to create Object
-CLASSWQ_OPENWQ* create_openwq() {
-    std::cout << "C API, create_openwq" << std::endl;
-    return new ClassWQ_OpenWQ();
-}
-
-void delete_openwq(CLASSWQ_OPENWQ* openWQ) {
-    std::cout << "C API, delete openwq" << std::endl;
-    delete openWQ;
-}
-
-int openwq_decl(ClassWQ_OpenWQ *openWQ, int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat, int y_direction) {
-    std::cout << "C API, Decl" << std::endl;
-    return openWQ->decl(numHRU, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat, y_direction);
-}
-
-
-int openwq_run_time_start(ClassWQ_OpenWQ *openWQ, int numHRU, int simtime_summa[], double soilMoisture[], double soilTemp[], double airTemp[],
-    double SWE_vol[], double canopyWat_vol[], double matricHead_vol[], double aquiferStorage_vol[]) {
-    
-    return openWQ->run_time_start(numHRU, simtime_summa,
-        soilMoisture, soilTemp, airTemp, SWE_vol, canopyWat_vol, matricHead_vol, aquiferStorage_vol);
-}
-
-
-int openwq_run_space(ClassWQ_OpenWQ *openWQ, int simtime_summa[], int source, int ix_s, int iy_s, int iz_s,
-        int recipient, int ix_r, int iy_r, int iz_r, double wflux_s2r, double wmass_source) {
-
-    return openWQ->run_space(simtime_summa, source, ix_s, iy_s, iz_s,
-        recipient, ix_r, iy_r, iz_r, wflux_s2r, wmass_source);
-}
-
-    int openwq_run_time_end(ClassWQ_OpenWQ *openWQ, int simtime_summa[]) {
-
-    return openWQ->run_time_end(simtime_summa);
 }
 
