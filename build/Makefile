@@ -2916,6 +2916,33 @@ src/OpenWQ_units.cpp.s:
 	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_units.cpp.s
 .PHONY : src/OpenWQ_units.cpp.s
 
+src/OpenWQ_utils.o: src/OpenWQ_utils.cpp.o
+
+.PHONY : src/OpenWQ_utils.o
+
+# target to build an object file
+src/OpenWQ_utils.cpp.o:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_utils.cpp.o
+.PHONY : src/OpenWQ_utils.cpp.o
+
+src/OpenWQ_utils.i: src/OpenWQ_utils.cpp.i
+
+.PHONY : src/OpenWQ_utils.i
+
+# target to preprocess a source file
+src/OpenWQ_utils.cpp.i:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_utils.cpp.i
+.PHONY : src/OpenWQ_utils.cpp.i
+
+src/OpenWQ_utils.s: src/OpenWQ_utils.cpp.s
+
+.PHONY : src/OpenWQ_utils.s
+
+# target to generate assembly for a file
+src/OpenWQ_utils.cpp.s:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_utils.cpp.s
+.PHONY : src/OpenWQ_utils.cpp.s
+
 src/OpenWQ_watertransp.o: src/OpenWQ_watertransp.cpp.o
 
 .PHONY : src/OpenWQ_watertransp.o
@@ -3261,6 +3288,9 @@ help:
 	@echo "... src/OpenWQ_units.o"
 	@echo "... src/OpenWQ_units.i"
 	@echo "... src/OpenWQ_units.s"
+	@echo "... src/OpenWQ_utils.o"
+	@echo "... src/OpenWQ_utils.i"
+	@echo "... src/OpenWQ_utils.s"
 	@echo "... src/OpenWQ_watertransp.o"
 	@echo "... src/OpenWQ_watertransp.i"
 	@echo "... src/OpenWQ_watertransp.s"
