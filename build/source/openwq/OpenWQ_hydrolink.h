@@ -22,6 +22,7 @@
 #include "OpenWQ_watertransp.h"
 #include "OpenWQ_extwatflux_ss.h"
 #include "OpenWQ_units.h"
+#include "OpenWQ_utils.h"
 #include "OpenWQ_solver.h"
 #include "OpenWQ_output.h"
 #include <iostream>
@@ -37,6 +38,7 @@ class ClassWQ_OpenWQ
         OpenWQ_json *OpenWQ_json_ref;
         OpenWQ_wqconfig *OpenWQ_wqconfig_ref;
         OpenWQ_units *OpenWQ_units_ref;
+        OpenWQ_utils *OpenWQ_utils_ref;
         OpenWQ_readjson *OpenWQ_readjson_ref;
         OpenWQ_vars *OpenWQ_vars_ref;
         OpenWQ_initiate *OpenWQ_initiate_ref;

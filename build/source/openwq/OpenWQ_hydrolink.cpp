@@ -43,6 +43,7 @@ int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matri
     OpenWQ_json_ref = new OpenWQ_json();
     OpenWQ_wqconfig_ref = new OpenWQ_wqconfig();
     OpenWQ_units_ref = new OpenWQ_units();
+    OpenWQ_utils_ref = new OpenWQ_utils();
     OpenWQ_readjson_ref = new OpenWQ_readjson();
     OpenWQ_initiate_ref = new OpenWQ_initiate();
     OpenWQ_watertransp_ref = new OpenWQ_watertransp();
@@ -83,6 +84,7 @@ int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matri
             *OpenWQ_json_ref,                // create OpenWQ_json object
             *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
             *OpenWQ_units_ref,               // functions for unit conversion
+            *OpenWQ_utils_ref,                // utility methods/functions
             *OpenWQ_readjson_ref,            // read json files
             *OpenWQ_vars_ref,
             *OpenWQ_initiate_ref,            // initiate modules
@@ -120,6 +122,7 @@ int ClassWQ_OpenWQ::run_time_start(int numHRU, int simtime_summa[],
         *OpenWQ_json_ref,
         *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
         *OpenWQ_units_ref,               // functions for unit conversion
+        *OpenWQ_utils_ref,                // utility methods/functions
         *OpenWQ_readjson_ref,            // read json files
         *OpenWQ_vars_ref,
         *OpenWQ_initiate_ref,            // initiate modules
@@ -144,6 +147,7 @@ int ClassWQ_OpenWQ::run_space(int simtime_summa[], int source, int ix_s, int iy_
         *OpenWQ_json_ref,
         *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
         *OpenWQ_units_ref,               // functions for unit conversion
+        *OpenWQ_utils_ref,                // utility methods/functions
         *OpenWQ_readjson_ref,            // read json files
         *OpenWQ_vars_ref,
         *OpenWQ_initiate_ref,            // initiate modules
@@ -204,6 +208,7 @@ int ClassWQ_OpenWQ::run_time_end(int simtime_summa[]) {
         *OpenWQ_json_ref,
         *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
         *OpenWQ_units_ref,               // functions for unit conversion
+        *OpenWQ_utils_ref,                // utility methods/functions
         *OpenWQ_readjson_ref,            // read json files
         *OpenWQ_vars_ref,
         *OpenWQ_initiate_ref,            // initiate modules
