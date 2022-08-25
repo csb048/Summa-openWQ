@@ -165,17 +165,77 @@ subroutine run_time_start(openWQ_obj, summa1_struc)
 end subroutine
 
 
-subroutine run_space_step(timeStruct, fluxStruct)
+subroutine run_space_step(timeStruct, fluxStruct, nGRU)
   USE var_lookup,   only: iLookPROG  ! named variables for state variables
   USE var_lookup,   only: iLookTIME  ! named variables for time data structure
   USE var_lookup,   only: iLookFLUX  ! named varaibles for flux data
   USE globalData,   only: openWQ_obj
   USE data_types,   only: var_dlength,var_i
-  ! USE summa_openWQ, only:progStruct_timestep_start
+  USE globalData,   only: gru_struc
   implicit none
 
-  type(var_i),             intent(in)    :: timeStruct          ! int vector   -- model time data
-  type(gru_hru_doubleVec), intent(in)    :: fluxStruct            ! x%var(:)%dat -- model fluxes
+  type(var_i),             intent(in)    :: timeStruct 
+  type(gru_hru_doubleVec), intent(in)    :: fluxStruct
+  integer(i4b),            intent(in)    :: nGRU
+
+  integer(i4b)                           :: hru_index ! needed because openWQ saves hrus as a single array
+  integer(i4b)                           :: iHRU      ! variable needed for looping
+  integer(i4b)                           :: iGRU      ! variable needed for looping
+
+  integer(i4b)                           :: simtime(5) ! 5 time values yy-mm-dd-hh-min
+  integer(i4b)                           :: err
+  ! compartment indexes
+  integer(i4b)                           :: scalarCanopyWat=0 ! SUMMA Side units: kg m-2
+  integer(i4b)                           :: mLayerMatricHead=1 ! SUMMA Side units: m
+  integer(i4b)                           :: scalarAquifer=2 ! SUMMA Side units: m
+  integer(i4b)                           :: mLayerVolFracWat=3 ! SUMMA Side units: ????
+  integer(i4b)                           :: iy_r
+  integer(i4b)                           :: iz_r
+  integer(i4b)                           :: iy_s
+  integer(i4b)                           :: iz_s
+
+  ! Fluxes leaving the canopy
+  real(rkind)                            :: scalarCanopySnowUnloading ! kg m-2 s-1
+  real(rkind)                            :: scalarCanopyLiqDrainage   ! kg m_2 s-1
+
+
+
+  simtime(1) = timeStruct%var(iLookTIME%iyyy)  ! Year
+  simtime(2) = timeStruct%var(iLookTIME%im)    ! month
+  simtime(3) = timeStruct%var(iLookTIME%id)    ! hour
+  simtime(4) = timeStruct%var(iLookTIME%ih)    ! day
+  simtime(5) = timeStruct%var(iLookTIME%imin)  ! minute
+  
+  hru_index=1
+  do iGRU=1,nGRU
+    do iHRU=1,gru_struc(iGRU)%hruCount
+      ! Canopy Fluxes
+      scalarCanopySnowUnloading = fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopySnowUnloading)%dat(1)
+      scalarCanopyLiqDrainage = fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopyLiqDrainage)%dat(1)
+      
+      iy_s = 1
+      iz_s = 1
+      iy_r = 1
+      iz_r = 1
+      err=openwq_obj%run_space(simtime, &
+                           scalarCanopyWat, hru_index, iy_s, iz_s, &
+                           mLayerVolFracWat, hru_index, iy_r, iz_r, &
+                           scalarCanopySnowUnloading, &
+                           progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1))
+      
+      err=openwq_obj%run_space(simtime, &
+                           scalarCanopyWat, hru_index, iy_s, iz_s, &
+                           mLayerVolFracWat, hru_index, iy_r, iz_r, &
+                           scalarCanopyLiqDrainage, &
+                           progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1))
+
+
+
+      hru_index = hru_index + hru_index
+    end do
+  end do
+
+
 
 end subroutine run_space_step
 

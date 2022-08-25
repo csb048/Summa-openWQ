@@ -75,7 +75,7 @@ int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matri
         OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil",numHRU,1,1));
 
         // Master Json
-        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/Summa-OpenWQ/synthetic_tests/9_batch_singleSp_1storder/summa/openWQ_master.json";
+        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/Summa-OpenWQ/synthetic_tests/11_batch_2species/summa/openWQ_master.json";
 
 
         OpenWQ_couplercalls_ref->InitialConfig(
@@ -134,9 +134,7 @@ int ClassWQ_OpenWQ::run_time_start(int numHRU, int simtime_summa[],
 
 int ClassWQ_OpenWQ::run_space(int simtime_summa[], int source, int ix_s, int iy_s, int iz_s,
         int recipient, int ix_r, int iy_r, int iz_r, double wflux_s2r, double wmass_source) {
-    std::cout << "C++ run_space" << std::endl;
-    std::cout << source << ", " << ix_s << ", " << iy_s << ", " << iz_s << ", " << recipient << ", " << ix_r 
-        << ", " << iy_r << ", " << iz_r << ", " << wflux_s2r << ", " << wmass_source << std::endl;
+   
 
     time_t simtime = convert_time(simtime_summa[0], simtime_summa[1], simtime_summa[2], simtime_summa[3], simtime_summa[4]);
     
@@ -167,6 +165,33 @@ int ClassWQ_OpenWQ::run_space(int simtime_summa[], int source, int ix_s, int iy_
         wmass_source);
 
     return 0;
+}
+
+int ClassWQ_OpenWQ::run_space_in(int simtime_summa[], int recipient, int ix_r, int iy_r, int iz_r, double wflux_s2r) {
+    
+    time_t simtime = convert_time(simtime_summa[0], simtime_summa[1], simtime_summa[2], simtime_summa[3], simtime_summa[4]);
+    std::string source_EWF_name;
+
+//     OpenWQ_couplercalls_ref->RunSpaceStep_IN(
+//         *OpenWQ_hostModelconfig_ref,
+//         *OpenWQ_json_ref,
+//         *OpenWQ_wqconfig_ref,
+//         *OpenWQ_units_ref,
+//         *OpenWQ_readjson_ref,
+//         *OpenWQ_vars_ref,
+//         *OpenWQ_initiate_ref,
+//         *OpenWQ_watertransp_ref,
+//         *OpenWQ_chem_ref,
+//         *OpenWQ_extwatflux_ss_ref,
+//         *OpenWQ_solver_ref,
+//         *OpenWQ_output_ref,
+//         simtime,
+//         source_EWF_name,
+//         recipient,
+//         ix_r,
+//         iy_r,
+//         iz_r,
+//         wflux_s2r);
 }
 
 int ClassWQ_OpenWQ::run_time_end(int simtime_summa[]) {

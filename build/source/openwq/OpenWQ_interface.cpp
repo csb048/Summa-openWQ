@@ -37,6 +37,7 @@ int openwq_run_space(ClassWQ_OpenWQ *openWQ, int simtime_summa[], int source, in
 
 int openwq_run_space_in(ClassWQ_OpenWQ *openWQ, int simtime_summa[], int recipient, int ix_r, int iy_r, int iz_r, double wflux_s2r) {
     
+    return openWQ->run_space_in(simtime_summa, recipient, ix_r, iy_r, iz_r, wflux_s2r);
 }
 
 
