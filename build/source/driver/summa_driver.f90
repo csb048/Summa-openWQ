@@ -124,8 +124,6 @@ do modelTimeStep=1,numtim
 
 end do  ! looping through time
 
-! call sleep(5)
-
 ! ! successful end
 call stop_program(0, 'finished simulation successfully.')
 end program summa_driver

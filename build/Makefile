@@ -2646,6 +2646,33 @@ source/openwq/OpenWQ_hydrolink.cpp.s:
 	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/source/openwq/OpenWQ_hydrolink.cpp.s
 .PHONY : source/openwq/OpenWQ_hydrolink.cpp.s
 
+source/openwq/OpenWQ_interface.o: source/openwq/OpenWQ_interface.cpp.o
+
+.PHONY : source/openwq/OpenWQ_interface.o
+
+# target to build an object file
+source/openwq/OpenWQ_interface.cpp.o:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/source/openwq/OpenWQ_interface.cpp.o
+.PHONY : source/openwq/OpenWQ_interface.cpp.o
+
+source/openwq/OpenWQ_interface.i: source/openwq/OpenWQ_interface.cpp.i
+
+.PHONY : source/openwq/OpenWQ_interface.i
+
+# target to preprocess a source file
+source/openwq/OpenWQ_interface.cpp.i:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/source/openwq/OpenWQ_interface.cpp.i
+.PHONY : source/openwq/OpenWQ_interface.cpp.i
+
+source/openwq/OpenWQ_interface.s: source/openwq/OpenWQ_interface.cpp.s
+
+.PHONY : source/openwq/OpenWQ_interface.s
+
+# target to generate assembly for a file
+source/openwq/OpenWQ_interface.cpp.s:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/source/openwq/OpenWQ_interface.cpp.s
+.PHONY : source/openwq/OpenWQ_interface.cpp.s
+
 source/openwq/openWQ.o: source/openwq/openWQ.f90.o
 
 .PHONY : source/openwq/openWQ.o
@@ -2727,6 +2754,33 @@ src/OpenWQ_couplercalls.cpp.s:
 	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_couplercalls.cpp.s
 .PHONY : src/OpenWQ_couplercalls.cpp.s
 
+src/OpenWQ_extwatflux_ss.o: src/OpenWQ_extwatflux_ss.cpp.o
+
+.PHONY : src/OpenWQ_extwatflux_ss.o
+
+# target to build an object file
+src/OpenWQ_extwatflux_ss.cpp.o:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_extwatflux_ss.cpp.o
+.PHONY : src/OpenWQ_extwatflux_ss.cpp.o
+
+src/OpenWQ_extwatflux_ss.i: src/OpenWQ_extwatflux_ss.cpp.i
+
+.PHONY : src/OpenWQ_extwatflux_ss.i
+
+# target to preprocess a source file
+src/OpenWQ_extwatflux_ss.cpp.i:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_extwatflux_ss.cpp.i
+.PHONY : src/OpenWQ_extwatflux_ss.cpp.i
+
+src/OpenWQ_extwatflux_ss.s: src/OpenWQ_extwatflux_ss.cpp.s
+
+.PHONY : src/OpenWQ_extwatflux_ss.s
+
+# target to generate assembly for a file
+src/OpenWQ_extwatflux_ss.cpp.s:
+	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_extwatflux_ss.cpp.s
+.PHONY : src/OpenWQ_extwatflux_ss.cpp.s
+
 src/OpenWQ_initiate.o: src/OpenWQ_initiate.cpp.o
 
 .PHONY : src/OpenWQ_initiate.o
@@ -2807,33 +2861,6 @@ src/OpenWQ_readjson.s: src/OpenWQ_readjson.cpp.s
 src/OpenWQ_readjson.cpp.s:
 	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_readjson.cpp.s
 .PHONY : src/OpenWQ_readjson.cpp.s
-
-src/OpenWQ_sinksource.o: src/OpenWQ_sinksource.cpp.o
-
-.PHONY : src/OpenWQ_sinksource.o
-
-# target to build an object file
-src/OpenWQ_sinksource.cpp.o:
-	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_sinksource.cpp.o
-.PHONY : src/OpenWQ_sinksource.cpp.o
-
-src/OpenWQ_sinksource.i: src/OpenWQ_sinksource.cpp.i
-
-.PHONY : src/OpenWQ_sinksource.i
-
-# target to preprocess a source file
-src/OpenWQ_sinksource.cpp.i:
-	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_sinksource.cpp.i
-.PHONY : src/OpenWQ_sinksource.cpp.i
-
-src/OpenWQ_sinksource.s: src/OpenWQ_sinksource.cpp.s
-
-.PHONY : src/OpenWQ_sinksource.s
-
-# target to generate assembly for a file
-src/OpenWQ_sinksource.cpp.s:
-	$(MAKE) -f CMakeFiles/openWQ.dir/build.make CMakeFiles/openWQ.dir/src/OpenWQ_sinksource.cpp.s
-.PHONY : src/OpenWQ_sinksource.cpp.s
 
 src/OpenWQ_solver.o: src/OpenWQ_solver.cpp.o
 
@@ -3204,6 +3231,9 @@ help:
 	@echo "... source/openwq/OpenWQ_hydrolink.o"
 	@echo "... source/openwq/OpenWQ_hydrolink.i"
 	@echo "... source/openwq/OpenWQ_hydrolink.s"
+	@echo "... source/openwq/OpenWQ_interface.o"
+	@echo "... source/openwq/OpenWQ_interface.i"
+	@echo "... source/openwq/OpenWQ_interface.s"
 	@echo "... source/openwq/openWQ.o"
 	@echo "... source/openwq/openWQ.i"
 	@echo "... source/openwq/openWQ.s"
@@ -3213,6 +3243,9 @@ help:
 	@echo "... src/OpenWQ_couplercalls.o"
 	@echo "... src/OpenWQ_couplercalls.i"
 	@echo "... src/OpenWQ_couplercalls.s"
+	@echo "... src/OpenWQ_extwatflux_ss.o"
+	@echo "... src/OpenWQ_extwatflux_ss.i"
+	@echo "... src/OpenWQ_extwatflux_ss.s"
 	@echo "... src/OpenWQ_initiate.o"
 	@echo "... src/OpenWQ_initiate.i"
 	@echo "... src/OpenWQ_initiate.s"
@@ -3222,9 +3255,6 @@ help:
 	@echo "... src/OpenWQ_readjson.o"
 	@echo "... src/OpenWQ_readjson.i"
 	@echo "... src/OpenWQ_readjson.s"
-	@echo "... src/OpenWQ_sinksource.o"
-	@echo "... src/OpenWQ_sinksource.i"
-	@echo "... src/OpenWQ_sinksource.s"
 	@echo "... src/OpenWQ_solver.o"
 	@echo "... src/OpenWQ_solver.i"
 	@echo "... src/OpenWQ_solver.s"

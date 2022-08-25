@@ -7,7 +7,7 @@ module summa_openWQ
   ! Subroutines
   public :: init_openwq
   public :: run_time_start
-  public :: run_space
+  public :: run_space_step
   public :: run_time_end
 
   ! Global Data for prognostic Variables of HRUs
@@ -50,11 +50,8 @@ subroutine init_openwq(err, message)
   call allocGlobal(prog_meta, progStruct_timestep_start, err, message) 
 end subroutine init_openwq
   
-
-
-
-  ! Subroutine that SUMMA calls to pass varialbes that need to go to
-  ! openWQ
+! Subroutine that SUMMA calls to pass varialbes that need to go to
+! openWQ - the copy of progStruct is done in here
 subroutine run_time_start(openWQ_obj, summa1_struc)
   USE summa_type, only:summa1_type_dec            ! master summa data type
   USE globalData, only:gru_struc
@@ -168,19 +165,19 @@ subroutine run_time_start(openWQ_obj, summa1_struc)
 end subroutine
 
 
-subroutine run_space(openwq_obj,ihru, timeVec, progStruct, fluxData)
-  USE var_lookup, only: iLookPROG  ! named variables for state variables
-  USE var_lookup, only: iLookTIME  ! named variables for time data structure
-  USE var_lookup, only: iLookFLUX  ! named varaibles for flux data
-  USE data_types, only: var_dlength
+subroutine run_space_step(timeStruct, fluxStruct)
+  USE var_lookup,   only: iLookPROG  ! named variables for state variables
+  USE var_lookup,   only: iLookTIME  ! named variables for time data structure
+  USE var_lookup,   only: iLookFLUX  ! named varaibles for flux data
+  USE globalData,   only: openWQ_obj
+  USE data_types,   only: var_dlength,var_i
+  ! USE summa_openWQ, only:progStruct_timestep_start
   implicit none
-  class(ClassWQ_OpenWQ), intent(in)    :: openWQ_obj
-  integer(i4b),          intent(in)    :: ihru
-  integer(i4b),          intent(in)    :: timeVec(:)          ! int vector   -- model time data
-  type(var_dlength),     intent(in)    :: progStruct            ! x%var(:)%dat -- model prognostic (state) variables
-  type(var_dlength),     intent(in)    :: fluxData            ! x%var(:)%dat -- model fluxes
 
-end subroutine run_space
+  type(var_i),             intent(in)    :: timeStruct          ! int vector   -- model time data
+  type(gru_hru_doubleVec), intent(in)    :: fluxStruct            ! x%var(:)%dat -- model fluxes
+
+end subroutine run_space_step
 
 
 subroutine run_time_end(openWQ_obj, summa1_struc)

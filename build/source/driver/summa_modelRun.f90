@@ -32,6 +32,9 @@ USE var_lookup,only:iLookDIAG        ! look-up values for local column model dia
 USE var_lookup,only:iLookINDEX       ! look-up values for local column index variables
 USE summa_util,only:handle_err
 
+! OpenWQ
+USE summa_openWQ,only:run_space_step
+
 ! safety: set private unless specified otherwise
 implicit none
 private
@@ -80,8 +83,8 @@ contains
  ! local variables: timing information
  integer*8                             :: openMPstart,openMPend ! time for the start of the parallelization section
  integer*8, allocatable                :: timeGRUstart(:)       ! time GRUs start
- real(rkind),  allocatable                :: timeGRUcompleted(:)   ! time required to complete each GRU
- real(rkind),  allocatable                :: timeGRU(:)            ! time spent on each GRU
+ real(rkind),  allocatable             :: timeGRUcompleted(:)   ! time required to complete each GRU
+ real(rkind),  allocatable             :: timeGRU(:)            ! time spent on each GRU
  ! ---------------------------------------------------------------------------------------
  ! associate to elements in the data structure
  summaVars: associate(&
@@ -263,7 +266,6 @@ contains
 
   ! check errors
   call handle_err(err, cmessage)
-
   !----- save timing information ------------------------------------------------
   !$omp critical(saveTiming)
   ! save timing information
@@ -273,6 +275,17 @@ contains
   !$omp end critical(saveTiming)
 
  end do  ! (looping through GRUs)
+
+ ! ************************************************************************************************************
+ ! OpenWQ
+ ! ************************************************************************************************************
+ 
+ call run_space_step(timeStruct, fluxStruct) 
+ 
+ ! ************************************************************************************************************
+ ! OpenWQ
+ ! ************************************************************************************************************
+
  !$omp end do
  end associate summaVars2
  !$omp end parallel
