@@ -60,7 +60,6 @@ USE mDecisions_module,only:&           ! look-up values for the choice of method
 
 ! OpenWQ Coupling
 USE globalData,only:openWQ_obj
-USE summa_openWQ,only:run_space
 
 ! -----------------------------------------------------------------------------------------------------------------------------------
 ! -----------------------------------------------------------------------------------------------------------------------------------
@@ -201,12 +200,6 @@ contains
                   ! error control
                   err,cmessage)                      ! intent(out):   error control
   if(err/=0)then; err=20; message=trim(message)//trim(cmessage); return; endif
-
-  ! ------------------------------OPENWQ---------------------------------
-  call run_space(openwq_obj,iHRU,timeVec,progHRU%hru(iHRU),fluxHRU%hru(iHRU))
-  ! ------------------------------OPENWQ---------------------------------
-
-
 
   ! update layer numbers that could be changed in run_oneHRU -- needed for model output
   gruInfo%hruInfo(iHRU)%nSnow = nSnow

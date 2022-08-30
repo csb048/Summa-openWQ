@@ -47,12 +47,10 @@ USE globalData,only:gru_struc                               ! gru-hru mapping st
 
 ! OpenWQ coupling 
 USE globalData,only:openWQ_obj
+USE summa_openWQ,only:init_openwq
 USE summa_openWQ,only:run_time_start
 USE summa_openWQ,only:run_time_end
-USE summa_openWQ,only:progStruct_timestep_start
-USE openWQ
-USE allocspace_module,only:allocGlobal                      ! module to allocate space for global data structures
-USE globalData,only:prog_meta
+
 USE, intrinsic :: iso_c_binding
 implicit none
 
@@ -68,10 +66,8 @@ integer(i4b)                       :: modelTimeStep              ! index of mode
 ! error control
 integer(i4b)                       :: err=0                      ! error code
 character(len=1024)                :: message=''                 ! error message
-integer(i4b)                       :: hruCount
 
-
-! *****************************************************************************
+!*****************************************************************************
 ! * preliminaries
 ! *****************************************************************************
 ! allocate space for the master summa structure
@@ -94,19 +90,16 @@ call handle_err(err, message)
 call summa_readRestart(summa1_struc(n), err, message)
 call handle_err(err, message)
 
-! ---------------------OPENWQ------------------------------------
-hruCount = sum( gru_struc(:)%hruCount )
-openwq_obj = ClassWQ_OpenWQ(hruCount) ! initalize openWQ object
-err=openwq_obj%decl()  ! intialize openWQ
-call allocGlobal(prog_meta, progStruct_timestep_start, err, message) ! initalize structure to hold state information
+! Init openWQ object
+call init_openwq(err, message)
 if(err/=0) call stop_program(1, 'problem allocating openWQ progStruct for saving state information')
-! ---------------------OPENWQ------------------------------------
+
 
 ! *****************************************************************************
-! * model simulation
-! *****************************************************************************
-! loop through time
-do modelTimeStep=1,3
+! ! * model simulation
+! ! *****************************************************************************
+! ! loop through time
+do modelTimeStep=1,numtim
 
  ! read model forcing data
  call summa_readForcing(modelTimeStep, summa1_struc(n), err, message)
@@ -126,11 +119,11 @@ do modelTimeStep=1,3
  call summa_writeOutputFiles(modelTimeStep, summa1_struc(n), err, message)
  call handle_err(err, message)
 
- ! *** OPENWQ Run_Time_End ***
+!  *** OPENWQ Run_Time_End ***
  call run_time_end(openwq_obj, summa1_struc(n))
 
 end do  ! looping through time
 
-! successful end
+! ! successful end
 call stop_program(0, 'finished simulation successfully.')
 end program summa_driver

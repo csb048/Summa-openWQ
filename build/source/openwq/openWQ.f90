@@ -16,6 +16,7 @@ module openwq
     procedure :: decl => openWQ_init
     procedure :: run_time_start => openWQ_run_time_start
     procedure :: run_space => openWQ_run_space
+    procedure :: run_space_in => openWQ_run_space_in
     procedure :: run_time_end => openWQ_run_time_end
 
  end type
@@ -24,19 +25,26 @@ module openwq
     procedure create_openwq
  end interface
  contains
-    function create_openwq(num)
+    function create_openwq()
         implicit none
         type(ClassWQ_OpenWQ) :: create_openwq
-        integer, intent(in) :: num
-        create_openwq%ptr = create_openwq_c(num)
+        create_openwq%ptr = create_openwq_c()
     end function
 
     ! supposed to be decl but needed to openWQ_decl in the interface file
     ! returns integer of either a failure(-1) or success(0)
-   integer function openWQ_init(this)
+   integer function openWQ_init(this,num_hru,num_layers_canopy, num_layers_matricHead, &
+      num_layers_aquifer, num_layers_volFracWat, y_direction)
       implicit none
       class(ClassWQ_OpenWQ) :: this
-      openWQ_init = openwq_decl_c(this%ptr)
+      integer(i4b), intent(in) :: num_hru
+      integer(i4b), intent(in) :: num_layers_canopy
+      integer(i4b), intent(in) :: num_layers_matricHead
+      integer(i4b), intent(in) :: num_layers_aquifer
+      integer(i4b), intent(in) :: num_layers_volFracWat
+      integer(i4b), intent(in) :: y_direction
+      openWQ_init = openwq_decl_c(this%ptr,num_hru,num_layers_canopy, num_layers_matricHead, &
+      num_layers_aquifer, num_layers_volFracWat, y_direction)
     end function
 !  ! Globaly accessible variable
 
@@ -73,6 +81,18 @@ module openwq
       real(rkind),  intent(in)   :: wflux_s2r
       real(rkind),  intent(in)   :: wmass_source
       openWQ_run_space = openwq_run_space_c(this%ptr,simtime,source,ix_s,iy_s,iz_s,recipient,ix_r,iy_r,iz_r,wflux_s2r,wmass_source)
+   end function
+
+   integer function openWQ_run_space_in(this,simtime,recipient,ix_r,iy_r,iz_r,wflux_s2r)
+      implicit none
+      class(ClassWQ_OpenWQ)      :: this
+      integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
+      integer(i4b), intent(in)   :: recipient
+      integer(i4b), intent(in)   :: ix_r
+      integer(i4b), intent(in)   :: iy_r
+      integer(i4b), intent(in)   :: iz_r
+      real(rkind),  intent(in)   :: wflux_s2r
+      openWQ_run_space_in = openwq_run_space_in_c(this%ptr,simtime,recipient,ix_r,iy_r,ix_r,wflux_s2r)
    end function
 
 
