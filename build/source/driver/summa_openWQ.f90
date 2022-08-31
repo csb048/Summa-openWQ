@@ -34,15 +34,28 @@ subroutine init_openwq(err, message)
   integer(i4b)                                    :: num_layers_aquifer
   integer(i4b)                                    :: num_layers_volFracWat
   integer(i4b)                                    :: y_direction
+  integer(i4b)                                    :: iGRU, iHRU          ! indices of GRUs and HRUs
 
   openwq_obj = ClassWQ_OpenWQ() ! initalize openWQ object
 
+  ! nx -> num of HRUs)
   hruCount = sum( gru_struc(:)%hruCount )
-  num_layers_canopy = 1 ! To-do: FInd this value
-  num_layers_matricHead = 1 ! To-do: FInd this value
-  num_layers_volFracWat = 1! To-do: FInd this value
-  num_layers_aquifer = 1 ! To-do: FInd this value
+
+  ! ny -> this seems to be fixes because SUMMA is based on the HRU concept, so grids are serialized)
   y_direction = 1
+
+  ! Openwq nz (number of layers)
+  num_layers_canopy = 1       ! Cannopy has only 1 layer
+  num_layers_aquifer = 1      ! GW has only 1 layer
+  num_layers_matricHead = 0   ! Soil may have multiple layers, and gru-hrus may have different values
+  num_layers_volFracWat = 0   ! Soil has multiple layers, and gru-hrus may have different values
+  do iGRU = 1, size(gru_struc(:))
+    do iHRU = 1, gru_struc(iGRU)%hruCount
+    num_layers_matricHead = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, num_layers_matricHead )
+    num_layers_volFracWat = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, num_layers_volFracWat )
+    enddo
+  enddo
+
   err=openwq_obj%decl(hruCount, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat, y_direction)  ! intialize openWQ
   
   ! Create copy of state information, needed for passing to openWQ with fluxes that require
