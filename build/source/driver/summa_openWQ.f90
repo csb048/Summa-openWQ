@@ -197,8 +197,7 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, maxNumLayers_snow, maxNum
           ! scalarSWE [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
           swe_vol(openWQArrayIndex, ilay) = &
             progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarSWE)%dat(ilay) &
-            * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea) &
-            / 1000
+            * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea) / 1000
 
         enddo
 
