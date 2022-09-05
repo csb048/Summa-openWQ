@@ -18,19 +18,19 @@ void delete_openwq(CLASSWQ_OPENWQ* openWQ) {
 int openwq_decl(
     ClassWQ_OpenWQ *openWQ, 
     int hruCount,              // num HRU
-    int num_layers_canopy,      // num layers of canopy (fixed to 1)
-    int num_layers_snow,        // num layers of snow (fixed to max of 5 because it varies)
-    int num_layers_soil,        // num layers of snoil (variable)
-    int num_layers_aquifer,     // num layers of aquifer (fixed to 1)
-    int num_Ylayers){            // num of layers in y-dir (set to 1 because not used in summa)
+    int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
+    int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
+    int nSoil_2openwq,        // num layers of snoil (variable)
+    int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
+    int nYdirec_2openwq){            // num of layers in y-dir (set to 1 because not used in summa)
 
     return openWQ->decl(
         hruCount, 
-        num_layers_canopy, 
-        num_layers_snow, 
-        num_layers_soil, 
-        num_layers_aquifer, 
-        num_Ylayers);
+        nCanopy_2openwq, 
+        nSnow_2openwq, 
+        nSoil_2openwq, 
+        nAquifer_2openwq, 
+        nYdirec_2openwq);
 
 }
 

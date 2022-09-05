@@ -63,11 +63,11 @@ class ClassWQ_OpenWQ
 
     int decl(
         int num_HRU,                // num HRU
-        int num_layers_canopy,      // num layers of canopy (fixed to 1)
-        int num_layers_snow,        // num layers of snow (fixed to max of 5 because it varies)
-        int num_layers_soil,        // num layers of snoil (variable)
-        int num_layers_aquifer,     // num layers of aquifer (fixed to 1)
-        int num_Ylayers);           // num of layers in y-dir (set to 1 because not used in summa)
+        int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
+        int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
+        int nSoil_2openwq,        // num layers of snoil (variable)
+        int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
+        int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 
     int run_time_start(int numHRU, int maxNumLayers_snow, int maxNumLayers_soil, int simtime_summa[],
         double soilMoisture[], double soilTemp[], double airTemp[],

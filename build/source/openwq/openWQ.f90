@@ -36,30 +36,30 @@ module openwq
    integer function openWQ_init( &
       this,                      & ! openwq object
       num_hru,                   & ! num HRU
-      num_layers_canopy,         & ! num layers of canopy (fixed to 1)
-      num_layers_snow,           & ! num layers of snow (fixed to max of 5 because it varies)
-      num_layers_soil,           & ! num layers of snoil (variable)
-      num_layers_aquifer,        & ! num layers of aquifer (fixed to 1)
-      num_Ylayers)                 ! num of layers in y-dir (set to 1 because not used in summa)
+      nCanopy_2openwq,         & ! num layers of canopy (fixed to 1)
+      nSnow_2openwq,           & ! num layers of snow (fixed to max of 5 because it varies)
+      nSoil_2openwq,           & ! num layers of snoil (variable)
+      nAquifer_2openwq,        & ! num layers of aquifer (fixed to 1)
+      nYdirec_2openwq)                 ! num of layers in y-dir (set to 1 because not used in summa)
       
       implicit none
       class(ClassWQ_OpenWQ) :: this
       integer(i4b), intent(in) :: num_hru
-      integer(i4b), intent(in) :: num_layers_canopy
-      integer(i4b), intent(in) :: num_layers_snow
-      integer(i4b), intent(in) :: num_layers_soil
-      integer(i4b), intent(in) :: num_layers_aquifer
+      integer(i4b), intent(in) :: nCanopy_2openwq
+      integer(i4b), intent(in) :: nSnow_2openwq
+      integer(i4b), intent(in) :: nSoil_2openwq
+      integer(i4b), intent(in) :: nAquifer_2openwq
       
-      integer(i4b), intent(in) :: num_Ylayers
+      integer(i4b), intent(in) :: nYdirec_2openwq
 
       openWQ_init = openwq_decl_c(  &
          this%ptr,                  & ! openwq object
          num_hru,                   & ! num HRU
-         num_layers_canopy,         & ! num layers of canopy (fixed to 1)
-         num_layers_snow,           & ! num layers of snow (fixed to max of 5 because it varies)
-         num_layers_soil,           & ! num layers of snoil (variable)
-         num_layers_aquifer,        & ! num layers of aquifer (fixed to 1)
-         num_Ylayers)                 ! num of layers in y-dir (set to 1 because not used in summa)
+         nCanopy_2openwq,         & ! num layers of canopy (fixed to 1)
+         nSnow_2openwq,           & ! num layers of snow (fixed to max of 5 because it varies)
+         nSoil_2openwq,           & ! num layers of snoil (variable)
+         nAquifer_2openwq,        & ! num layers of aquifer (fixed to 1)
+         nYdirec_2openwq)                 ! num of layers in y-dir (set to 1 because not used in summa)
 
     end function
 !  ! Globaly accessible variable

@@ -20,6 +20,7 @@ module summa_openWQ
   ! Subroutine to initalize the openWQ object
   ! putting it here to keep the SUMMA_Driver clean
 subroutine init_openwq(err, message)
+
   USE globalData,only:openWQ_obj
   USE globalData,only:gru_struc                               ! gru-hru mapping structures
   USE globalData,only:prog_meta
@@ -30,11 +31,11 @@ subroutine init_openwq(err, message)
   integer(i4b),intent(inout)                      :: err
   character(*),intent(inout)                      :: message         ! error messgage
   integer(i4b)                                    :: hruCount
-  integer(i4b)                                    :: num_layers_canopy
-  integer(i4b)                                    :: num_layers_snow
-  integer(i4b)                                    :: num_layers_soil
-  integer(i4b)                                    :: num_layers_aquifer
-  integer(i4b)                                    :: num_Ylayers     ! number of layers in the y-dir (not used in summa)
+  integer(i4b)                                    :: nCanopy_2openwq
+  integer(i4b)                                    :: nSnow_2openwq
+  integer(i4b)                                    :: nSoil_2openwq
+  integer(i4b)                                    :: nAquifer_2openwq
+  integer(i4b)                                    :: nYdirec_2openwq     ! number of layers in the y-dir (not used in summa)
   integer(i4b)                                    :: iGRU, iHRU          ! indices of GRUs and HRUs
 
   openwq_obj = ClassWQ_OpenWQ() ! initalize openWQ object
@@ -43,30 +44,29 @@ subroutine init_openwq(err, message)
   hruCount = sum( gru_struc(:)%hruCount )
 
   ! ny -> this seems to be fixes because SUMMA is based on the HRU concept, so grids are serialized)
-  num_Ylayers = 1
+  nYdirec_2openwq = 1
 
   ! Openwq nz (number of layers)
-  num_layers_canopy = 1       ! Cannopy has only 1 layer
-  num_layers_aquifer = 1      ! GW has only 1 layer
-  num_layers_soil = 0   ! Soil may have multiple layers, and gru-hrus may have different values
-  num_layers_snow = 0   ! Snow has multiple layers, and gru-hrus may have different values (up to 5 layers)
+  nCanopy_2openwq = 1       ! Cannopy has only 1 layer
+  nAquifer_2openwq = 1      ! GW has only 1 layer
+  nSoil_2openwq = 0   ! Soil may have multiple layers, and gru-hrus may have different values
+  nSnow_2openwq = 0   ! Snow has multiple layers, and gru-hrus may have different values (up to 5 layers)
   do iGRU = 1, size(gru_struc(:))
     do iHRU = 1, gru_struc(iGRU)%hruCount
-      num_layers_soil = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, num_layers_soil )
+      nSoil_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, nSoil_2openwq )
       !num_layers_volFracWat = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, num_layers_volFracWat )
     enddo
   enddo
-
-  num_layers_snow = 5 ! maximum number of snow layers
+  nSnow_2openwq = 5 ! maximum number of snow layers
 
   ! intialize openWQ
   err=openwq_obj%decl(    &
     hruCount,             & ! num HRU
-    num_layers_canopy,    & ! num layers of canopy (fixed to 1)
-    num_layers_snow,      & ! num layers of snow (fixed to max of 5 because it varies)
-    num_layers_soil,      & ! num layers of snoil (variable)
-    num_layers_aquifer,   & ! num layers of aquifer (fixed to 1)
-    num_Ylayers)             ! num of layers in y-dir (set to 1 because not used in summa)
+    nCanopy_2openwq,    & ! num layers of canopy (fixed to 1)
+    nSnow_2openwq,      & ! num layers of snow (fixed to max of 5 because it varies)
+    nSoil_2openwq,      & ! num layers of snoil (variable)
+    nAquifer_2openwq,   & ! num layers of aquifer (fixed to 1)
+    nYdirec_2openwq)             ! num of layers in y-dir (set to 1 because not used in summa)
   
   ! Create copy of state information, needed for passing to openWQ with fluxes that require
   ! the previous time_steps volume
@@ -76,7 +76,10 @@ end subroutine init_openwq
   
 ! Subroutine that SUMMA calls to pass varialbes that need to go to
 ! openWQ - the copy of progStruct is done in here
-subroutine run_time_start(openWQ_obj, summa1_struc)
+subroutine run_time_start( &
+    openWQ_obj,   & ! passing openwq object
+    summa1_struc)
+
   USE summa_type, only: summa1_type_dec            ! master summa data type
   USE globalData, only: gru_struc
 

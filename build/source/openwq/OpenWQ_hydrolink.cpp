@@ -39,11 +39,11 @@ time_t ClassWQ_OpenWQ::convert_time(int year, int month, int day, int hour, int 
 
 int ClassWQ_OpenWQ::decl(
     int num_HRU,                // num HRU
-    int num_layers_canopy,      // num layers of canopy (fixed to 1)
-    int num_layers_snow,        // num layers of snow (fixed to max of 5 because it varies)
-    int num_layers_soil,        // num layers of snoil (variable)
-    int num_layers_aquifer,     // num layers of aquifer (fixed to 1)
-    int num_Ylayers){           // num of layers in y-dir (set to 1 because not used in summa)
+    int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
+    int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
+    int nSoil_2openwq,        // num layers of snoil (variable)
+    int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
+    int nYdirec_2openwq){           // num of layers in y-dir (set to 1 because not used in summa)
     
     OpenWQ_hostModelconfig_ref = new OpenWQ_hostModelconfig();
     OpenWQ_couplercalls_ref = new OpenWQ_couplercalls();
@@ -64,23 +64,23 @@ int ClassWQ_OpenWQ::decl(
 
         // Compartment names
         // Make sure to use capital letters for compartment names
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",num_HRU,num_Ylayers,num_layers_canopy));      // Canopy
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERVOLFRACWAT",num_HRU,num_Ylayers,num_layers_snow)); // SWE
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"MLAYERMATRICHEAD",num_HRU,num_Ylayers,num_layers_soil)); // Soil
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"SCALARAQUIFER",num_HRU,num_Ylayers,num_layers_aquifer));       // GW
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",num_HRU,nYdirec_2openwq,nCanopy_2openwq));      // Canopy
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERVOLFRACWAT",num_HRU,nYdirec_2openwq,nSnow_2openwq)); // SWE
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"MLAYERMATRICHEAD",num_HRU,nYdirec_2openwq,nSoil_2openwq)); // Soil
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"SCALARAQUIFER",num_HRU,nYdirec_2openwq,nAquifer_2openwq));       // GW
         
 
         OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
 
         // External fluxes
         // Make sure to use capital letters for external fluxes
-        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP",num_HRU,num_Ylayers,1));
+        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP",num_HRU,nYdirec_2openwq,1));
 
         // Dependencies
         // to expand BGC modelling options
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",num_HRU,num_Ylayers,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair",num_HRU,num_Ylayers,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil",num_HRU,num_Ylayers,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",num_HRU,nYdirec_2openwq,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair",num_HRU,nYdirec_2openwq,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil",num_HRU,nYdirec_2openwq,1));
 
         // Master Json
         OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
