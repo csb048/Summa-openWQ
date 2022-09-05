@@ -35,12 +35,12 @@ extern "C" {
         int nSnow_2openwq, 
         int nSoil_2openwq,
         int simtime_summa[], 
-        double soilMoisture[], 
-        double soilTemp[], 
-        double airTemp[], 
-        double SWE_vol[], 
+        double soilMoist_depVar[], 
+        double soilTemp_depVar[], 
+        double airTemp_depVar[], 
+        double sweWatVol_stateVar[], 
         double canopyWat[], 
-        double matricHead_vol[], 
+        double soilWatVol_stateVar[], 
         double aquiferStorage[]);
 
     // OpenWQ run functions, this function decides which C++ code to call

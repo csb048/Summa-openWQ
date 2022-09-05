@@ -110,18 +110,18 @@ int ClassWQ_OpenWQ::decl(
     return 0;
 }
 
-// SoilMoisture does not have a value - it is passed as 0
+// soilMoist_depVar does not have a value - it is passed as 0
 int ClassWQ_OpenWQ::run_time_start(
     int numHRU, 
     int nSnow_2openwq, 
     int nSoil_2openwq,
     int simtime_summa[], 
-    double soilMoisture[], 
-    double soilTemp[], 
-    double airTemp[],
-    double SWE_vol[], 
+    double soilMoist_depVar[], 
+    double soilTemp_depVar[], 
+    double airTemp_depVar[],
+    double sweWatVol_stateVar[], 
     double canopyWat[], 
-    double matricHead_vol[], 
+    double soilWatVol_stateVar[], 
     double aquiferStorage[]) {
 
     time_t simtime = convert_time(simtime_summa[0], 
@@ -132,13 +132,13 @@ int ClassWQ_OpenWQ::run_time_start(
 
     for (int i = 0; i < numHRU; i++) {
         // Updating Chemistry dependencies
-        (*OpenWQ_hostModelconfig_ref->dependVar)[0](i,0,0) = soilMoisture[i]; 
-        (*OpenWQ_hostModelconfig_ref->dependVar)[1](i,0,0) = airTemp[i];
-        (*OpenWQ_hostModelconfig_ref->dependVar)[2](i,0,0) = soilTemp[i];
+        (*OpenWQ_hostModelconfig_ref->dependVar)[0](i,0,0) = soilMoist_depVar[i]; 
+        (*OpenWQ_hostModelconfig_ref->dependVar)[1](i,0,0) = airTemp_depVar[i];
+        (*OpenWQ_hostModelconfig_ref->dependVar)[2](i,0,0) = soilTemp_depVar[i];
         // Updating water volumes
-        //(*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = SWE_vol[i];
+        //(*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = sweWatVol_stateVar[i];
         (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = canopyWat[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = matricHead_vol[i];
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = soilWatVol_stateVar[i];
         (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[2](i,0,0) = aquiferStorage[i];
     }
 
@@ -261,7 +261,7 @@ int ClassWQ_OpenWQ::run_time_end(
         *OpenWQ_solver_ref,
         *OpenWQ_output_ref,
         simtime);
-        
+
     return 0;
 }
 

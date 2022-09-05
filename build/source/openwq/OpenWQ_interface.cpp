@@ -41,26 +41,26 @@ int openwq_run_time_start(
     int nSnow_2openwq, 
     int nSoil_2openwq, 
     int simtime_summa[], 
-    double soilMoisture[], 
-    double soilTemp[], 
-    double airTemp[],
-    double SWE_vol[], 
-    double canopyWat_vol[], 
-    double matricHead_vol[], 
-    double aquiferStorage_vol[]) {
+    double soilMoist_depVar[], 
+    double soilTemp_depVar[], 
+    double airTemp_depVar[],
+    double sweWatVol_stateVar[], 
+    double canopyWatVol_stateVar[], 
+    double soilWatVol_stateVar[], 
+    double aquiferWatVol_stateVar[]) {
     
     return openWQ->run_time_start(
         numHRU, 
         nSnow_2openwq, 
         nSoil_2openwq, 
         simtime_summa, 
-        soilMoisture, 
-        soilTemp, 
-        airTemp, 
-        SWE_vol, 
-        canopyWat_vol, 
-        matricHead_vol, 
-        aquiferStorage_vol);
+        soilMoist_depVar, 
+        soilTemp_depVar, 
+        airTemp_depVar, 
+        sweWatVol_stateVar, 
+        canopyWatVol_stateVar, 
+        soilWatVol_stateVar, 
+        aquiferWatVol_stateVar);
 }
 
 

@@ -62,10 +62,10 @@ subroutine init_openwq(err, message)
   ! intialize openWQ
   err=openwq_obj%decl(    &
     hruCount,             & ! num HRU
-    nCanopy_2openwq,    & ! num layers of canopy (fixed to 1)
-    nSnow_2openwq,      & ! num layers of snow (fixed to max of 5 because it varies)
-    nSoil_2openwq,      & ! num layers of snoil (variable)
-    nAquifer_2openwq,   & ! num layers of aquifer (fixed to 1)
+    nCanopy_2openwq,      & ! num layers of canopy (fixed to 1)
+    nSnow_2openwq,        & ! num layers of snow (fixed to max of 5 because it varies)
+    nSoil_2openwq,        & ! num layers of snoil (variable)
+    nAquifer_2openwq,     & ! num layers of aquifer (fixed to 1)
     nYdirec_2openwq)             ! num of layers in y-dir (set to 1 because not used in summa)
   
   ! Create copy of state information, needed for passing to openWQ with fluxes that require
@@ -76,8 +76,8 @@ end subroutine init_openwq
   
 ! Subroutine that SUMMA calls to pass varialbes that need to go to
 ! openWQ - the copy of progStruct is done in here
-subroutine run_time_start( &
-    openWQ_obj,   & ! passing openwq object
+subroutine run_time_start(  &
+    openWQ_obj,             & ! passing openwq object
     summa1_struc)
 
   USE summa_type, only: summa1_type_dec            ! master summa data type
@@ -107,11 +107,20 @@ subroutine run_time_start( &
     enddo
   enddo
 
-  call run_time_start_go(openwq_obj, summa1_struc, nSnow_2openwq, nSoil_2openwq)
+  call run_time_start_go( &
+    openwq_obj,           &
+    summa1_struc,         &
+    nSnow_2openwq,        &
+    nSoil_2openwq)
 
 end subroutine
 
-subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2openwq)
+subroutine run_time_start_go( &
+    openWQ_obj,               &
+    summa1_struc,             &
+    nSnow_2openwq,            &
+    nSoil_2openwq)
+
   USE summa_type, only: summa1_type_dec            ! master summa data type
   USE globalData, only: gru_struc
   USE var_lookup, only: iLookPROG  ! named variables for state variables
@@ -133,13 +142,13 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2ope
   integer(i4b)                        :: iDat
   integer(i4b)                        :: openWQArrayIndex
   integer(i4b)                        :: simtime(5) ! 5 time values yy-mm-dd-hh-min
-  real(rkind)                         :: airTemp(sum(gru_struc(:)%hruCount))
-  real(rkind)                         :: canopyWat_vol(sum(gru_struc(:)%hruCount))
-  real(rkind)                         :: aquiferStorage_vol(sum(gru_struc(:)%hruCount))
-  real(rkind)                         :: swe_vol(sum(gru_struc(:)%hruCount), nSnow_2openwq)
-  real(rkind)                         :: matricHead_vol(sum(gru_struc(:)%hruCount), nSoil_2openwq)
-  real(rkind)                         :: soilTemp(sum(gru_struc(:)%hruCount), nSoil_2openwq)
-  real(rkind)                         :: soilMoisture(sum(gru_struc(:)%hruCount), nSoil_2openwq)
+  real(rkind)                         :: airTemp_depVar(sum(gru_struc(:)%hruCount))
+  real(rkind)                         :: canopyWatVol_stateVar(sum(gru_struc(:)%hruCount))
+  real(rkind)                         :: aquiferWatVol_stateVar(sum(gru_struc(:)%hruCount))
+  real(rkind)                         :: sweWatVol_stateVar(sum(gru_struc(:)%hruCount), nSnow_2openwq)
+  real(rkind)                         :: soilWatVol_stateVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
+  real(rkind)                         :: soilTemp_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
+  real(rkind)                         :: soilMoist_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   integer(i4b)                        :: err
 
   summaVars: associate(&
@@ -162,7 +171,7 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2ope
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         ! Update scaler dependencies
         ! Tair (Summa in K) -> convert to degrees C for Openwq
-        airTemp(openWQArrayIndex) = &
+        airTemp_depVar(openWQArrayIndex) = &
           progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1) &
           - 273.15
 
@@ -171,13 +180,13 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2ope
         ! Vegetation
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarCanopyWat [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
-        canopyWat_vol(openWQArrayIndex) = &
+        canopyWatVol_stateVar(openWQArrayIndex) = &
           progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1) &
           * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea) / 1000
         ! Aquifer
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarAquiferStorage [m], so needs to  to multiply by hru area [m2] only
-        aquiferStorage_vol(openWQArrayIndex) = &
+        aquiferWatVol_stateVar(openWQArrayIndex) = &
           progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
           * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
 
@@ -186,16 +195,16 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2ope
           
           ! Tsoil
           ! (Summa in K) -> convert to degrees C for Openwq
-          soilTemp(openWQArrayIndex, ilay) = &
+          soilTemp_depVar(openWQArrayIndex, ilay) = &
             progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay) &
             - 273.15
 
-          soilMoisture(openWQArrayIndex, ilay) = 0     ! TODO: Find the value for this varaibles
+          soilMoist_depVar(openWQArrayIndex, ilay) = 0     ! TODO: Find the value for this varaibles
 
           ! Soil
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! mLayerMatricHead [m], so needs to  to multiply by hru area [m2]
-          matricHead_vol(openWQArrayIndex, ilay) = &
+          soilWatVol_stateVar(openWQArrayIndex, ilay) = &
             progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerMatricHead)%dat(ilay) &
             * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
     
@@ -207,7 +216,7 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2ope
           ! Snow
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! scalarSWE [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
-          swe_vol(openWQArrayIndex, ilay) = &
+          sweWatVol_stateVar(openWQArrayIndex, ilay) = &
             progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarSWE)%dat(ilay) &
             * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea) / 1000
 
@@ -238,16 +247,16 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2ope
   
   err=openWQ_obj%run_time_start(&
         sum(gru_struc(:)%hruCount),             & ! total HRUs
-        nSnow_2openwq,                      &
-        nSoil_2openwq,                      &
+        nSnow_2openwq,                          &
+        nSoil_2openwq,                          &
         simtime,                                &
-        soilMoisture,                           &                    
-        soilTemp,                               &
-        airTemp,                                &
-        swe_vol,                                &
-        canopyWat_vol,                          &
-        matricHead_vol,                         &
-        aquiferStorage_vol)
+        soilMoist_depVar,                       &                    
+        soilTemp_depVar,                        &
+        airTemp_depVar,                         &
+        sweWatVol_stateVar,                     &
+        canopyWatVol_stateVar,                  &
+        soilWatVol_stateVar,                    &
+        aquiferWatVol_stateVar)
 
   ! copy progStruct values to progStruct_timestep_start
 
@@ -256,7 +265,11 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2ope
 end subroutine
 
 
-subroutine run_space_step(timeStruct, fluxStruct, nGRU)
+subroutine run_space_step(  &
+    timeStruct,             &
+    fluxStruct,             &
+    nGRU)
+
   USE var_lookup,   only: iLookPROG  ! named variables for state variables
   USE var_lookup,   only: iLookTIME  ! named variables for time data structure
   USE var_lookup,   only: iLookFLUX  ! named varaibles for flux data
@@ -308,16 +321,17 @@ subroutine run_space_step(timeStruct, fluxStruct, nGRU)
       iz_s = 1
       iy_r = 1
       iz_r = 1
-      err=openwq_obj%run_space(simtime, &
-                           scalarCanopyWat, hru_index, iy_s, iz_s, &
-                           mLayerVolFracWat, hru_index, iy_r, iz_r, &
-                           scalarCanopySnowUnloading, &
+      
+      err=openwq_obj%run_space(simtime,                                                                         &
+                           scalarCanopyWat, hru_index, iy_s, iz_s,                                              &
+                           mLayerVolFracWat, hru_index, iy_r, iz_r,                                             &
+                           scalarCanopySnowUnloading,                                                           &
                            progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1))
       
-      err=openwq_obj%run_space(simtime, &
-                           scalarCanopyWat, hru_index, iy_s, iz_s, &
-                           mLayerVolFracWat, hru_index, iy_r, iz_r, &
-                           scalarCanopyLiqDrainage, &
+      err=openwq_obj%run_space(simtime,                                                                         &
+                           scalarCanopyWat, hru_index, iy_s, iz_s,                                              &
+                           mLayerVolFracWat, hru_index, iy_r, iz_r,                                             &
+                           scalarCanopyLiqDrainage,                                                             &
                            progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1))
 
 
@@ -331,7 +345,10 @@ subroutine run_space_step(timeStruct, fluxStruct, nGRU)
 end subroutine run_space_step
 
 
-subroutine run_time_end(openWQ_obj, summa1_struc)
+subroutine run_time_end( &
+  openWQ_obj, &
+  summa1_struc)
+
   USE summa_type, only:summa1_type_dec            ! master summa data type
   
   USE var_lookup, only: iLookTIME  ! named variables for time data structure

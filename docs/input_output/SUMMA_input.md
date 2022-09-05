@@ -205,7 +205,7 @@ time | time | double | [see below](#forcing_file_time_units) | time since time r
 pptrate  | time, hru | double | kg m-2 s-1 | Precipitation rate | |
 SWRadAtm | time, hru | double | W m-2 | Downward shortwave radiation at the [upper boundary](#forcing_file_upper_boundary) | |
 LWRadAtm | time, hru | double | W m-2 | Downward longwave radiation at the [upper boundary](#forcing_file_upper_boundary) | |
-airtemp  | time, hru | double | K | Air temperature at the [measurement height](#forcing_file_measurement_height) | |
+airTemp_depVar  | time, hru | double | K | Air temperature at the [measurement height](#forcing_file_measurement_height) | |
 windspd  | time, hru | double | m s-1 | Wind speed at the [measurement height](#forcing_file_measurement_height) | |
 airpres  | time, hru | double | Pa | Air pressure at the the [measurement height](#forcing_file_measurement_height)| |
 spechum  | time, hru | double | g g-1 | Specific humidity at the [measurement height](#forcing_file_measurement_height) | |
@@ -241,7 +241,7 @@ The restart file does not have a time dimension, since it represents a specific 
 | nSnow | scalarv, hru | int | - |  Number of snow layers | |
 | scalarCanopyIce | scalarv, hru | double | kg m-2 | Mass of ice on the vegetation canopy | |
 | scalarCanopyLiq | scalarv, hru | double | kg m-2 | Mass of liquid water on the vegetation canopy | |
-| scalarCanairTemp | scalarv, hru | double | Pa | Temperature of the canopy air space | |
+| scalarCanairTemp_depVar | scalarv, hru | double | Pa | Temperature of the canopy air space | |
 | scalarCanopyTemp | scalarv, hru | double | K | Temperature of the vegetation canopy | |
 | scalarSnowAlbedo | scalarv, hru | double | - | Snow albedo for the entire spectral band | |
 | scalarSnowDepth | scalarv, hru | double | m | Total snow depth | |

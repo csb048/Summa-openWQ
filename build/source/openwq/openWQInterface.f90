@@ -35,13 +35,13 @@ interface
         nSnow_2openwq, &
         nSoil_2openwq, &
         simtime, &
-        soilMoisture, &
-        soilTemp, &
-        airTemp, &
-        swe_vol, &
-        canopyWat_vol, &
-        matricHead_vol, &
-        aquiferStorage_vol) bind(C, name="openwq_run_time_start")
+        soilMoist_depVar, &
+        soilTemp_depVar, &
+        airTemp_depVar, &
+        sweWatVol_stateVar, &
+        canopyWatVol_stateVar, &
+        soilWatVol_stateVar, &
+        aquiferWatVol_stateVar) bind(C, name="openwq_run_time_start")
 
         use iso_c_binding
         implicit none
@@ -51,14 +51,14 @@ interface
         integer(c_int), intent(in), value    :: nSnow_2openwq
         integer(c_int), intent(in), value    :: nSoil_2openwq
         integer(c_int), intent(in)           :: simtime(5)
-        real(c_double), intent(in)           :: soilMoisture(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: soilTemp(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: airTemp(numHRU)
-        real(c_double), intent(in)           :: swe_vol(numHRU, nSnow_2openwq)
-        real(c_double), intent(in)           :: canopyWat_vol(numHRU)
-        real(c_double), intent(in)           :: matricHead_vol(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: aquiferStorage_vol(numHRU)
-        
+        real(c_double), intent(in)           :: soilMoist_depVar(numHRU, nSoil_2openwq)
+        real(c_double), intent(in)           :: soilTemp_depVar(numHRU, nSoil_2openwq)
+        real(c_double), intent(in)           :: airTemp_depVar(numHRU)
+        real(c_double), intent(in)           :: sweWatVol_stateVar(numHRU, nSnow_2openwq)
+        real(c_double), intent(in)           :: canopyWatVol_stateVar(numHRU)
+        real(c_double), intent(in)           :: soilWatVol_stateVar(numHRU, nSoil_2openwq)
+        real(c_double), intent(in)           :: aquiferWatVol_stateVar(numHRU)
+
     end function
 
     function openwq_run_space_c(&

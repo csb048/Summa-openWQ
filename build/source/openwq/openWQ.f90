@@ -36,10 +36,10 @@ module openwq
    integer function openWQ_init( &
       this,                      & ! openwq object
       num_hru,                   & ! num HRU
-      nCanopy_2openwq,         & ! num layers of canopy (fixed to 1)
-      nSnow_2openwq,           & ! num layers of snow (fixed to max of 5 because it varies)
-      nSoil_2openwq,           & ! num layers of snoil (variable)
-      nAquifer_2openwq,        & ! num layers of aquifer (fixed to 1)
+      nCanopy_2openwq,           & ! num layers of canopy (fixed to 1)
+      nSnow_2openwq,             & ! num layers of snow (fixed to max of 5 because it varies)
+      nSoil_2openwq,             & ! num layers of snoil (variable)
+      nAquifer_2openwq,          & ! num layers of aquifer (fixed to 1)
       nYdirec_2openwq)                 ! num of layers in y-dir (set to 1 because not used in summa)
       
       implicit none
@@ -64,19 +64,19 @@ module openwq
     end function
 !  ! Globaly accessible variable
 
-   integer function openWQ_run_time_start( &
-      this, &
-      numHRU, &
-      nSnow_2openwq, &
-      nSoil_2openwq, &
-      simtime, &
-      soilMoisture, &
-      soilTemp, &
-      airTemp, &
-      swe_vol, &
-      canopyWat_vol, &
-      matricHead_vol, &
-      aquiferStorage_vol)
+   integer function openWQ_run_time_start(   &
+      this,                                  &
+      numHRU,                                &
+      nSnow_2openwq,                         &
+      nSoil_2openwq,                         &
+      simtime,                               &
+      soilMoist_depVar,                      &
+      soilTemp_depVar,                       &
+      airTemp_depVar,                        &
+      sweWatVol_stateVar,                    &
+      canopyWatVol_stateVar,                 &
+      soilWatVol_stateVar,                   &
+      aquiferWatVol_stateVar)
       
       implicit none
       class(ClassWQ_OpenWQ)      :: this
@@ -84,35 +84,35 @@ module openwq
       integer(i4b), intent(in)   :: nSnow_2openwq
       integer(i4b), intent(in)   :: nSoil_2openwq
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
-      real(rkind),  intent(in)   :: soilMoisture(numHRU, nSoil_2openwq)
-      real(rkind),  intent(in)   :: soilTemp(numHRU, nSoil_2openwq)
-      real(rkind),  intent(in)   :: airTemp(numHRU)
-      real(rkind),  intent(in)   :: swe_vol(numHRU, nSnow_2openwq)
-      real(rkind),  intent(in)   :: canopyWat_vol(numHRU)
-      real(rkind),  intent(in)   :: matricHead_vol(numHRU,nSoil_2openwq)
-      real(rkind),  intent(in)   :: aquiferStorage_vol(numHRU)
+      real(rkind),  intent(in)   :: airTemp_depVar(numHRU)
+      real(rkind),  intent(in)   :: soilTemp_depVar(numHRU, nSoil_2openwq)
+      real(rkind),  intent(in)   :: soilMoist_depVar(numHRU, nSoil_2openwq)
+      real(rkind),  intent(in)   :: canopyWatVol_stateVar(numHRU)
+      real(rkind),  intent(in)   :: sweWatVol_stateVar(numHRU, nSnow_2openwq)
+      real(rkind),  intent(in)   :: soilWatVol_stateVar(numHRU,nSoil_2openwq)
+      real(rkind),  intent(in)   :: aquiferWatVol_stateVar(numHRU)
 
       openWQ_run_time_start = openwq_run_time_start_c( &
-         this%ptr, & 
-         numHRU, &
-         nSnow_2openwq, &
-         nSoil_2openwq, &
-         simtime, &
-         soilMoisture, &
-         soilTemp, &
-         airTemp, &
-         swe_vol, &
-         canopyWat_vol, &
-         matricHead_vol, &
-         aquiferStorage_vol)
+         this%ptr,               & 
+         numHRU,                 &
+         nSnow_2openwq,          &
+         nSoil_2openwq,          &
+         simtime,                &
+         soilMoist_depVar,       &
+         soilTemp_depVar,        &
+         airTemp_depVar,         &
+         sweWatVol_stateVar,     &
+         canopyWatVol_stateVar,  &
+         soilWatVol_stateVar,    &
+         aquiferWatVol_stateVar)
    
       end function
 
-   integer function openWQ_run_space( &
-      this, &
-      simtime, &
-      source,ix_s,iy_s,iz_s, &
-      recipient,ix_r,iy_r,iz_r, &
+   integer function openWQ_run_space(  &
+      this,                            &
+      simtime,                         &
+      source,ix_s,iy_s,iz_s,           &
+      recipient,ix_r,iy_r,iz_r,        &
       wflux_s2r,wmass_source)
 
       implicit none
@@ -130,18 +130,18 @@ module openwq
       real(rkind),  intent(in)   :: wmass_source
 
       openWQ_run_space = openwq_run_space_c( &
-         this%ptr, &
-         simtime, &
-         source,ix_s,iy_s,iz_s, &
-         recipient,ix_r,iy_r,iz_r, &
+         this%ptr,                           &
+         simtime,                            &
+         source,ix_s,iy_s,iz_s,              &
+         recipient,ix_r,iy_r,iz_r,           &
          wflux_s2r,wmass_source)
    
    end function
 
-   integer function openWQ_run_space_in( &
-      this, &
-      simtime, &
-      recipient,ix_r,iy_r,iz_r,&
+   integer function openWQ_run_space_in(  &
+      this,                               &
+      simtime,                            &
+      recipient,ix_r,iy_r,iz_r,           &
       wflux_s2r)
 
       implicit none
@@ -154,16 +154,16 @@ module openwq
       real(rkind),  intent(in)   :: wflux_s2r
 
       openWQ_run_space_in = openwq_run_space_in_c( &
-         this%ptr, &
-         simtime, &
-         recipient,ix_r,iy_r,ix_r, &
+         this%ptr,                                 &
+         simtime,                                  &
+         recipient,ix_r,iy_r,ix_r,                 &
          wflux_s2r)
 
    end function
 
 
-   integer function openWQ_run_time_end( &
-      this, &
+   integer function openWQ_run_time_end(  &
+      this,                               &
       simtime)
 
       implicit none
@@ -171,7 +171,7 @@ module openwq
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
 
       openWQ_run_time_end = openWQ_run_time_end_c( &
-         this%ptr, &
+         this%ptr,                                 &
          simtime)
 
    end function
