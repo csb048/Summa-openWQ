@@ -36,8 +36,8 @@ interface
         nSoil_2openwq, &
         simtime, &
         soilMoist_depVar, &
-        soilTemp_depVar, &
-        airTemp_depVar, &
+        soilTemp_K_depVar, &
+        airTemp_K_depVar, &
         sweWatVol_stateVar, &
         canopyWatVol_stateVar, &
         soilWatVol_stateVar, &
@@ -52,8 +52,8 @@ interface
         integer(c_int), intent(in), value    :: nSoil_2openwq
         integer(c_int), intent(in)           :: simtime(5)
         real(c_double), intent(in)           :: soilMoist_depVar(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: soilTemp_depVar(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: airTemp_depVar(numHRU)
+        real(c_double), intent(in)           :: soilTemp_K_depVar(numHRU, nSoil_2openwq)
+        real(c_double), intent(in)           :: airTemp_K_depVar(numHRU)
         real(c_double), intent(in)           :: sweWatVol_stateVar(numHRU, nSnow_2openwq)
         real(c_double), intent(in)           :: canopyWatVol_stateVar(numHRU)
         real(c_double), intent(in)           :: soilWatVol_stateVar(numHRU, nSoil_2openwq)

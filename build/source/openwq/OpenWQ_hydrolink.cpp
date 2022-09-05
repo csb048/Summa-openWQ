@@ -85,8 +85,8 @@ int ClassWQ_OpenWQ::decl(
         // Dependencies
         // to expand BGC modelling options
         OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",num_HRU,nYdirec_2openwq,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair",num_HRU,nYdirec_2openwq,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil",num_HRU,nYdirec_2openwq,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair_K",num_HRU,nYdirec_2openwq,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil_K",num_HRU,nYdirec_2openwq,1));
 
         // Master Json
         OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
@@ -117,8 +117,8 @@ int ClassWQ_OpenWQ::run_time_start(
     int nSoil_2openwq,
     int simtime_summa[], 
     double soilMoist_depVar[], 
-    double soilTemp_depVar[], 
-    double airTemp_depVar[],
+    double soilTemp_K_depVar[], 
+    double airTemp_K_depVar[],
     double sweWatVol_stateVar[], 
     double canopyWat[], 
     double soilWatVol_stateVar[], 
@@ -133,8 +133,8 @@ int ClassWQ_OpenWQ::run_time_start(
     for (int i = 0; i < numHRU; i++) {
         // Updating Chemistry dependencies
         (*OpenWQ_hostModelconfig_ref->dependVar)[0](i,0,0) = soilMoist_depVar[i]; 
-        (*OpenWQ_hostModelconfig_ref->dependVar)[1](i,0,0) = airTemp_depVar[i];
-        (*OpenWQ_hostModelconfig_ref->dependVar)[2](i,0,0) = soilTemp_depVar[i];
+        (*OpenWQ_hostModelconfig_ref->dependVar)[1](i,0,0) = airTemp_K_depVar[i];
+        (*OpenWQ_hostModelconfig_ref->dependVar)[2](i,0,0) = soilTemp_K_depVar[i];
         // Updating water volumes
         //(*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = sweWatVol_stateVar[i];
         (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = canopyWat[i];

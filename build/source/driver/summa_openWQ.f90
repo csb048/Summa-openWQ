@@ -142,12 +142,12 @@ subroutine run_time_start_go( &
   integer(i4b)                        :: iDat
   integer(i4b)                        :: openWQArrayIndex
   integer(i4b)                        :: simtime(5) ! 5 time values yy-mm-dd-hh-min
-  real(rkind)                         :: airTemp_depVar(sum(gru_struc(:)%hruCount))
+  real(rkind)                         :: airTemp_K_depVar(sum(gru_struc(:)%hruCount))
   real(rkind)                         :: canopyWatVol_stateVar(sum(gru_struc(:)%hruCount))
   real(rkind)                         :: aquiferWatVol_stateVar(sum(gru_struc(:)%hruCount))
   real(rkind)                         :: sweWatVol_stateVar(sum(gru_struc(:)%hruCount), nSnow_2openwq)
   real(rkind)                         :: soilWatVol_stateVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
-  real(rkind)                         :: soilTemp_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
+  real(rkind)                         :: soilTemp_K_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   real(rkind)                         :: soilMoist_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   integer(i4b)                        :: err
 
@@ -173,8 +173,8 @@ subroutine run_time_start_go( &
         ! ############################
 
         ! Tair 
-        ! (Summa in K) -> convert to degrees C for Openwq
-        airTemp_depVar(openWQArrayIndex) = &
+        ! (Summa in K)
+        airTemp_K_depVar(openWQArrayIndex) = &
           progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1)
 
         ! Vegetation
@@ -199,10 +199,9 @@ subroutine run_time_start_go( &
         do ilay = 1, nSoil_2openwq
           
           ! Tsoil
-          ! (Summa in K) -> convert to degrees C for Openwq
-          soilTemp_depVar(openWQArrayIndex, ilay) = &
-            progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay) &
-            - 273.15
+          ! (Summa in K)
+          soilTemp_K_depVar(openWQArrayIndex, ilay) = &
+            progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay)
 
           soilMoist_depVar(openWQArrayIndex, ilay) = 0     ! TODO: Find the value for this varaibles
 
@@ -256,8 +255,8 @@ subroutine run_time_start_go( &
         nSoil_2openwq,                          &
         simtime,                                &
         soilMoist_depVar,                       &                    
-        soilTemp_depVar,                        &
-        airTemp_depVar,                         &
+        soilTemp_K_depVar,                        &
+        airTemp_K_depVar,                         &
         sweWatVol_stateVar,                     &
         canopyWatVol_stateVar,                  &
         soilWatVol_stateVar,                    &
@@ -267,6 +266,7 @@ subroutine run_time_start_go( &
 
 
   end associate summaVars
+
 end subroutine
 
 
