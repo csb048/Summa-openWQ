@@ -153,6 +153,7 @@ subroutine run_time_start_go( &
   real(rkind)                         :: soilTemp_K_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   real(rkind)                         :: soilMoist_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   integer(i4b)                        :: err
+  real(rkind),parameter              :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
 
   summaVars: associate(&
       progStruct     => summa1_struc%progStruct             , &
@@ -184,17 +185,23 @@ subroutine run_time_start_go( &
 
         ! Tair 
         ! (Summa in K)
-        airTemp_K_depVar(openWQArrayIndex) =  Tair_summa_K
+        if(Tair_summa_K /= valueMissing) then
+          airTemp_K_depVar(openWQArrayIndex) =  Tair_summa_K 
+        endif
           
         ! Vegetation
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarCanopyWat [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
-        canopyWatVol_stateVar(openWQArrayIndex) = CanopyStorWat_summa_kg_m2 * hru_area_m2 / iden_water
+        if(CanopyStorWat_summa_kg_m2 /= valueMissing) then
+          canopyWatVol_stateVar(openWQArrayIndex) = CanopyStorWat_summa_kg_m2 * hru_area_m2 / iden_water
+        endif
 
         ! Aquifer
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarAquiferStorage [m], so needs to  to multiply by hru area [m2] only
-        aquiferWatVol_stateVar(openWQArrayIndex) = AquiferStorWat_summa_m * hru_area_m2
+        if(AquiferStorWat_summa_m /= valueMissing) then
+          aquiferWatVol_stateVar(openWQArrayIndex) = AquiferStorWat_summa_m * hru_area_m2
+        endif 
         
         ! ############################
         ! Update layered variables and dependenecies
@@ -204,20 +211,24 @@ subroutine run_time_start_go( &
         do ilay = 1, nSoil_2openwq
           
           SoilVars: associate(&
-            Tsoil_summa_K => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat        ,&
-            Wsoil_summa_m => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerMatricHead)%dat   &
+            Tsoil_summa_K => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay)        ,&
+            Wsoil_summa_m => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerMatricHead)%dat(ilay)   &
           )
           ! Tsoil
           ! (Summa in K)
-          soilTemp_K_depVar(openWQArrayIndex, ilay) = Tsoil_summa_K(ilay)
+          if(Tsoil_summa_K /= valueMissing) then
+            soilTemp_K_depVar(openWQArrayIndex, ilay) = Tsoil_summa_K
+          endif
 
           soilMoist_depVar(openWQArrayIndex, ilay) = 0     ! TODO: Find the value for this varaibles
 
           ! Soil
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! mLayerMatricHead [m], so needs to  to multiply by hru area [m2]
-          soilWatVol_stateVar(openWQArrayIndex, ilay) = Wsoil_summa_m(ilay) * hru_area_m2
-          
+          if(Wsoil_summa_m /= valueMissing) then
+            soilWatVol_stateVar(openWQArrayIndex, ilay) = Wsoil_summa_m * hru_area_m2
+          endif
+
           end associate SoilVars
 
         enddo
@@ -226,18 +237,26 @@ subroutine run_time_start_go( &
         do ilay = 1, nSnow_2openwq
 
           SnowVars: associate(&
-            mLayerDepth      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat         , &    ! depth of each layer (m)
-            mLayerVolFracIce => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracIce)%dat    , &    ! volumetric fraction of ice in each layer  (-)
-            mLayerVolFracLiq => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracLiq)%dat      &    ! volumetric fraction of liquid water in each layer (-)
+            mLayerDepth      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(ilay)         , &    ! depth of each layer (m)
+            mLayerVolFracIce => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracIce)%dat(ilay)    , &    ! volumetric fraction of ice in each layer  (-)
+            mLayerVolFracLiq => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracLiq)%dat(ilay)      &    ! volumetric fraction of liquid water in each layer (-)
           )
           
           ! Snow
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! mLayerVolFracIce and mLayerVolFracLiq [-], so needs to  to multiply by hru area [m2] and divide by water density
           ! But needs to account for both ice and liquid, and convert to liquid volumes
-          sweWatVol_stateVar(openWQArrayIndex, ilay) =                                              &
-            (mLayerVolFracIce(ilay) * iden_ice + mLayerVolFracLiq(ilay) * iden_water) / iden_water  &
-            * mLayerDepth(ilay) * hru_area_m2
+          if(mLayerVolFracIce /= valueMissing .or. &
+             mLayerVolFracLiq /= valueMissing) then
+
+            sweWatVol_stateVar(openWQArrayIndex, ilay) =                                              &
+              (max(mLayerVolFracIce, 0._rkind) * iden_ice + &
+              max(mLayerVolFracLiq, 0._rkind) * iden_water) / iden_water  &
+              * mLayerDepth * hru_area_m2
+            else
+              sweWatVol_stateVar(openWQArrayIndex, ilay) = 0._rkind
+
+          endif
 
           end associate SnowVars
 
