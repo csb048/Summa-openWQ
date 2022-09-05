@@ -20,7 +20,14 @@ extern "C" {
     void delete_openwq(CLASSWQ_OPENWQ* openWQ);
 
     // OpenWQ initalization method
-    int openwq_decl(CLASSWQ_OPENWQ *openWQ,int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat, int y_direction);
+    int openwq_decl(
+        ClassWQ_OpenWQ *openWQ, 
+        int hruCount,               // num HRU
+        int num_layers_canopy,      // num layers of canopy (fixed to 1)
+        int num_layers_snow,        // num layers of snow (fixed to max of 5 because it varies)
+        int num_layers_soil,        // num layers of snoil (variable)
+        int num_layers_aquifer,     // num layers of aquifer (fixed to 1)
+        int num_Ylayers);           // num of layers in y-dir (set to 1 because not used in summa)
 
     int openwq_run_time_start(CLASSWQ_OPENWQ *openWQ, int numHRU, int maxNumLayers_snow, int maxNumLayers_soil,
         int simtime_summa[], double soilMoisture[], double soilTemp[], double airTemp[], double SWE_vol[], double canopyWat[], double matricHead_vol[], double aquiferStorage[]);

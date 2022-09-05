@@ -37,9 +37,15 @@ time_t ClassWQ_OpenWQ::convert_time(int year, int month, int day, int hour, int 
     return sim_time;
 }
 
-int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_volFracWat, 
-    int num_layers_matricHead, int num_layers_aquifer, int y_direction) {
-    OpenWQ_hostModelconfig_ref = new OpenWQ_hostModelconfig(); // Initalize hostModelconfig
+int ClassWQ_OpenWQ::decl(
+    int num_HRU,                // num HRU
+    int num_layers_canopy,      // num layers of canopy (fixed to 1)
+    int num_layers_snow,        // num layers of snow (fixed to max of 5 because it varies)
+    int num_layers_soil,        // num layers of snoil (variable)
+    int num_layers_aquifer,     // num layers of aquifer (fixed to 1)
+    int num_Ylayers){           // num of layers in y-dir (set to 1 because not used in summa)
+    
+    OpenWQ_hostModelconfig_ref = new OpenWQ_hostModelconfig();
     OpenWQ_couplercalls_ref = new OpenWQ_couplercalls();
     OpenWQ_json_ref = new OpenWQ_json();
     OpenWQ_wqconfig_ref = new OpenWQ_wqconfig();
@@ -52,29 +58,29 @@ int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_volFr
     OpenWQ_extwatflux_ss_ref = new OpenWQ_extwatflux_ss();
     OpenWQ_output_ref = new OpenWQ_output();
     
-    this->numHRU = numHRU;
+    this->num_HRU = num_HRU;
 
     if (OpenWQ_hostModelconfig_ref->HydroComp.size()==0) {
 
         // Compartment names
         // Make sure to use capital letters for compartment names
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",numHRU,y_direction,num_layers_canopy));      // Canopy
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERVOLFRACWAT",numHRU,y_direction,num_layers_volFracWat)); // SWE
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"MLAYERMATRICHEAD",numHRU,y_direction,num_layers_matricHead)); // Soil
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"SCALARAQUIFER",numHRU,y_direction,num_layers_aquifer));       // GW
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",num_HRU,num_Ylayers,num_layers_canopy));      // Canopy
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERVOLFRACWAT",num_HRU,num_Ylayers,num_layers_snow)); // SWE
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"MLAYERMATRICHEAD",num_HRU,num_Ylayers,num_layers_soil)); // Soil
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"SCALARAQUIFER",num_HRU,num_Ylayers,num_layers_aquifer));       // GW
         
 
         OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
 
         // External fluxes
         // Make sure to use capital letters for external fluxes
-        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP",numHRU,y_direction,1));
+        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP",num_HRU,num_Ylayers,1));
 
         // Dependencies
         // to expand BGC modelling options
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",numHRU,y_direction,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair",numHRU,y_direction,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil",numHRU,y_direction,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",num_HRU,num_Ylayers,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair",num_HRU,num_Ylayers,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil",num_HRU,num_Ylayers,1));
 
         // Master Json
         OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";

@@ -48,7 +48,7 @@ class ClassWQ_OpenWQ
         OpenWQ_solver *OpenWQ_solver_ref;
         OpenWQ_output *OpenWQ_output_ref;
 
-        int numHRU;
+        int num_HRU;
         const float *hru_area;
 
     // Constructor
@@ -58,10 +58,16 @@ class ClassWQ_OpenWQ
     
     // Methods
     void printNum() {
-        std::cout << "num = " << this->numHRU << std::endl;
+        std::cout << "num = " << this->num_HRU << std::endl;
     }
 
-    int decl(int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat, int y_direction);
+    int decl(
+        int num_HRU,                // num HRU
+        int num_layers_canopy,      // num layers of canopy (fixed to 1)
+        int num_layers_snow,        // num layers of snow (fixed to max of 5 because it varies)
+        int num_layers_soil,        // num layers of snoil (variable)
+        int num_layers_aquifer,     // num layers of aquifer (fixed to 1)
+        int num_Ylayers);           // num of layers in y-dir (set to 1 because not used in summa)
 
     int run_time_start(int numHRU, int maxNumLayers_snow, int maxNumLayers_soil, int simtime_summa[],
         double soilMoisture[], double soilTemp[], double airTemp[],
