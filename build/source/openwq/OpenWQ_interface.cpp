@@ -20,10 +20,11 @@ int openwq_decl(ClassWQ_OpenWQ *openWQ, int numHRU, int num_layers_canopy, int n
 }
 
 
-int openwq_run_time_start(ClassWQ_OpenWQ *openWQ, int numHRU, int simtime_summa[], double soilMoisture[], double soilTemp[], double airTemp[],
+int openwq_run_time_start(ClassWQ_OpenWQ *openWQ, int numHRU, int maxNumLayers_snow, int maxNumLayers_soil, 
+    int simtime_summa[], double soilMoisture[], double soilTemp[], double airTemp[],
     double SWE_vol[], double canopyWat_vol[], double matricHead_vol[], double aquiferStorage_vol[]) {
     
-    return openWQ->run_time_start(numHRU, simtime_summa,
+    return openWQ->run_time_start(numHRU, maxNumLayers_snow, maxNumLayers_soil, simtime_summa, 
         soilMoisture, soilTemp, airTemp, SWE_vol, canopyWat_vol, matricHead_vol, aquiferStorage_vol);
 }
 

@@ -97,8 +97,8 @@ int ClassWQ_OpenWQ::decl(int numHRU, int num_layers_canopy, int num_layers_matri
 }
 
 // SoilMoisture does not have a value - it is passed as 0
-int ClassWQ_OpenWQ::run_time_start(int numHRU, int simtime_summa[],
-        double soilMoisture[], double soilTemp[], double airTemp[],
+int ClassWQ_OpenWQ::run_time_start(int numHRU, int maxNumLayers_snow, int maxNumLayers_soil,
+        int simtime_summa[], double soilMoisture[], double soilTemp[], double airTemp[],
         double SWE_vol[], double canopyWat[], double matricHead_vol[], double aquiferStorage[]) {
 
     time_t simtime = convert_time(simtime_summa[0], simtime_summa[1], simtime_summa[2], simtime_summa[3], simtime_summa[4]);

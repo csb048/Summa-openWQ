@@ -63,7 +63,7 @@ class ClassWQ_OpenWQ
 
     int decl(int numHRU, int num_layers_canopy, int num_layers_matricHead, int num_layers_aquifer, int num_layers_volFracWat, int y_direction);
 
-    int run_time_start(int numHRU, int simtime_summa[], 
+    int run_time_start(int numHRU, int maxNumLayers_snow, int maxNumLayers_soil, int simtime_summa[],
         double soilMoisture[], double soilTemp[], double airTemp[],
         double SWE_vol[], double canopyWat[], double matricHead_vol[], double aquiferStorage[]);
 

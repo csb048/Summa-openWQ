@@ -223,9 +223,11 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, maxNumLayers_snow, maxNum
   simtime(3) = timeStruct%var(iLookTIME%id)    ! hour
   simtime(4) = timeStruct%var(iLookTIME%ih)    ! day
   simtime(5) = timeStruct%var(iLookTIME%imin)  ! minute
-
+  
   err=openWQ_obj%run_time_start(&
         sum(gru_struc(:)%hruCount),             & ! total HRUs
+        maxNumLayers_snow,                      &
+        maxNumLayers_soil,                      &
         simtime,                                &
         soilMoisture,                           &                    
         soilTemp,                               &

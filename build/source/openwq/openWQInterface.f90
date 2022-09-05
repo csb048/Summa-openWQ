@@ -19,7 +19,7 @@ interface
         integer(c_int), intent(in), value  :: y_direction
     end function
 
-    function openwq_run_time_start_c(openWQ, numHRU, simtime, &
+    function openwq_run_time_start_c(openWQ, numHRU, maxNumLayers_snow, maxNumLayers_soil, simtime, &
         soilMoisture, soilTemp, airTemp, swe_vol, canopyWat_vol, &
         matricHead_vol, aquiferStorage_vol) bind(C, name="openwq_run_time_start")
         use iso_c_binding
@@ -27,13 +27,15 @@ interface
         integer(c_int)                       :: openwq_run_time_start_c ! returns 0 (success) or -1 (failure)
         type(c_ptr),    intent(in), value    :: openWQ
         integer(c_int), intent(in), value    :: numHRU
+        integer(c_int), intent(in), value    :: maxNumLayers_snow
+        integer(c_int), intent(in), value    :: maxNumLayers_soil
         integer(c_int), intent(in)           :: simtime(5)
-        real(c_double), intent(in)           :: soilMoisture(numHRU)
-        real(c_double), intent(in)           :: soilTemp(numHRU)
+        real(c_double), intent(in)           :: soilMoisture(numHRU, maxNumLayers_soil)
+        real(c_double), intent(in)           :: soilTemp(numHRU, maxNumLayers_soil)
         real(c_double), intent(in)           :: airTemp(numHRU)
-        real(c_double), intent(in)           :: swe_vol(numHRU)
+        real(c_double), intent(in)           :: swe_vol(numHRU, maxNumLayers_snow)
         real(c_double), intent(in)           :: canopyWat_vol(numHRU)
-        real(c_double), intent(in)           :: matricHead_vol(numHRU)
+        real(c_double), intent(in)           :: matricHead_vol(numHRU, maxNumLayers_soil)
         real(c_double), intent(in)           :: aquiferStorage_vol(numHRU)
     end function
 

@@ -48,22 +48,27 @@ module openwq
     end function
 !  ! Globaly accessible variable
 
-   integer function openWQ_run_time_start(this, numHRU, simtime, &
+   integer function openWQ_run_time_start(this, numHRU, maxNumLayers_snow, maxNumLayers_soil, simtime, &
       soilMoisture, soilTemp, airTemp, swe_vol, canopyWat_vol, matricHead_vol, aquiferStorage_vol)
+      
       implicit none
       class(ClassWQ_OpenWQ)      :: this
       integer(i4b), intent(in)   :: numHRU
+      integer(i4b), intent(in)   :: maxNumLayers_snow
+      integer(i4b), intent(in)   :: maxNumLayers_soil
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
-      real(rkind),  intent(in)   :: soilMoisture(numHRU)
-      real(rkind),  intent(in)   :: soilTemp(numHRU)
+      real(rkind),  intent(in)   :: soilMoisture(numHRU, maxNumLayers_soil)
+      real(rkind),  intent(in)   :: soilTemp(numHRU, maxNumLayers_soil)
       real(rkind),  intent(in)   :: airTemp(numHRU)
-      real(rkind),  intent(in)   :: swe_vol(numHRU)
+      real(rkind),  intent(in)   :: swe_vol(numHRU, maxNumLayers_snow)
       real(rkind),  intent(in)   :: canopyWat_vol(numHRU)
-      real(rkind),  intent(in)   :: matricHead_vol(numHRU)
+      real(rkind),  intent(in)   :: matricHead_vol(numHRU,maxNumLayers_soil)
       real(rkind),  intent(in)   :: aquiferStorage_vol(numHRU)
-      openWQ_run_time_start = openwq_run_time_start_c(this%ptr, numHRU, simtime, &
+
+      openWQ_run_time_start = openwq_run_time_start_c(this%ptr, numHRU, maxNumLayers_snow, maxNumLayers_soil, simtime, &
          soilMoisture, soilTemp, airTemp, swe_vol, canopyWat_vol, matricHead_vol, aquiferStorage_vol)
-   end function
+   
+      end function
 
    integer function openWQ_run_space(this,simtime,source,ix_s,iy_s,iz_s, &
          recipient,ix_r,iy_r,iz_r,wflux_s2r,wmass_source)
