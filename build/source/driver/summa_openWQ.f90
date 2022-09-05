@@ -126,6 +126,9 @@ subroutine run_time_start_go( &
   USE var_lookup, only: iLookPROG  ! named variables for state variables
   USE var_lookup, only: iLookTIME  ! named variables for time data structure
   USE var_lookup, only: iLookATTR  ! named variables for real valued attribute data structure
+  USE multiconst,only:&
+                        iden_ice,       & ! intrinsic density of ice             (kg m-3)
+                        iden_water        ! intrinsic density of liquid water    (kg m-3)
 
   implicit none
 
@@ -165,6 +168,13 @@ subroutine run_time_start_go( &
   do iGRU = 1, size(gru_struc(:))
       do iHRU = 1, gru_struc(iGRU)%hruCount
 
+        GeneralVars: associate(&
+          hru_area_m2                 => attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)                      ,&
+          Tair_summa_K                => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1)      ,&
+          CanopyStorWat_summa_kg_m2   => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1)        ,&
+          AquiferStorWat_summa_m      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1)   &
+        )
+
         openWQArrayIndex = openWQArrayIndex + 1 
 
         ! ############################
@@ -174,22 +184,17 @@ subroutine run_time_start_go( &
 
         ! Tair 
         ! (Summa in K)
-        airTemp_K_depVar(openWQArrayIndex) = &
-          progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1)
-
+        airTemp_K_depVar(openWQArrayIndex) =  Tair_summa_K
+          
         ! Vegetation
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarCanopyWat [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
-        canopyWatVol_stateVar(openWQArrayIndex) = &
-          progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1) &
-          * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea) / 1000
+        canopyWatVol_stateVar(openWQArrayIndex) = CanopyStorWat_summa_kg_m2 * hru_area_m2 / iden_water
 
         ! Aquifer
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarAquiferStorage [m], so needs to  to multiply by hru area [m2] only
-        aquiferWatVol_stateVar(openWQArrayIndex) = &
-          progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
-          * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
+        aquiferWatVol_stateVar(openWQArrayIndex) = AquiferStorWat_summa_m * hru_area_m2
         
         ! ############################
         ! Update layered variables and dependenecies
@@ -198,31 +203,43 @@ subroutine run_time_start_go( &
         ! Soil
         do ilay = 1, nSoil_2openwq
           
+          SoilVars: associate(&
+            Tsoil_summa_K => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat        ,&
+            Wsoil_summa_m => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerMatricHead)%dat   &
+          )
           ! Tsoil
           ! (Summa in K)
-          soilTemp_K_depVar(openWQArrayIndex, ilay) = &
-            progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay)
+          soilTemp_K_depVar(openWQArrayIndex, ilay) = Tsoil_summa_K(ilay)
 
           soilMoist_depVar(openWQArrayIndex, ilay) = 0     ! TODO: Find the value for this varaibles
 
           ! Soil
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! mLayerMatricHead [m], so needs to  to multiply by hru area [m2]
-          soilWatVol_stateVar(openWQArrayIndex, ilay) = &
-            progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerMatricHead)%dat(ilay) &
-            * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
-    
+          soilWatVol_stateVar(openWQArrayIndex, ilay) = Wsoil_summa_m(ilay) * hru_area_m2
+          
+          end associate SoilVars
+
         enddo
 
         ! Snow
         do ilay = 1, nSnow_2openwq
+
+          SnowVars: associate(&
+            mLayerDepth      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat         , &    ! depth of each layer (m)
+            mLayerVolFracIce => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracIce)%dat    , &    ! volumetric fraction of ice in each layer  (-)
+            mLayerVolFracLiq => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracLiq)%dat      &    ! volumetric fraction of liquid water in each layer (-)
+          )
           
           ! Snow
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
-          ! scalarSWE [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
-          sweWatVol_stateVar(openWQArrayIndex, ilay) = &
-            progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarSWE)%dat(ilay) &
-            * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea) / 1000
+          ! mLayerVolFracIce and mLayerVolFracLiq [-], so needs to  to multiply by hru area [m2] and divide by water density
+          ! But needs to account for both ice and liquid, and convert to liquid volumes
+          sweWatVol_stateVar(openWQArrayIndex, ilay) =                                              &
+            (mLayerVolFracIce(ilay) * iden_ice + mLayerVolFracLiq(ilay) * iden_water) / iden_water  &
+            * mLayerDepth(ilay) * hru_area_m2
+
+          end associate SnowVars
 
         enddo
 
@@ -238,6 +255,8 @@ subroutine run_time_start_go( &
             progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(iDat) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(iDat)
           end do
         end do
+
+        end associate GeneralVars
 
       end do
   end do
@@ -255,15 +274,14 @@ subroutine run_time_start_go( &
         nSoil_2openwq,                          &
         simtime,                                &
         soilMoist_depVar,                       &                    
-        soilTemp_K_depVar,                        &
-        airTemp_K_depVar,                         &
+        soilTemp_K_depVar,                      &
+        airTemp_K_depVar,                       &
         sweWatVol_stateVar,                     &
         canopyWatVol_stateVar,                  &
         soilWatVol_stateVar,                    &
         aquiferWatVol_stateVar)
 
   ! copy progStruct values to progStruct_timestep_start
-
 
   end associate summaVars
 
