@@ -159,37 +159,43 @@ subroutine run_time_start_go( &
 
   ! Update dependencies and storage volumes
   ! Assemble the data to send to openWQ
+
   openWQArrayIndex = 0 ! index into the arrays that are being passed to openWQ
+
   do iGRU = 1, size(gru_struc(:))
       do iHRU = 1, gru_struc(iGRU)%hruCount
 
         openWQArrayIndex = openWQArrayIndex + 1 
 
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Update layered variables
+        ! ############################
+        ! Update unlayered variables and dependencies 
+        ! (1 layer only)
+        ! ############################
 
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Update scaler dependencies
-        ! Tair (Summa in K) -> convert to degrees C for Openwq
+        ! Tair 
+        ! (Summa in K) -> convert to degrees C for Openwq
         airTemp_depVar(openWQArrayIndex) = &
           progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1)
 
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Update scalar storage volumes
         ! Vegetation
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarCanopyWat [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
         canopyWatVol_stateVar(openWQArrayIndex) = &
           progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1) &
           * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea) / 1000
+
         ! Aquifer
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarAquiferStorage [m], so needs to  to multiply by hru area [m2] only
         aquiferWatVol_stateVar(openWQArrayIndex) = &
           progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
           * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
+        
+        ! ############################
+        ! Update layered variables and dependenecies
+        ! ############################
 
-        ! Update soil variables and dependenecies
+        ! Soil
         do ilay = 1, nSoil_2openwq
           
           ! Tsoil
@@ -209,7 +215,7 @@ subroutine run_time_start_go( &
     
         enddo
 
-        ! Update snow variables and dependenecies
+        ! Snow
         do ilay = 1, nSnow_2openwq
           
           ! Snow
