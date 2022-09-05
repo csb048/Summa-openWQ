@@ -172,8 +172,7 @@ subroutine run_time_start_go( &
         ! Update scaler dependencies
         ! Tair (Summa in K) -> convert to degrees C for Openwq
         airTemp_depVar(openWQArrayIndex) = &
-          progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1) &
-          - 273.15
+          progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1)
 
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         ! Update scalar storage volumes
@@ -321,7 +320,7 @@ subroutine run_space_step(  &
       iz_s = 1
       iy_r = 1
       iz_r = 1
-      
+
       err=openwq_obj%run_space(simtime,                                                                         &
                            scalarCanopyWat, hru_index, iy_s, iz_s,                                              &
                            mLayerVolFracWat, hru_index, iy_r, iz_r,                                             &
