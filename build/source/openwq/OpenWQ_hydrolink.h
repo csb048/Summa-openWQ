@@ -31,8 +31,10 @@
 
 class ClassWQ_OpenWQ
 {
+
     // Instance Variables
     private:
+
         OpenWQ_couplercalls *OpenWQ_couplercalls_ref;
         OpenWQ_hostModelconfig *OpenWQ_hostModelconfig_ref;
         OpenWQ_json *OpenWQ_json_ref;
@@ -69,18 +71,39 @@ class ClassWQ_OpenWQ
         int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
         int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 
-    int run_time_start(int numHRU, int maxNumLayers_snow, int maxNumLayers_soil, int simtime_summa[],
-        double soilMoisture[], double soilTemp[], double airTemp[],
-        double SWE_vol[], double canopyWat[], double matricHead_vol[], double aquiferStorage[]);
+    int run_time_start(
+        int numHRU, 
+        int nSnow_2openwq, 
+        int nSoil_2openwq, 
+        int simtime_summa[],
+        double soilMoisture[], 
+        double soilTemp[], 
+        double airTemp[],
+        double SWE_vol[], 
+        double canopyWat[], 
+        double matricHead_vol[], 
+        double aquiferStorage[]);
 
-    int run_space(int simtime_summa[], int source, int ix_s, int iy_s, int iz_s,
-        int recipient, int ix_r, int iy_r, int iz_r, double wflux_s2r, double wmass_source);
+    int run_space(
+        int simtime_summa[], 
+        int source, int ix_s, int iy_s, int iz_s,
+        int recipient, int ix_r, int iy_r, int iz_r, 
+        double wflux_s2r, double wmass_source);
 
-    int run_space_in(int simtime_summa[], int recipient, int ix_r, int iy_r, int iz_r, double wflux_s2r);
+    int run_space_in(
+        int simtime_summa[], 
+        int recipient, int ix_r, int iy_r, int iz_r, 
+        double wflux_s2r);
 
-    int run_time_end(int simtime_summa[]);
+    int run_time_end(
+        int simtime_summa[]);
 
-    time_t convert_time(int year, int month, int day, int hour, int minute);
+    time_t convert_time(
+        int year, 
+        int month, 
+        int day, 
+        int hour, 
+        int minute);
 
 };
 #endif

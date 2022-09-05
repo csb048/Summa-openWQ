@@ -91,27 +91,27 @@ subroutine run_time_start( &
   ! local variables
   integer(i4b)                       :: iGRU
   integer(i4b)                       :: iHRU
-  integer(i4b)                       :: maxNumLayers_soil ! maximum number of layers for soil
-  integer(i4b)                       :: maxNumLayers_snow ! maximum number of layers for snow)
+  integer(i4b)                       :: nSoil_2openwq ! maximum number of layers for soil
+  integer(i4b)                       :: nSnow_2openwq ! maximum number of layers for snow)
   integer(i4b)                       :: err
 
   ! Get number of soil and snow layers
   ! Needs to be isolated because explicit-shaped arrays can only be defined with parameters 
   ! or int passed as an argument
-  maxNumLayers_soil = 0
-  maxNumLayers_snow = 0
+  nSoil_2openwq = 0
+  nSnow_2openwq = 0
   do iGRU = 1, size(gru_struc(:))
     do iHRU = 1, gru_struc(iGRU)%hruCount
-      ! maxNumLayers_snow = max( gru_struc(iGRU)%hruInfo(iHRU)%nSnow, maxNumLayers_snow )
-      maxNumLayers_soil = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, maxNumLayers_soil )
+      ! nSnow_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSnow, nSnow_2openwq )
+      nSoil_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, nSoil_2openwq )
     enddo
   enddo
 
-  call run_time_start_go(openwq_obj, summa1_struc, maxNumLayers_snow, maxNumLayers_soil)
+  call run_time_start_go(openwq_obj, summa1_struc, nSnow_2openwq, nSoil_2openwq)
 
 end subroutine
 
-subroutine run_time_start_go(openWQ_obj, summa1_struc, maxNumLayers_snow, maxNumLayers_soil)
+subroutine run_time_start_go(openWQ_obj, summa1_struc, nSnow_2openwq, nSoil_2openwq)
   USE summa_type, only: summa1_type_dec            ! master summa data type
   USE globalData, only: gru_struc
   USE var_lookup, only: iLookPROG  ! named variables for state variables
@@ -124,8 +124,8 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, maxNumLayers_snow, maxNum
   class(ClassWQ_OpenWQ), intent(in)   :: openWQ_obj
   type(summa1_type_dec), intent(in)   :: summa1_struc
   ! local variables
-  integer(i4b), intent(in)            :: maxNumLayers_snow
-  integer(i4b), intent(in)            :: maxNumLayers_soil
+  integer(i4b), intent(in)            :: nSnow_2openwq
+  integer(i4b), intent(in)            :: nSoil_2openwq
   integer(i4b)                        :: iGRU
   integer(i4b)                        :: iHRU
   integer(i4b)                        :: ilay
@@ -136,10 +136,10 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, maxNumLayers_snow, maxNum
   real(rkind)                         :: airTemp(sum(gru_struc(:)%hruCount))
   real(rkind)                         :: canopyWat_vol(sum(gru_struc(:)%hruCount))
   real(rkind)                         :: aquiferStorage_vol(sum(gru_struc(:)%hruCount))
-  real(rkind)                         :: swe_vol(sum(gru_struc(:)%hruCount), maxNumLayers_snow)
-  real(rkind)                         :: matricHead_vol(sum(gru_struc(:)%hruCount), maxNumLayers_soil)
-  real(rkind)                         :: soilTemp(sum(gru_struc(:)%hruCount), maxNumLayers_soil)
-  real(rkind)                         :: soilMoisture(sum(gru_struc(:)%hruCount), maxNumLayers_soil)
+  real(rkind)                         :: swe_vol(sum(gru_struc(:)%hruCount), nSnow_2openwq)
+  real(rkind)                         :: matricHead_vol(sum(gru_struc(:)%hruCount), nSoil_2openwq)
+  real(rkind)                         :: soilTemp(sum(gru_struc(:)%hruCount), nSoil_2openwq)
+  real(rkind)                         :: soilMoisture(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   integer(i4b)                        :: err
 
   summaVars: associate(&
@@ -182,7 +182,7 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, maxNumLayers_snow, maxNum
           * attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)
 
         ! Update soil variables and dependenecies
-        do ilay = 1, maxNumLayers_soil
+        do ilay = 1, nSoil_2openwq
           
           ! Tsoil
           ! (Summa in K) -> convert to degrees C for Openwq
@@ -202,7 +202,7 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, maxNumLayers_snow, maxNum
         enddo
 
         ! Update snow variables and dependenecies
-        do ilay = 1, maxNumLayers_snow
+        do ilay = 1, nSnow_2openwq
           
           ! Snow
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
@@ -238,8 +238,8 @@ subroutine run_time_start_go(openWQ_obj, summa1_struc, maxNumLayers_snow, maxNum
   
   err=openWQ_obj%run_time_start(&
         sum(gru_struc(:)%hruCount),             & ! total HRUs
-        maxNumLayers_snow,                      &
-        maxNumLayers_soil,                      &
+        nSnow_2openwq,                      &
+        nSoil_2openwq,                      &
         simtime,                                &
         soilMoisture,                           &                    
         soilTemp,                               &
