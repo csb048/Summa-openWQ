@@ -53,10 +53,12 @@ subroutine init_openwq(err, message)
   do iGRU = 1, size(gru_struc(:))
     do iHRU = 1, gru_struc(iGRU)%hruCount
       num_layers_matricHead = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, num_layers_matricHead )
-      num_layers_volFracWat = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, num_layers_volFracWat )
+      !num_layers_volFracWat = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, num_layers_volFracWat )
     enddo
   enddo
 
+  num_layers_volFracWat = 5 ! maximum number of snow layers
+  
   err=openwq_obj%decl(hruCount, num_layers_canopy, num_layers_matricHead, num_layers_aquifer, num_layers_volFracWat, y_direction)  ! intialize openWQ
   
   ! Create copy of state information, needed for passing to openWQ with fluxes that require
