@@ -43,8 +43,10 @@ module openwq
       integer(i4b), intent(in) :: num_layers_aquifer
       integer(i4b), intent(in) :: num_layers_volFracWat
       integer(i4b), intent(in) :: y_direction
-      openWQ_init = openwq_decl_c(this%ptr,num_hru,num_layers_canopy, num_layers_matricHead, &
-      num_layers_aquifer, num_layers_volFracWat, y_direction)
+
+      openWQ_init = openwq_decl_c(this%ptr,num_hru,num_layers_canopy, num_layers_volFracWat, &
+         num_layers_matricHead, num_layers_aquifer, y_direction)
+
     end function
 !  ! Globaly accessible variable
 
@@ -85,7 +87,9 @@ module openwq
       integer(i4b), intent(in)   :: iz_r
       real(rkind),  intent(in)   :: wflux_s2r
       real(rkind),  intent(in)   :: wmass_source
+
       openWQ_run_space = openwq_run_space_c(this%ptr,simtime,source,ix_s,iy_s,iz_s,recipient,ix_r,iy_r,iz_r,wflux_s2r,wmass_source)
+   
    end function
 
    integer function openWQ_run_space_in(this,simtime,recipient,ix_r,iy_r,iz_r,wflux_s2r)
@@ -97,7 +101,9 @@ module openwq
       integer(i4b), intent(in)   :: iy_r
       integer(i4b), intent(in)   :: iz_r
       real(rkind),  intent(in)   :: wflux_s2r
+
       openWQ_run_space_in = openwq_run_space_in_c(this%ptr,simtime,recipient,ix_r,iy_r,ix_r,wflux_s2r)
+      
    end function
 
 
@@ -105,7 +111,9 @@ module openwq
       implicit none
       class(ClassWQ_OpenWQ)      :: this
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
+
       openWQ_run_time_end = openWQ_run_time_end_c(this%ptr,simtime)
+
    end function
 
 end module openwq
