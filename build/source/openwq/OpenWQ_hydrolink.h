@@ -91,7 +91,7 @@ class ClassWQ_OpenWQ
         double wflux_s2r, double wmass_source);
 
     int run_space_in(
-        int simtime_summa[], 
+        int simtime_summa[],
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r);
 
