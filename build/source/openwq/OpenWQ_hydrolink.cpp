@@ -200,6 +200,7 @@ int ClassWQ_OpenWQ::run_space(
 
 int ClassWQ_OpenWQ::run_space_in(
     int simtime_summa[],
+    std::string source_EWF_name,
     int recipient, int ix_r, int iy_r, int iz_r, 
     double wflux_s2r) {
     
@@ -209,8 +210,6 @@ int ClassWQ_OpenWQ::run_space_in(
         simtime_summa[2], 
         simtime_summa[3], 
         simtime_summa[4]);
-
-    std::string source_EWF_name = "PRECIP";
 
      OpenWQ_couplercalls_ref->RunSpaceStep_IN(
         *OpenWQ_hostModelconfig_ref,

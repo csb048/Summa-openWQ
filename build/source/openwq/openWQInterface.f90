@@ -90,6 +90,7 @@ interface
     function openwq_run_space_in_c( &
         openWQ, &
         simtime, &
+        source_EWF_name, &
         recipient,ix_r,iy_r,iz_r, &
         wflux_s2r) bind(C, name="openwq_run_space_in")
 
@@ -103,6 +104,7 @@ interface
         integer(c_int), intent(in), value      :: iy_r
         integer(c_int), intent(in), value      :: iz_r
         real(c_double), intent(in), value      :: wflux_s2r
+        character(c_char), intent(in)          :: source_EWF_name
 
     end function
 

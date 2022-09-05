@@ -92,6 +92,7 @@ class ClassWQ_OpenWQ
 
     int run_space_in(
         int simtime_summa[],
+        std::string source_EWF_name,
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r);
 

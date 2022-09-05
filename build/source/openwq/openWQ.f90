@@ -141,6 +141,7 @@ module openwq
    integer function openWQ_run_space_in(  &
       this,                               &
       simtime,                            &
+      source_EWF_name,                    &
       recipient,ix_r,iy_r,iz_r,           &
       wflux_s2r)
 
@@ -152,10 +153,12 @@ module openwq
       integer(i4b), intent(in)   :: iy_r
       integer(i4b), intent(in)   :: iz_r
       real(rkind),  intent(in)   :: wflux_s2r
+      character(*), intent(in)   :: source_EWF_name
 
       openWQ_run_space_in = openwq_run_space_in_c( &
          this%ptr,                                 &
          simtime,                                  &
+         source_EWF_name,                          &
          recipient,ix_r,iy_r,ix_r,                 &
          wflux_s2r)
 

@@ -416,6 +416,7 @@ subroutine run_space_step(  &
         iy_r = 1; iz_r = 1
         err=openwq_obj%run_space_in(                      &
           simtime,                                        &
+          'PRECIP',                                       &
           mLayerVolFracWat, hru_index, iy_r, iz_r,        &
           scalarThroughfallRain_summa_m3                  &
             + scalarThroughfallSnow_summa_m3)
