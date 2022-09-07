@@ -344,9 +344,9 @@ subroutine run_space_step(  &
 
   ! compartment indexes
   integer(i4b)                           :: scalarCanopyWat_index=0 ! SUMMA Side units: kg m-2
-  integer(i4b)                           :: mLayerMatricHead_index=1 ! SUMMA Side units: m
-  integer(i4b)                           :: scalarAquifer_index=2 ! SUMMA Side units: m
-  integer(i4b)                           :: mLayerVolFracWat_index=3 ! SUMMA Side units: ????
+  integer(i4b)                           :: mLayerVolFracWat_index=1 ! SUMMA Side units: ????
+  integer(i4b)                           :: mLayerMatricHead_index=2 ! SUMMA Side units: m
+  integer(i4b)                           :: scalarAquifer_index=3 ! SUMMA Side units: m
   integer(i4b)                           :: iy_r
   integer(i4b)                           :: iz_r
   integer(i4b)                           :: iy_s
@@ -398,7 +398,7 @@ subroutine run_space_step(  &
         mLayerLiqFluxSnow_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%mLayerLiqFluxSnow)%dat(:)               ,&
         ! Soil Fluxes
         nSoil                                     => gru_struc(iGRU)%hruInfo(iHRU)%nSoil                                                  ,&
-
+        mLayerLiqFluxSoil_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%mLayerLiqFluxSoil)%dat(:)               ,&
 
         ! Aquifer
         scalarAquiferStorage_summa_kg_m2          => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
@@ -466,9 +466,9 @@ subroutine run_space_step(  &
       ! ####################################################################
       ! Snow Fluxes
       ! ####################################################################
-      do iLayer = 1, nSnow-1 ! last layer of snow becomes different fluxes
-        iz_s = iLayer
-        iz_r = iLayer + 1
+      do iLayer = 1, nSnow-1 ! last layer of snow becomes different fluxes 
+        iz_s = iLayer; iz_r = iLayer + 1;
+        iy_r = 1; iz_r = 1
         err=openwq_obj%run_space(                         &
           simtime,                                        &
           mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
@@ -481,8 +481,17 @@ subroutine run_space_step(  &
       ! ####################################################################
       ! Soil Fluxes
       ! ####################################################################
-
-      ! Kyle...
+      do iLayer = 1, nSoil - 1 ! last layer of soil becomes different fluxes
+        iz_s = iLayer + nSnow
+        iz_r = iLayer + 1 + nSnow
+        iy_r = 1; iz_r = 1
+        err=openwq_obj%run_space(                         &
+          simtime,                                        &
+          mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
+          mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
+          mLayerLiqFluxSoil_s1(iLayer+nSnow),             &
+          mLayerVolFracWat_summa_kg_m2(iLayer+nSnow))
+      end do
 
       ! ####################################################################
       ! Aquifer Fluxes

@@ -71,8 +71,8 @@ int ClassWQ_OpenWQ::decl(
         // Compartment names
         // Make sure to use capital letters for compartment names
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",num_HRU,nYdirec_2openwq,nCanopy_2openwq));      // Canopy
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERVOLFRACWAT",num_HRU,nYdirec_2openwq,nSnow_2openwq)); // SWE
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"MLAYERMATRICHEAD",num_HRU,nYdirec_2openwq,nSoil_2openwq)); // Soil
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERVOLFRACWAT",num_HRU,nYdirec_2openwq,nSnow_2openwq + nSoil_2openwq)); // Soil + Snow
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"MLAYERMATRICHEAD",num_HRU,nYdirec_2openwq,nSoil_2openwq)); 
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"SCALARAQUIFER",num_HRU,nYdirec_2openwq,nAquifer_2openwq));       // GW
         
 
@@ -170,8 +170,8 @@ int ClassWQ_OpenWQ::run_space(
     double wflux_s2r, double wmass_source) {
 
     // Convert Fortran Index to C++ index
-    // ix_s -= 1; iy_s -= 1; iz_s -= 1;
-    // ix_r -= 1; iy_r -= 1; iz_r -= 1;
+    ix_s -= 1; iy_s -= 1; iz_s -= 1;
+    ix_r -= 1; iy_r -= 1; iz_r -= 1;
 
    
     time_t simtime = convert_time(
