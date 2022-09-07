@@ -81,13 +81,17 @@ int openwq_run_space(
 int openwq_run_space_in(
     ClassWQ_OpenWQ *openWQ, 
     int simtime_summa[],
-    std::string source_EWF_name,
+    char* source_EWF_name,
     int recipient, int ix_r, int iy_r, int iz_r, 
     double wflux_s2r) {
     
+    // convert source_EWF_name to string
+    std::string source_EWF_name_str(source_EWF_name);
+    std::cout << source_EWF_name_str << "\n"; 
+
     return openWQ->run_space_in(
         simtime_summa,
-        source_EWF_name,
+        source_EWF_name_str,
         recipient, ix_r, iy_r, iz_r, 
         wflux_s2r);
 }

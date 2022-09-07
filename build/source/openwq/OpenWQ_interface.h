@@ -54,7 +54,7 @@ extern "C" {
     int openwq_run_space_in(
         CLASSWQ_OPENWQ *openWQ, 
         int simtime_summa[],
-        std::string source_EWF_name,
+        char* source_EWF_name,
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r);
 
