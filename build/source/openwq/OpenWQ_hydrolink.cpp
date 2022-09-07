@@ -168,6 +168,11 @@ int ClassWQ_OpenWQ::run_space(
     int source, int ix_s, int iy_s, int iz_s,
     int recipient, int ix_r, int iy_r, int iz_r, 
     double wflux_s2r, double wmass_source) {
+
+    // Convert Fortran Index to C++ index
+    // ix_s -= 1; iy_s -= 1; iz_s -= 1;
+    // ix_r -= 1; iy_r -= 1; iz_r -= 1;
+
    
     time_t simtime = convert_time(
         simtime_summa[0], 
