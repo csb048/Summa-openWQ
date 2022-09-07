@@ -53,10 +53,9 @@ subroutine init_openwq(err, message)
   do iGRU = 1, size(gru_struc(:))
     do iHRU = 1, gru_struc(iGRU)%hruCount
       nSoil_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, nSoil_2openwq )
-      !num_layers_volFracWat = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, num_layers_volFracWat )
+      nSnow_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSnow, nSnow_2openwq )
     enddo
   enddo
-  nSnow_2openwq = 5 ! maximum number of snow layers
 
   ! intialize openWQ
   err=openwq_obj%decl(    &
