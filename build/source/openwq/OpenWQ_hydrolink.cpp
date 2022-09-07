@@ -203,6 +203,9 @@ int ClassWQ_OpenWQ::run_space_in(
     std::string source_EWF_name,
     int recipient, int ix_r, int iy_r, int iz_r, 
     double wflux_s2r) {
+
+    // Convert Fortran Index to C++ index
+    ix_r -= 1; iy_r -= 1; iz_r -= 1;
     
     time_t simtime = convert_time(
         simtime_summa[0], 

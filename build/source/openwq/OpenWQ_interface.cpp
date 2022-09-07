@@ -87,7 +87,6 @@ int openwq_run_space_in(
     
     // convert source_EWF_name to string
     std::string source_EWF_name_str(source_EWF_name);
-    std::cout << source_EWF_name_str << "\n"; 
 
     return openWQ->run_space_in(
         simtime_summa,
