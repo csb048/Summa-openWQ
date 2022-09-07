@@ -314,7 +314,8 @@ subroutine run_space_step(  &
   USE var_lookup,   only: iLookPROG  ! named variables for state variables
   USE var_lookup,   only: iLookTIME  ! named variables for time data structure
   USE var_lookup,   only: iLookFLUX  ! named varaibles for flux data
-  USE var_lookup, only: iLookATTR  ! named variables for real valued attribute data structure
+  USE var_lookup,   only: iLookATTR  ! named variables for real valued attribute data structure
+  USE var_lookup,   only: iLookINDEX 
   USE summa_type,   only: summa1_type_dec            ! master summa data type
   USE globalData,   only: openWQ_obj
   USE data_types,   only: var_dlength,var_i
@@ -371,7 +372,7 @@ subroutine run_space_step(  &
 
   do iGRU=1,nGRU
     do iHRU=1,gru_struc(iGRU)%hruCount
-
+      print*, hru_index
       hru_index = hru_index + 1
 
       ! ####################################################################
@@ -389,8 +390,13 @@ subroutine run_space_step(  &
         scalarCanopyLiqDrainage_summa_kg_m2_s1    => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopyLiqDrainage)%dat(1)         ,&
         scalarCanopyTranspiration_summa_kg_m2_s1  => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopyTranspiration)%dat(1)       ,& 
         scalarCanopyEvaporation_summa_kg_m2_s1    => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopyEvaporation)%dat(1)         ,&
-        scalarCanopySublimation_summa_kg_m2_s1    => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopySublimation)%dat(1)         ,& 
+        scalarCanopySublimation_summa_kg_m2_s1    => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopySublimation)%dat(1)         &
+      )
+
+      Snow_SoilVars: associate(&
         ! Snow + Soil - Control Volume
+        current_nSnow                             => summa1_struc%indxStruct%gru(iGRU)%hru(iHRU)%var(iLookINDEX%nSnow)%dat(1)             ,&
+        current_nSoil                             => summa1_struc%indxStruct%gru(iGRU)%hru(iHRU)%var(iLookINDEX%nSoil)%dat(1)             ,&
         mLayerVolFracWat_summa_kg_m2              => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:) ,&
         ! Snow Fluxes
         nSnow                                     => gru_struc(iGRU)%hruInfo(iHRU)%nSnow                                                  ,&
@@ -402,6 +408,8 @@ subroutine run_space_step(  &
         ! Aquifer
         scalarAquiferStorage_summa_kg_m2          => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
       )
+        print*, "Snow = ", current_nSnow
+        print*, "Soil = ", current_nSoil
 
         ! If no canopy, then skip
         !if(canopyStorWat_summa_kg_m2 =/ valueMissing) then
@@ -465,21 +473,32 @@ subroutine run_space_step(  &
       ! ####################################################################
       ! Snow Fluxes
       ! ####################################################################
-      do iLayer = 1, nSnow-1 ! last layer of snow becomes different fluxes 
-        iz_s = iLayer; iz_r = iLayer + 1;
-        iy_r = 1; iz_r = 1
-        err=openwq_obj%run_space(                         &
-          simtime,                                        &
-          mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
-          mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
-          mLayerLiqFluxSnow_s1(iLayer),                   &
-          mLayerVolFracWat_summa_kg_m2(iLayer))
-      end do
+      ! Special care will need to be taken with the snow
+      if (current_nSnow /= 0) then
+        do iLayer = 1, nSnow-1 ! last layer of snow becomes different fluxes 
+          iz_s = iLayer; iz_r = iLayer + 1;
+          iy_r = 1; iz_r = 1
+          err=openwq_obj%run_space(                         &
+            simtime,                                        &
+            mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
+            mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
+            mLayerLiqFluxSnow_s1(iLayer),                   &
+            mLayerVolFracWat_summa_kg_m2(iLayer))
+        end do
+      end if
+      ! Fluxes From Snow to soil
       
 
       ! ####################################################################
       ! Soil Fluxes
       ! ####################################################################
+      
+   
+
+
+
+
+
       do iLayer = 1, nSoil - 1 ! last layer of soil becomes different fluxes
         iz_s = iLayer + nSnow
         iz_r = iLayer + 1 + nSnow
@@ -497,7 +516,7 @@ subroutine run_space_step(  &
       ! ####################################################################
 
       ! Kyle...
-
+      end associate Snow_SoilVars
       end associate CanopyVars
 
     end do
