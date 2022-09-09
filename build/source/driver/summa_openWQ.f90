@@ -403,13 +403,16 @@ subroutine run_space_step(  &
         mLayerLiqFluxSnow_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%mLayerLiqFluxSnow)%dat(:)               ,&
         ! Soil Fluxes
         nSoil                                     => gru_struc(iGRU)%hruInfo(iHRU)%nSoil                                                  ,&
-        mLayerLiqFluxSoil_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%mLayerLiqFluxSoil)%dat(:)               ,&
+        mLayerLiqFluxSoil_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%mLayerLiqFluxSoil)%dat(:)               &
+      )
+
+      AquiferVars: associate(&
 
         ! Aquifer
-        scalarAquiferStorage_summa_kg_m2          => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
+        scalarAquiferStorage_summa_kg_m2          => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1), &
+        scalarAquiferRecharge_m                   => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarAquiferRecharge)%dat(1)              , &        
+        scalarAquiferBaseflow_OUT                 => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarAquiferBaseflow)%dat(1)                &        
       )
-        print*, "Snow = ", current_nSnow
-        print*, "Soil = ", current_nSoil
 
         ! If no canopy, then skip
         !if(canopyStorWat_summa_kg_m2 =/ valueMissing) then
@@ -493,16 +496,9 @@ subroutine run_space_step(  &
       ! Soil Fluxes
       ! ####################################################################
       
-   
-
-
-
-
-
       do iLayer = 1, nSoil - 1 ! last layer of soil becomes different fluxes
-        iz_s = iLayer + nSnow
-        iz_r = iLayer + 1 + nSnow
-        iy_r = 1; iz_r = 1
+        iy_r = 1; iz_s = iLayer + nSnow;
+        iy_r = 1; iz_r = iLayer + 1 + nSnow
         err=openwq_obj%run_space(                         &
           simtime,                                        &
           mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
@@ -514,8 +510,26 @@ subroutine run_space_step(  &
       ! ####################################################################
       ! Aquifer Fluxes
       ! ####################################################################
+      iy_s = 1; iz_s = nSoil
+      iy_r = 1; iz_r = 1
+      err=openwq_obj%run_space(                           &
+        simtime,                                          &
+        mLayerVolFracWat_index, hru_index, iy_s, iz_s,    &
+        scalarAquifer_index, hru_index, iy_r, iz_r,       &
+        scalarAquiferRecharge_m,                          &
+        mLayerVolFracWat_summa_kg_m2(nSoil))
 
-      ! Kyle...
+      
+      iy_s = 1; iz_s = 1; 
+      iy_r = -1; iz_r = -1 ! -1 is the flag for no recipient inside the system (so lost from model)
+      err=openwq_obj%run_space(                         &
+        simtime,                                        &
+        scalarAquifer_index, hru_index, iy_s, iz_s,     &
+        scalarAquifer_index, hru_index, iy_r, iz_r,     &
+        scalarAquiferBaseflow_OUT,                      &
+        scalarAquiferStorage_summa_kg_m2)
+      
+      end associate AquiferVars
       end associate Snow_SoilVars
       end associate CanopyVars
 
