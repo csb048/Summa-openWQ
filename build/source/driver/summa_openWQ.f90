@@ -342,25 +342,31 @@ subroutine run_space_step(  &
   integer(i4b)                           :: err
   real(rkind),parameter                  :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
 
-  ! compartment indexes
-  integer(i4b)                           :: scalarCanopyWat_index=0 ! SUMMA Side units: kg m-2
-  integer(i4b)                           :: mLayerVolFracWat_index=1 ! SUMMA Side units: ????
-  integer(i4b)                           :: mLayerMatricHead_index=2 ! SUMMA Side units: m
-  integer(i4b)                           :: scalarAquifer_index=3 ! SUMMA Side units: m
+  ! compartment indexes in OpenWQ (defined in the hydrolink)
+  integer(i4b)                           :: scalarCanopyWat_indexOpenWQ   = 0
+  integer(i4b)                           :: mLayerVolFracWat_indexOpenWQ  = 1
+  integer(i4b)                           :: mLayerMatricHead_indexOpenWQ  = 2
+  integer(i4b)                           :: scalarAquifer_indexOpenWQ     = 3
   integer(i4b)                           :: iy_r
   integer(i4b)                           :: iz_r
   integer(i4b)                           :: iy_s
   integer(i4b)                           :: iz_s
 
+  ! Summa to OpenWQ units
+  ! DomainVars
   real(rkind)                            :: hru_area_m2
-  real(rkind)                            :: canopyStorWat_kg_m3
+  ! PrecipVars
+  real(rkind)                            :: scalarRainfall_summa_m3
+  real(rkind)                            :: scalarSnowfall_summa_m3
   real(rkind)                            :: scalarThroughfallRain_summa_m3
   real(rkind)                            :: scalarThroughfallSnow_summa_m3
-  real(rkind)                            :: fluxOUT_scalarCanopySnowUnloading_summa_m3
-  real(rkind)                            :: fluxOUT_scalarCanopyLiqDrainage_summa_m3
-  real(rkind)                            :: fluxOUT_scalarCanopyTranspiration_summa_m3
-  real(rkind)                            :: fluxOUT_scalarCanopyEvaporation_summa_m3
-  real(rkind)                            :: fluxOUT_scalarCanopySublimation_summa_m3      
+  ! CanopyVars
+  real(rkind)                            :: canopyStorWat_kg_m3
+  real(rkind)                            :: scalarCanopySnowUnloading_summa_m3
+  real(rkind)                            :: scalarCanopyLiqDrainage_summa_m3
+  real(rkind)                            :: scalarCanopyTranspiration_summa_m3
+  real(rkind)                            :: scalarCanopyEvaporation_summa_m3
+  real(rkind)                            :: scalarCanopySublimation_summa_m3      
 
   simtime(1) = timeStruct%var(iLookTIME%iyyy)  ! Year
   simtime(2) = timeStruct%var(iLookTIME%im)    ! month
@@ -376,16 +382,25 @@ subroutine run_space_step(  &
       hru_index = hru_index + 1
 
       ! ####################################################################
-      ! CANOPY Fluxes
+      ! Associate relevant variables
       ! ####################################################################
 
-      ! Associate relevant variables
+      DomainVars: associate( &
+        ! General Summa info
+        hru_area_m2 => summa1_struc%attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)  &
+      )
+
+      PrecipVars: associate( &
+        ! Precipitation 
+        scalarRainfall_summa_kg_m2_s1 => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarRainfall)%dat(1)           ,&
+        scalarSnowfall_summa_kg_m2_s1 => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarSnowfall)%dat(1)           ,&
+        scalarThroughfallRain_summa_kg_m2_s1      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarThroughfallRain)%dat(1)           ,&
+        scalarThroughfallSnow_summa_kg_m2_s1      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarThroughfallSnow)%dat(1)           &
+      )
+
       CanopyVars: associate( &     
-        hru_area_m2                               => summa1_struc%attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)                   ,&
         ! Canopy           
         canopyStorWat_summa_kg_m2                 => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1)  ,&
-        scalarThroughfallRain_summa_kg_m2_s1      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarThroughfallRain)%dat(1)           ,&
-        scalarThroughfallSnow_summa_kg_m2_s1      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarThroughfallSnow)%dat(1)           ,&
         scalarCanopySnowUnloading_summa_kg_m2_s1  => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopySnowUnloading)%dat(1)       ,&
         scalarCanopyLiqDrainage_summa_kg_m2_s1    => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopyLiqDrainage)%dat(1)         ,&
         scalarCanopyTranspiration_summa_kg_m2_s1  => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarCanopyTranspiration)%dat(1)       ,& 
@@ -408,68 +423,71 @@ subroutine run_space_step(  &
         ! Aquifer
         scalarAquiferStorage_summa_kg_m2          => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1) &
       )
-        print*, "Snow = ", current_nSnow
-        print*, "Soil = ", current_nSoil
 
-        ! If no canopy, then skip
-        !if(canopyStorWat_summa_kg_m2 =/ valueMissing) then
+      print*, "Snow = ", current_nSnow
+      print*, "Soil = ", current_nSoil
 
-        ! Convert Canopy water volume to m3
-        canopyStorWat_kg_m3 = CanopyStorWat_summa_kg_m2 * hru_area_m2 / iden_water
+      ! ####################################################################
+      ! Converte associate variable units: from SUMMA to OpenWQ units
+      ! OpenWQ: Volume (m3), Time (sec)
+      ! Where: Vol in kg/m2, then convert to m3 by multipling by (hru_area_m2 / iden_water)
+      ! Where: Flux in kg/m2/s, then convert to m3/time_step by multiplying by (hru_area_m2 * data_step / iden_water)
+      ! ####################################################################
 
-        ! Unit conversions for the fluxes (summa data_step is in seconds)
-        ! Dividing both by iden_water because we want in vol in m3 of liquid water
-        scalarThroughfallRain_summa_m3 = scalarThroughfallRain_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
-        scalarThroughfallSnow_summa_m3 = scalarThroughfallSnow_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
-        fluxOUT_scalarCanopySnowUnloading_summa_m3 = scalarCanopySnowUnloading_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
-        fluxOUT_scalarCanopyLiqDrainage_summa_m3 = scalarCanopyLiqDrainage_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
-        fluxOUT_scalarCanopyTranspiration_summa_m3 = scalarCanopyTranspiration_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
-        fluxOUT_scalarCanopyEvaporation_summa_m3 = scalarCanopyEvaporation_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
-        fluxOUT_scalarCanopySublimation_summa_m3 = scalarCanopySublimation_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
+      ! PrecipVars
+      scalarRainfall_summa_m3 = scalarRainfall_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
+      scalarSnowfall_summa_m3 = scalarSnowfall_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water
+      scalarThroughfallRain_summa_m3 = scalarThroughfallRain_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water ! flux
+      scalarThroughfallSnow_summa_m3 = scalarThroughfallSnow_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water ! flux
 
-        ! .......................................................
-        ! Call run_space ........................................
-        ! .......................................................
-        
-        ! 1) Input flux (Precipitation)
-        ! scalarThroughfallRain + scalarThroughfallSnow
+      ! CanopyVars
+      canopyStorWat_kg_m3 = CanopyStorWat_summa_kg_m2 * hru_area_m2 / iden_water ! vol
+      scalarCanopySnowUnloading_summa_m3 = scalarCanopySnowUnloading_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water ! flux
+      scalarCanopyLiqDrainage_summa_m3 = scalarCanopyLiqDrainage_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water ! flux
+      scalarCanopyTranspiration_summa_m3 = scalarCanopyTranspiration_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water ! flux
+      scalarCanopyEvaporation_summa_m3 = scalarCanopyEvaporation_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water ! flux
+      scalarCanopySublimation_summa_m3 = scalarCanopySublimation_summa_kg_m2_s1 * hru_area_m2 * data_step / iden_water ! flux
+
+      ! ####################################################################
+      ! Apply Fluxes
+      ! Call RunSpaceStep
+      ! ####################################################################
+
+      ! precipitation -> canopy
+      if(canopyStorWat_summa_kg_m2 /= valueMissing) then
+      
         iy_r = 1; iz_r = 1
-        err=openwq_obj%run_space_in(                      &
-          simtime,                                        &
-          'PRECIP',                                       &
-          mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
-          scalarThroughfallRain_summa_m3                  &
-            + scalarThroughfallSnow_summa_m3)
+        err=openwq_obj%run_space_in(                                      &
+          simtime,                                                        &
+          'PRECIP',                                                       &
+          mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,                  &
+          (scalarRainfall_summa_m3 - scalarThroughfallRain_summa_m3)      & 
+            + (scalarSnowfall_summa_m3 - scalarThroughfallSnow_summa_m3)  &
+          )
 
-        ! 2) fluxOUT to Upper soil/snow layer 
-        ! scalarCanopySnowUnloading + flux_scalarCanopyLiqDrainage_m3
-        ! They can be together because the source and sink compartments and ix,iy,iz are the same
+        ! canopy -> upper snow/soil upper layer
         iy_s = 1; iz_s = 1; 
         iy_r = 1; iz_r = 1
         err=openwq_obj%run_space(                         &
           simtime,                                        &
-          scalarCanopyWat_index, hru_index, iy_s, iz_s,   &
-          mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
-          fluxOUT_scalarCanopySnowUnloading_summa_m3      & 
-            + fluxOUT_scalarCanopyLiqDrainage_summa_m3,   &
+          scalarCanopyWat_indexOpenWQ, hru_index, iy_s, iz_s,   &
+          mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
+          scalarCanopySnowUnloading_summa_m3 + scalarCanopyLiqDrainage_summa_m3,           &
           canopyStorWat_kg_m3)
 
-        ! 3) fluxOUT (lost from system) -> leads to incresed concentration
-        ! fluxOUT_scalarCanopyTranspiration_summa_m3 + fluxOUT_scalarCanopyEvaporation_summa_m3 + fluxOUT_scalarCanopySublimation_summa_m3
-        iy_s = 1; iz_s = 1; 
-        iy_r = -1; iz_r = -1 ! -1 is the flag for no recipient inside the system (so lost from model)
-        err=openwq_obj%run_space(                         &
-          simtime,                                        &
-          scalarCanopyWat_index, hru_index, iy_s, iz_s,   &
-          mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
-          fluxOUT_scalarCanopyTranspiration_summa_m3      &  
-            + fluxOUT_scalarCanopyEvaporation_summa_m3    &
-            + fluxOUT_scalarCanopySublimation_summa_m3,   &
-          canopyStorWat_kg_m3)
+        ! canopy -> OUT (lost from model)
+          iy_s = 1; iz_s = 1; 
+          iy_r = -1; iz_r = -1 ! -1 is the flag for no recipient inside the system (so lost from model)
+          err=openwq_obj%run_space(                         &
+            simtime,                                        &
+            scalarCanopyWat_indexOpenWQ, hru_index, iy_s, iz_s,   &
+            mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
+            scalarCanopyTranspiration_summa_m3 + scalarCanopyEvaporation_summa_m3 + &
+              scalarCanopySublimation_summa_m3,   &
+            canopyStorWat_kg_m3)
 
-      !endif
+      endif
         
-
       ! ####################################################################
       ! Snow Fluxes
       ! ####################################################################
@@ -480,8 +498,8 @@ subroutine run_space_step(  &
           iy_r = 1; iz_r = 1
           err=openwq_obj%run_space(                         &
             simtime,                                        &
-            mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
-            mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
+            mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,  &
+            mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
             mLayerLiqFluxSnow_s1(iLayer),                   &
             mLayerVolFracWat_summa_kg_m2(iLayer))
         end do
@@ -493,20 +511,14 @@ subroutine run_space_step(  &
       ! Soil Fluxes
       ! ####################################################################
       
-   
-
-
-
-
-
       do iLayer = 1, nSoil - 1 ! last layer of soil becomes different fluxes
         iz_s = iLayer + nSnow
         iz_r = iLayer + 1 + nSnow
         iy_r = 1; iz_r = 1
         err=openwq_obj%run_space(                         &
           simtime,                                        &
-          mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
-          mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
+          mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,  &
+          mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
           mLayerLiqFluxSoil_s1(iLayer+nSnow),             &
           mLayerVolFracWat_summa_kg_m2(iLayer+nSnow))
       end do
@@ -518,6 +530,10 @@ subroutine run_space_step(  &
       ! Kyle...
       end associate Snow_SoilVars
       end associate CanopyVars
+      end associate PrecipVars
+      end associate DomainVars
+      
+      
 
     end do
   end do

@@ -89,7 +89,7 @@ int ClassWQ_OpenWQ::decl(
         OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil_K",num_HRU,nYdirec_2openwq,1));
 
         // Master Json
-        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/Summa-OpenWQ/synthetic_tests/1_conserv_instant_SW/summa/openWQ_master.json";
+        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
 
 
         OpenWQ_couplercalls_ref->InitialConfig(
@@ -237,6 +237,8 @@ int ClassWQ_OpenWQ::run_space_in(
         source_EWF_name,
         recipient, ix_r, iy_r, iz_r,
         wflux_s2r);
+
+    return 0;
 }
 
 int ClassWQ_OpenWQ::run_time_end(
