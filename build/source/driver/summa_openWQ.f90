@@ -453,41 +453,42 @@ subroutine run_space_step(  &
       ! Call RunSpaceStep
       ! ####################################################################
 
-      ! precipitation -> canopy
+      ! Fluxes involving the canopy
       if(canopyStorWat_summa_kg_m2 /= valueMissing) then
-      
+        
+        ! precipitation -> canopy
         iy_r = 1; iz_r = 1
-        err=openwq_obj%run_space_in(                                      &
-          simtime,                                                        &
-          'PRECIP',                                                       &
+        err=openwq_obj%run_space_in(                                            &
+          simtime,                                                              &
+          'PRECIP',                                                             &
           mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,                  &
-          (scalarRainfall_summa_m3 - scalarThroughfallRain_summa_m3)      & 
-            + (scalarSnowfall_summa_m3 - scalarThroughfallSnow_summa_m3)  &
+          (scalarRainfall_summa_m3 - scalarThroughfallRain_summa_m3)            & 
+            + (scalarSnowfall_summa_m3 - scalarThroughfallSnow_summa_m3)        &
           )
 
         ! canopy -> upper snow/soil upper layer
         iy_s = 1; iz_s = 1; 
         iy_r = 1; iz_r = 1
-        err=openwq_obj%run_space(                         &
-          simtime,                                        &
-          scalarCanopyWat_indexOpenWQ, hru_index, iy_s, iz_s,   &
-          mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
-          scalarCanopySnowUnloading_summa_m3 + scalarCanopyLiqDrainage_summa_m3,           &
+        err=openwq_obj%run_space(                                                 &
+          simtime,                                                                &
+          scalarCanopyWat_indexOpenWQ, hru_index, iy_s, iz_s,                     &
+          mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,                    &
+          scalarCanopySnowUnloading_summa_m3 + scalarCanopyLiqDrainage_summa_m3,  &
           canopyStorWat_kg_m3)
 
         ! canopy -> OUT (lost from model)
           iy_s = 1; iz_s = 1; 
           iy_r = -1; iz_r = -1 ! -1 is the flag for no recipient inside the system (so lost from model)
-          err=openwq_obj%run_space(                         &
-            simtime,                                        &
-            scalarCanopyWat_indexOpenWQ, hru_index, iy_s, iz_s,   &
-            mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
-            scalarCanopyTranspiration_summa_m3 + scalarCanopyEvaporation_summa_m3 + &
-              scalarCanopySublimation_summa_m3,   &
+          err=openwq_obj%run_space(                                                   &
+            simtime,                                                                  &
+            scalarCanopyWat_indexOpenWQ, hru_index, iy_s, iz_s,                       &
+            mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,                      &
+            scalarCanopyTranspiration_summa_m3 + scalarCanopyEvaporation_summa_m3 +   &
+              scalarCanopySublimation_summa_m3,                                       &
             canopyStorWat_kg_m3)
 
       endif
-        
+      
       ! ####################################################################
       ! Snow Fluxes
       ! ####################################################################
@@ -496,14 +497,16 @@ subroutine run_space_step(  &
         do iLayer = 1, nSnow-1 ! last layer of snow becomes different fluxes 
           iz_s = iLayer; iz_r = iLayer + 1;
           iy_r = 1; iz_r = 1
-          err=openwq_obj%run_space(                         &
-            simtime,                                        &
-            mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,  &
-            mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
-            mLayerLiqFluxSnow_s1(iLayer),                   &
+          err=openwq_obj%run_space(                                                   &
+            simtime,                                                                  &
+            mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,                      &
+            mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,                      &
+            mLayerLiqFluxSnow_s1(iLayer),                                             &
             mLayerVolFracWat_summa_kg_m2(iLayer))
         end do
       end if
+
+      
       ! Fluxes From Snow to soil
       
 
