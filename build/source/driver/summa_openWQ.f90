@@ -372,7 +372,6 @@ subroutine run_space_step(  &
 
   do iGRU=1,nGRU
     do iHRU=1,gru_struc(iGRU)%hruCount
-      print*, hru_index
       hru_index = hru_index + 1
 
       ! ####################################################################
@@ -400,10 +399,10 @@ subroutine run_space_step(  &
         mLayerVolFracWat_summa_kg_m2              => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:) ,&
         ! Snow Fluxes
         nSnow                                     => gru_struc(iGRU)%hruInfo(iHRU)%nSnow                                                  ,&
-        mLayerLiqFluxSnow_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%mLayerLiqFluxSnow)%dat(:)               ,&
+        iLayerLiqFluxSnow_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%iLayerLiqFluxSnow)%dat(:)               ,&
         ! Soil Fluxes
         nSoil                                     => gru_struc(iGRU)%hruInfo(iHRU)%nSoil                                                  ,&
-        mLayerLiqFluxSoil_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%mLayerLiqFluxSoil)%dat(:)               &
+        iLayerLiqFluxSoil_s1                      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%iLayerLiqFluxSoil)%dat(:)               &
       )
 
       AquiferVars: associate(&
@@ -485,7 +484,7 @@ subroutine run_space_step(  &
             simtime,                                        &
             mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
             mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
-            mLayerLiqFluxSnow_s1(iLayer),                   &
+            iLayerLiqFluxSnow_s1(iLayer-1),                 & ! I think this needs to be -1 because the interfaces fluxes start at 0
             mLayerVolFracWat_summa_kg_m2(iLayer))
         end do
       end if
@@ -503,7 +502,7 @@ subroutine run_space_step(  &
           simtime,                                        &
           mLayerVolFracWat_index, hru_index, iy_s, iz_s,  &
           mLayerVolFracWat_index, hru_index, iy_r, iz_r,  &
-          mLayerLiqFluxSoil_s1(iLayer+nSnow),             &
+          iLayerLiqFluxSoil_s1(iLayer+nSnow-1),           & ! I think this needs to be -1 because the interfaces fluxes start at 0
           mLayerVolFracWat_summa_kg_m2(iLayer+nSnow))
       end do
 
