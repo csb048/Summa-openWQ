@@ -260,12 +260,6 @@ subroutine run_time_start_go( &
 
         enddo
 
-        ! **************  
-        ! Fluxes
-        !************** 
-
-        ! TODO
-
         ! Copy the prog structure
         do iVar = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var)
           do iDat = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat)
@@ -397,7 +391,7 @@ subroutine run_space_step(  &
 
   do iGRU=1,nGRU
     do iHRU=1,gru_struc(iGRU)%hruCount
-      print*, hru_index
+      !print*, hru_index
       hru_index = hru_index + 1
 
       ! ####################################################################
