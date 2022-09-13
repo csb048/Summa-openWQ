@@ -509,10 +509,10 @@ subroutine run_space_step(  &
         wflux_s2r = (scalarRainfall_summa_m3 - scalarThroughfallRain_summa_m3) &
                     + (scalarSnowfall_summa_m3 - scalarThroughfallSnow_summa_m3)
         ! *Call run_space_in*
-        err=openwq_obj%run_space_in(                                            &
-          simtime,                                                              &
-          'PRECIP',                                                             &
-          canopy_index_openwq, hru_index, iy_r, iz_r,                           &
+        err=openwq_obj%run_space_in(                    &
+          simtime,                                      &
+          'PRECIP',                                     &
+          canopy_index_openwq, hru_index, iy_r, iz_r,   &
           wflux_s2r)
 
         ! ====================================================
@@ -533,10 +533,10 @@ subroutine run_space_step(  &
         wflux_s2r = scalarCanopySnowUnloading_summa_m3 &
                       + scalarCanopyLiqDrainage_summa_m3
         ! *Call run_space*
-        err=openwq_obj%run_space(                                                 &
-          simtime,                                                                &
-          OpenWQindex_s, hru_index, iy_s, iz_s,                     &
-          OpenWQindex_r, hru_index, iy_r, iz_r,                    &
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
           wflux_s2r,  &
           wmass_source)
         
@@ -558,11 +558,11 @@ subroutine run_space_step(  &
                       + scalarCanopyEvaporation_summa_m3  &
                       + scalarCanopySublimation_summa_m3
         ! *Call run_space*
-        err=openwq_obj%run_space(                                                   &
-          simtime,                                                                  &
-          OpenWQindex_s, hru_index, iy_s, iz_s,                       &
-          OpenWQindex_r, hru_index, iy_r, iz_r,                                   &
-          wflux_s2r,                                                              &
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,  &
           wmass_source)
 
       endif
@@ -589,11 +589,11 @@ subroutine run_space_step(  &
       wflux_s2r = scalarThroughfallRain_summa_m3 &
                     + scalarThroughfallSnow_summa_m3
       ! *Call run_space_in*
-      err=openwq_obj%run_space_in(                                            &
-        simtime,                                                              &
-        'PRECIP',                                                             &
-        OpenWQindex_r, hru_index, iy_r, iz_r,                  &
-        wflux_s2r       &
+      err=openwq_obj%run_space_in(                &
+        simtime,                                  &
+        'PRECIP',                                 &
+        OpenWQindex_r, hru_index, iy_r, iz_r,     &
+        wflux_s2r                                 &
         )
       
       ! Snow fluxes
@@ -617,11 +617,11 @@ subroutine run_space_step(  &
         ! snow sublimation
         wflux_s2r = scalarSnowSublimation_summa_m3
         ! *Call run_space*
-        err=openwq_obj%run_space(                                     &
-          simtime,                                                    &
-          OpenWQindex_s, hru_index, iy_s, iz_s,        &
-          -1, -1, -1, -1,                                             & ! lost
-          wflux_s2r,                                      &
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
           wmass_source)
 
         ! ====================================================
@@ -641,11 +641,11 @@ subroutine run_space_step(  &
           mLayerLiqFluxSnow_summa_m3 = iLayerLiqFluxSnow_summa_m_s(iLayer) * hru_area_m2 * data_step
           wflux_s2r = mLayerLiqFluxSnow_summa_m3 
           ! *Call run_space*
-          err=openwq_obj%run_space(                               &
-            simtime,                                              &
-            OpenWQindex_s, hru_index, iy_s, iz_s,  &
-            OpenWQindex_r, hru_index, iy_r, iz_r,  &
-            wflux_s2r,                 & 
+          err=openwq_obj%run_space(                       &
+            simtime,                                      &
+            OpenWQindex_s, hru_index, iy_s, iz_s,         &
+            OpenWQindex_r, hru_index, iy_r, iz_r,         &
+            wflux_s2r,                                    &
             wmass_source)
 
         end do
@@ -669,11 +669,11 @@ subroutine run_space_step(  &
       ! *Flux*
       wflux_s2r = scalarGroundEvaporation_summa_m3
       ! *Call run_space*
-      err=openwq_obj%run_space(                                     &
-        simtime,                                                    &
-        OpenWQindex_s, hru_index, iy_s, iz_s,        &
-        OpenWQindex_r, hru_index, iy_r, iz_r,  &
-        wflux_s2r,                           &
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
         wmass_source)
 
       ! ====================================================
@@ -695,11 +695,11 @@ subroutine run_space_step(  &
       mLayerLiqFluxSnow_summa_m3 = iLayerLiqFluxSnow_summa_m_s(nSnow) * hru_area_m2 * data_step
       wflux_s2r = mLayerLiqFluxSnow_summa_m3
       ! *Call run_space*
-      err=openwq_obj%run_space(                               &
-        simtime,                                              &
-        OpenWQindex_s, hru_index, iy_s, iz_s,  &
-        OpenWQindex_r, hru_index, iy_r, iz_r,  &
-        wflux_s2r,                 & 
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
         wmass_source)
 
       ! ====================================================
@@ -722,12 +722,13 @@ subroutine run_space_step(  &
         mLayerLiqFluxSoil_summa_m3 = iLayerLiqFluxSoil_summa_m_s(iLayer-1) * hru_area_m2 * data_step
         wflux_s2r = mLayerLiqFluxSoil_summa_m3 
         ! *Call run_space*
-        err=openwq_obj%run_space(                               &
-          simtime,                                              &
-          OpenWQindex_s, hru_index, iy_s, iz_s,  &
-          OpenWQindex_r, hru_index, iy_r, iz_r,  & 
-          wflux_s2r,                 & 
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
           wmass_source)
+
       end do
 
       ! --------------------------------------------------------------------
@@ -753,11 +754,11 @@ subroutine run_space_step(  &
       ! *Flux*
       wflux_s2r = scalarAquiferRecharge_summa_m3
       ! *Call run_space*
-      err=openwq_obj%run_space(                           &
-        simtime,                                          &
-        OpenWQindex_s, hru_index, iy_s, iz_s,    &
-        OpenWQindex_r, hru_index, iy_r, iz_r,       &
-        wflux_s2r,                 & 
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
         wmass_source)
 
       ! ====================================================
@@ -777,11 +778,11 @@ subroutine run_space_step(  &
       ! *Flux*
       wflux_s2r = scalarAquiferBaseflow_summa_m3
       ! *Call run_space*
-      err=openwq_obj%run_space(                           &
-        simtime,                                          &
-        OpenWQindex_s, hru_index, iy_s, iz_s,    &
-        OpenWQindex_r, hru_index, iy_r, iz_r,       &
-        wflux_s2r,                 & 
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
         wmass_source)
 
       ! ====================================================
