@@ -596,13 +596,13 @@ subroutine run_space_step(  &
         wflux_s2r       &
         )
       
-      ! ====================================================
-      ! 2.2 Snow fluxes
-      ! ====================================================
+      ! Snow fluxes
       if (current_nSnow /= 0) then
 
-        ! snow -> OUT (lost from model) (sublimation)
+        ! ====================================================
+        ! 2.2 snow -> OUT (lost from model) (sublimation)
         ! only top snow layer! ->>>> NEED TO CONFIRM THIS
+        ! ====================================================
         ! *Source*:
         ! snow (upper layer)
         OpenWQindex_s = snowSoil_index_openwq
@@ -815,7 +815,6 @@ subroutine run_space_step(  &
       end associate DomainVars
       
       
-
     end do
   end do
 
