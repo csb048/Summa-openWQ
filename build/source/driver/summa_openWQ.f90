@@ -388,6 +388,11 @@ subroutine run_space_step(  &
 
   hru_index = 0
 
+  ! Summa does not have a y-direction, 
+  ! so the dimension will always be 1
+  iy_r = 1 
+  iy_s = 1
+
   do iGRU=1,nGRU
     do iHRU=1,gru_struc(iGRU)%hruCount
       print*, hru_index
@@ -488,12 +493,11 @@ subroutine run_space_step(  &
 
       if(scalarCanopyWat_summa_kg_m2 /= valueMissing) then
         
-        ! precipitation -> canopy
-        iy_r = 1; iz_r = 1
-        wflux_s2r = scalarRainfall_summa_m3 &
-                    - scalarThroughfallRain_summa_m3 &
-                    + scalarSnowfall_summa_m3  &
-                    - scalarThroughfallSnow_summa_m3
+        ! ****************************
+        ! precipitation -> canopy 
+        iz_r = 1
+        wflux_s2r = (scalarRainfall_summa_m3 - scalarThroughfallRain_summa_m3) &
+                    + (scalarSnowfall_summa_m3 - scalarThroughfallSnow_summa_m3)
         err=openwq_obj%run_space_in(                                            &
           simtime,                                                              &
           'PRECIP',                                                             &
@@ -502,8 +506,8 @@ subroutine run_space_step(  &
 
         ! canopy -> upper snow/soil upper layer
         ! scalarCanopySnowUnloading + scalarCanopyLiqDrainage
-        iy_s = 1; iz_s = 1; 
-        iy_r = 1; iz_r = 1
+        iz_s = 1
+        iz_r = 1
         wflux_s2r = scalarCanopySnowUnloading_summa_m3 &
                       + scalarCanopyLiqDrainage_summa_m3
         wmass_source = canopyStorWat_kg_m3
@@ -515,7 +519,7 @@ subroutine run_space_step(  &
           wmass_source)
 
         ! canopy -> OUT (lost from model) (Transp + Evap + Subl)
-          iy_s = 1; iz_s = 1;
+          iz_s = 1;
           wflux_s2r = scalarCanopyTranspiration_summa_m3    &
                         + scalarCanopyEvaporation_summa_m3  &
                         + scalarCanopySublimation_summa_m3
@@ -535,7 +539,7 @@ subroutine run_space_step(  &
       
       ! precicipitation -> upper snow/soil layer
       ! scalarThroughfallRain + scalarThroughfallSnow
-      iy_r = 1; iz_r = 1
+      iz_r = 1
       wflux_s2r = scalarThroughfallRain_summa_m3 &
                     + scalarThroughfallSnow_summa_m3
       err=openwq_obj%run_space_in(                                            &
@@ -552,7 +556,7 @@ subroutine run_space_step(  &
         ! only top snow layer ??
         ! ->>>> NEED TO CONFIRM THIS
         mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(1) * hru_area_m2 * mLayerDepth_summa_m(1)
-        iy_s = 1; iz_s = 1; 
+        iz_s = 1; 
         wflux_s2r = scalarSnowSublimation
         wmass_source = mLayerVolFracWat_summa_m3
         err=openwq_obj%run_space(                                     &
@@ -570,7 +574,7 @@ subroutine run_space_step(  &
           mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer-1) * hru_area_m2 * mLayerDepth_summa_m(iLayer)
           mLayerLiqFluxSnow_summa_m3 = iLayerLiqFluxSnow_summa_m_s(iLayer-1) * hru_area_m2 * data_step
           iz_s = iLayer; iz_r = iLayer + 1;
-          iy_r = 1; iz_r = 1
+          iz_r = 1
           wflux_s2r = mLayerLiqFluxSnow_summa_m3 
           wmass_source = mLayerVolFracWat_summa_m3
           err=openwq_obj%run_space(                               &
@@ -586,7 +590,7 @@ subroutine run_space_step(  &
       ! Soil fluxes
       ! upper soil -> OUT (lost from system) (evaporatoon)
       mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(nSnow+1) * hru_area_m2 * mLayerDepth_summa_m(nSnow+1)
-      iy_s = 1; iz_s = 1; 
+      iz_s = 1; 
       wflux_s2r = scalarGroundEvaporation_summa_m3
       wmass_source = mLayerVolFracWat_summa_m3
       err=openwq_obj%run_space(                                     &
@@ -601,7 +605,7 @@ subroutine run_space_step(  &
       mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(nSnow) * hru_area_m2 * mLayerDepth_summa_m(nSnow)
       mLayerLiqFluxSnow_summa_m3 = iLayerLiqFluxSnow_summa_m_s(nSnow) * hru_area_m2 * data_step
       iz_s = iLayer; iz_r = nSnow; ! snow lower layer
-      iy_r = 1; iz_r = 1           ! soil top layer
+      iz_r = 1           ! soil top layer
       wflux_s2r = mLayerLiqFluxSnow_summa_m3
       wmass_source = mLayerVolFracWat_summa_m3
       err=openwq_obj%run_space(                               &
@@ -618,7 +622,7 @@ subroutine run_space_step(  &
         mLayerLiqFluxSoil_summa_m3 = iLayerLiqFluxSoil_summa_m_s(iLayer-1) * hru_area_m2 * data_step
         iz_s = iLayer + nSnow
         iz_r = iLayer + 1 + nSnow
-        iy_r = 1; iz_r = 1
+        iz_r = 1
         wflux_s2r = mLayerLiqFluxSoil_summa_m3 
         wmass_source = mLayerVolFracWat_summa_m3
         err=openwq_obj%run_space(                               &
@@ -635,8 +639,8 @@ subroutine run_space_step(  &
       
       ! Lower soil layer -> Aquifer
       mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(nSoil) * hru_area_m2 * mLayerDepth_summa_m(nSoil)
-      iy_s = 1; iz_s = nSoil
-      iy_r = 1; iz_r = 1
+      iz_s = nSoil
+      iz_r = 1
       wflux_s2r = scalarAquiferRecharge_summa_m3
       wmass_source = mLayerVolFracWat_summa_m3
       err=openwq_obj%run_space(                           &
@@ -648,7 +652,7 @@ subroutine run_space_step(  &
 
       ! Aquifer -> OUT (lost from model) (baseflow) 
       ! ->>>> NEED TO CONFIRM THAT THIS IS REALLY LOST
-      iy_s = 1; iz_s = 1; 
+      iz_s = 1; 
       wflux_s2r = scalarAquiferBaseflow_summa_m3
       wmass_source = scalarAquiferStorage_summa_m3
       err=openwq_obj%run_space(                           &
@@ -659,7 +663,7 @@ subroutine run_space_step(  &
         wmass_source)
 
       ! Aquifer -> OUT (lost from model) (transpiration) 
-        iy_s = 1; iz_s = 1; 
+        iz_s = 1; 
         wflux_s2r = scalarAquiferTranspire_summa_m3
         wmass_source = scalarAquiferStorage_summa_m3
         err=openwq_obj%run_space(                         &
