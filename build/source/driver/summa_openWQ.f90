@@ -343,10 +343,9 @@ subroutine run_space_step(  &
   real(rkind),parameter                  :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
 
   ! compartment indexes in OpenWQ (defined in the hydrolink)
-  integer(i4b)                           :: scalarCanopyWat_indexOpenWQ   = 0
-  integer(i4b)                           :: mLayerVolFracWat_indexOpenWQ  = 1
-  integer(i4b)                           :: mLayerMatricHead_indexOpenWQ  = 2
-  integer(i4b)                           :: scalarAquifer_indexOpenWQ     = 3
+  integer(i4b)                           :: canopy_index_openwq   = 0
+  integer(i4b)                           :: snowSoil_index_openwq  = 1
+  integer(i4b)                           :: aquifer_index_openwq     = 2
   integer(i4b)                           :: iy_r
   integer(i4b)                           :: iz_r
   integer(i4b)                           :: iy_s
@@ -501,7 +500,7 @@ subroutine run_space_step(  &
         err=openwq_obj%run_space_in(                                            &
           simtime,                                                              &
           'PRECIP',                                                             &
-          scalarCanopyWat_indexOpenWQ, hru_index, iy_r, iz_r,                   &
+          canopy_index_openwq, hru_index, iy_r, iz_r,                   &
           wflux_s2r)
 
         ! canopy -> upper snow/soil upper layer
@@ -513,8 +512,8 @@ subroutine run_space_step(  &
         wmass_source = canopyStorWat_kg_m3
         err=openwq_obj%run_space(                                                 &
           simtime,                                                                &
-          scalarCanopyWat_indexOpenWQ, hru_index, iy_s, iz_s,                     &
-          mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,                    &
+          canopy_index_openwq, hru_index, iy_s, iz_s,                     &
+          snowSoil_index_openwq, hru_index, iy_r, iz_r,                    &
           wflux_s2r,  &
           wmass_source)
 
@@ -526,7 +525,7 @@ subroutine run_space_step(  &
           wmass_source = canopyStorWat_kg_m3
           err=openwq_obj%run_space(                                                   &
             simtime,                                                                  &
-            scalarCanopyWat_indexOpenWQ, hru_index, iy_s, iz_s,                       &
+            canopy_index_openwq, hru_index, iy_s, iz_s,                       &
             -1, -1, -1, -1,                                                           & ! lost
             wflux_s2r,                                                              &
             wmass_source)
@@ -545,7 +544,7 @@ subroutine run_space_step(  &
       err=openwq_obj%run_space_in(                                            &
         simtime,                                                              &
         'PRECIP',                                                             &
-        mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,                  &
+        snowSoil_index_openwq, hru_index, iy_r, iz_r,                  &
         wflux_s2r       &
         )
       
@@ -561,7 +560,7 @@ subroutine run_space_step(  &
         wmass_source = mLayerVolFracWat_summa_m3
         err=openwq_obj%run_space(                                     &
           simtime,                                                    &
-          mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,        &
+          snowSoil_index_openwq, hru_index, iy_s, iz_s,        &
           -1, -1, -1, -1,                                             & ! lost
           wflux_s2r,                                      &
           wmass_source)
@@ -579,8 +578,8 @@ subroutine run_space_step(  &
           wmass_source = mLayerVolFracWat_summa_m3
           err=openwq_obj%run_space(                               &
             simtime,                                              &
-            mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,  &
-            mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
+            snowSoil_index_openwq, hru_index, iy_s, iz_s,  &
+            snowSoil_index_openwq, hru_index, iy_r, iz_r,  &
             wflux_s2r,                 & 
             wmass_source)
         end do
@@ -595,7 +594,7 @@ subroutine run_space_step(  &
       wmass_source = mLayerVolFracWat_summa_m3
       err=openwq_obj%run_space(                                     &
         simtime,                                                    &
-        mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,        &
+        snowSoil_index_openwq, hru_index, iy_s, iz_s,        &
         -1, -1, -1, -1,                                             & ! lost
         wflux_s2r,                           &
         wmass_source)
@@ -610,8 +609,8 @@ subroutine run_space_step(  &
       wmass_source = mLayerVolFracWat_summa_m3
       err=openwq_obj%run_space(                               &
         simtime,                                              &
-        mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,  &
-        mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  &
+        snowSoil_index_openwq, hru_index, iy_s, iz_s,  &
+        snowSoil_index_openwq, hru_index, iy_r, iz_r,  &
         wflux_s2r,                 & 
         wmass_source)
 
@@ -627,8 +626,8 @@ subroutine run_space_step(  &
         wmass_source = mLayerVolFracWat_summa_m3
         err=openwq_obj%run_space(                               &
           simtime,                                              &
-          mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,  &
-          mLayerVolFracWat_indexOpenWQ, hru_index, iy_r, iz_r,  & 
+          snowSoil_index_openwq, hru_index, iy_s, iz_s,  &
+          snowSoil_index_openwq, hru_index, iy_r, iz_r,  & 
           wflux_s2r,                 & 
           wmass_source)
       end do
@@ -645,8 +644,8 @@ subroutine run_space_step(  &
       wmass_source = mLayerVolFracWat_summa_m3
       err=openwq_obj%run_space(                           &
         simtime,                                          &
-        mLayerVolFracWat_indexOpenWQ, hru_index, iy_s, iz_s,    &
-        scalarAquifer_indexOpenWQ, hru_index, iy_r, iz_r,       &
+        snowSoil_index_openwq, hru_index, iy_s, iz_s,    &
+        aquifer_index_openwq, hru_index, iy_r, iz_r,       &
         wflux_s2r,                 & 
         wmass_source)
 
@@ -657,7 +656,7 @@ subroutine run_space_step(  &
       wmass_source = scalarAquiferStorage_summa_m3
       err=openwq_obj%run_space(                           &
         simtime,                                          &
-        scalarAquifer_indexOpenWQ, hru_index, iy_s, iz_s,       &
+        aquifer_index_openwq, hru_index, iy_s, iz_s,       &
         -1, -1, -1, -1,                                   & ! lost
         wflux_s2r,                 & 
         wmass_source)
@@ -668,7 +667,7 @@ subroutine run_space_step(  &
         wmass_source = scalarAquiferStorage_summa_m3
         err=openwq_obj%run_space(                         &
           simtime,                                        &
-          scalarAquifer_indexOpenWQ, hru_index, iy_s, iz_s,     &
+          aquifer_index_openwq, hru_index, iy_s, iz_s,     &
           -1, -1, -1, -1,                                 & ! lost
           wflux_s2r,                 & 
           wmass_source)
