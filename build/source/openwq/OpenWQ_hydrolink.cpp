@@ -71,9 +71,8 @@ int ClassWQ_OpenWQ::decl(
         // Compartment names
         // Make sure to use capital letters for compartment names
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",num_HRU,nYdirec_2openwq,nCanopy_2openwq));      // Canopy
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERVOLFRACWAT",num_HRU,nYdirec_2openwq,nSnow_2openwq + nSoil_2openwq)); // Soil + Snow
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"MLAYERMATRICHEAD",num_HRU,nYdirec_2openwq,nSoil_2openwq)); 
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"SCALARAQUIFER",num_HRU,nYdirec_2openwq,nAquifer_2openwq));       // GW
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"ILAYERVOLFRACWAT",num_HRU,nYdirec_2openwq,nSnow_2openwq + nSoil_2openwq)); // Soil + Snow
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"SCALARAQUIFER",num_HRU,nYdirec_2openwq,nAquifer_2openwq));       // GW
         
 
         OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
@@ -89,7 +88,7 @@ int ClassWQ_OpenWQ::decl(
         OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil_K",num_HRU,nYdirec_2openwq,1));
 
         // Master Json
-        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/Summa-OpenWQ/synthetic_tests/1_conserv_instant_SW/summa/openWQ_master.json";
+        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
 
 
         OpenWQ_couplercalls_ref->InitialConfig(
@@ -237,6 +236,8 @@ int ClassWQ_OpenWQ::run_space_in(
         source_EWF_name,
         recipient, ix_r, iy_r, iz_r,
         wflux_s2r);
+
+    return 0;
 }
 
 int ClassWQ_OpenWQ::run_time_end(
