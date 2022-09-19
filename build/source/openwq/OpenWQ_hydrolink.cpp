@@ -73,8 +73,8 @@ int ClassWQ_OpenWQ::decl(
         // Make sure to use capital letters for compartment names
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",num_HRU,nYdirec_2openwq,nCanopy_2openwq));        // Canopy
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"ILAYERVOLFRACWAT_SNOW",num_HRU,nYdirec_2openwq,nSnow_2openwq));    // snow (layerd)
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"ILAYERVOLFRACWAT_SOIL",num_HRU,nYdirec_2openwq,nSoil_2openwq));    // soil (layerd)
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"RUNOFF",num_HRU,nYdirec_2openwq,nRunoff_2openwq));                 // runoff
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"RUNOFF",num_HRU,nYdirec_2openwq,nRunoff_2openwq));                 // runoff
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"ILAYERVOLFRACWAT_SOIL",num_HRU,nYdirec_2openwq,nSoil_2openwq));    // soil (layerd)
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(4,"SCALARAQUIFER",num_HRU,nYdirec_2openwq,nAquifer_2openwq));         // AQUIFER
 
 
@@ -146,8 +146,8 @@ int ClassWQ_OpenWQ::run_time_start(
         if (nSnow_2openwq > 0) {
             (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = sweWatVol_stateVar[i];   // snow
         }
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[2](i,0,0) = soilWatVol_stateVar[i];  // soil
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[3](i,0,0) = runoff_vol;       // runoff
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[2](i,0,0) = runoff_vol;              // runoff
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[3](i,0,0) = soilWatVol_stateVar[i];  // soil
         (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[4](i,0,0) = aquiferStorage[i];       // runoff
     }
 

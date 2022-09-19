@@ -347,8 +347,10 @@ subroutine run_space_step(  &
 
   ! compartment indexes in OpenWQ (defined in the hydrolink)
   integer(i4b)                           :: canopy_index_openwq    = 0
-  integer(i4b)                           :: snowSoil_index_openwq  = 1
-  integer(i4b)                           :: aquifer_index_openwq   = 2
+  integer(i4b)                           :: snow_index_openwq      = 1
+  integer(i4b)                           :: runoff_index_openwq    = 2
+  integer(i4b)                           :: soil_index_openwq      = 3
+  integer(i4b)                           :: aquifer_index_openwq   = 4
   integer(i4b)                           :: OpenWQindex_s
   integer(i4b)                           :: OpenWQindex_r
   integer(i4b)                           :: iy_r
@@ -519,7 +521,7 @@ subroutine run_space_step(  &
           wflux_s2r)
 
         ! ====================================================
-        ! 1.2 canopy -> upper snow/soil upper layer
+        ! 1.2 canopy -> upper snow layer or runoff pool
         ! scalarCanopySnowUnloading + scalarCanopyLiqDrainage
         ! ====================================================
         ! *Source*
@@ -527,10 +529,14 @@ subroutine run_space_step(  &
         OpenWQindex_s = canopy_index_openwq
         iz_s          = 1
         wmass_source = canopyStorWat_kg_m3
-        ! *Recipient*
-        ! snow+soil (upper layer: z = 1)
-        OpenWQindex_r = snowSoil_index_openwq
-        iz_r = 1
+        ! *Recipient* depends on snow layers
+        if (current_nSnow .gt. 0)then
+          OpenWQindex_r = snow_index_openwq
+          iz_r = 1 ! upper layer
+        else
+          OpenWQindex_r = runoff_index_openwq
+          iz_r = 1 ! upper layer
+        end if
         ! *Flux*
         ! snow uloading + liq drainage
         wflux_s2r = scalarCanopySnowUnloading_summa_m3 &
@@ -569,35 +575,52 @@ subroutine run_space_step(  &
           wmass_source)
 
       endif
-      
       ! --------------------------------------------------------------------
       ! %%%%%%%%%%%%%%%%%%%%%%%%%%%
-      ! 2. Snow + Soil Fluxes
+      ! 2. Snow
       ! %%%%%%%%%%%%%%%%%%%%%%%%%%%
       ! --------------------------------------------------------------------
-      
-      ! ====================================================
-      ! 2.1 precicipitation -> upper snow/soil layer
-      ! scalarThroughfallRain + scalarThroughfallSnow
-      ! ====================================================
+      ! first check if there is snow, we may have to use nsnow from GRU_Struc. current_snow is snow from the indxStruct
+      if (current_nSnow .gt. 0)then
+        ! do all the snow fluxes
 
-      ! *Source*:
-      ! PRECIP (external flux, so need call run_space_in)
-      ! *Recipient*: 
-      ! snow+soil (upper layer)
-      OpenWQindex_r = snowSoil_index_openwq
-      iz_r = 1
-      ! *Flux*
-      ! throughfall rain and snow
-      wflux_s2r = scalarThroughfallRain_summa_m3 &
-                    + scalarThroughfallSnow_summa_m3
-      ! *Call run_space_in*
-      err=openwq_obj%run_space_in(                &
-        simtime,                                  &
-        'PRECIP',                                 &
-        OpenWQindex_r, hru_index, iy_r, iz_r,     &
-        wflux_s2r                                 &
-        )
+      else
+        ! ====================================================
+        ! 2.1 precicipitation -> upper snow/soil layer
+        ! scalarThroughfallRain + scalarThroughfallSnow
+        ! ====================================================
+
+        ! *Source*:
+        ! PRECIP (external flux, so need call run_space_in)
+        ! *Recipient*: 
+        ! snow+soil (upper layer)
+        OpenWQindex_r = soil_index_openwq
+        iz_r = 1
+        ! *Flux*
+        ! throughfall rain and snow
+        wflux_s2r = scalarThroughfallRain_summa_m3 &
+                      + scalarThroughfallSnow_summa_m3
+        ! *Call run_space_in*
+        err=openwq_obj%run_space_in(                &
+          simtime,                                  &
+          'PRECIP',                                 &
+          OpenWQindex_r, hru_index, iy_r, iz_r,     &
+          wflux_s2r                                 &
+          )
+      end if
+
+
+
+
+
+
+      ! --------------------------------------------------------------------
+      ! %%%%%%%%%%%%%%%%%%%%%%%%%%%
+      ! 3. Soil Fluxes
+      ! %%%%%%%%%%%%%%%%%%%%%%%%%%%
+      ! --------------------------------------------------------------------
+      
+   
       
       ! Snow fluxes
       if (current_nSnow /= 0) then
