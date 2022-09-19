@@ -83,9 +83,9 @@ int ClassWQ_OpenWQ::decl(
 
         // Dependencies
         // to expand BGC modelling options
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",num_HRU,nYdirec_2openwq,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair_K",num_HRU,nYdirec_2openwq,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil_K",num_HRU,nYdirec_2openwq,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair_K",num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil_K",num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq));
 
         // Master Json
         OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/Summa-OpenWQ/synthetic_tests/9_batch_singleSp_1storder/summa/openWQ_master.json";
