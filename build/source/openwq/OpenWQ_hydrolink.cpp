@@ -68,11 +68,14 @@ int ClassWQ_OpenWQ::decl(
 
     if (OpenWQ_hostModelconfig_ref->HydroComp.size()==0) {
 
+        int nRunoff_2openwq = 1; // compartment for convience, this does not exist in SUMMA
         // Compartment names
         // Make sure to use capital letters for compartment names
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",num_HRU,nYdirec_2openwq,nCanopy_2openwq));      // Canopy
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"ILAYERVOLFRACWAT",num_HRU,nYdirec_2openwq,nSnow_2openwq + nSoil_2openwq)); // Soil + Snow
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"SCALARAQUIFER",num_HRU,nYdirec_2openwq,nAquifer_2openwq));       // GW
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"VEGITATION",num_HRU,nYdirec_2openwq,nCanopy_2openwq));  // Canopy
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SNOW",num_HRU,nYdirec_2openwq,nSnow_2openwq));          // snow (layerd)
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SOIL",num_HRU,nYdirec_2openwq,nSoil_2openwq));          // soil (layerd)
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"RUNOFF",num_HRU,nYdirec_2openwq,nRunoff_2openwq));     // runoff
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"GROUNDWATER",num_HRU,nYdirec_2openwq,nAquifer_2openwq));// AQUIFER
         
 
         OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
@@ -136,9 +139,10 @@ int ClassWQ_OpenWQ::run_time_start(
         (*OpenWQ_hostModelconfig_ref->dependVar)[2](i,0,0) = soilTemp_K_depVar[i];
         // Updating water volumes
         //(*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = sweWatVol_stateVar[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = canopyWat[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = soilWatVol_stateVar[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[2](i,0,0) = aquiferStorage[i];
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = canopyWat[i];            // canopy
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = sweWatVol_stateVar[i];                                  // snow
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = soilWatVol_stateVar[i];  // soil
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[2](i,0,0) = aquiferStorage[i];       // runoff
     }
 
     // *OpenWQ_hostModelconfig_ref.time_step = 5;

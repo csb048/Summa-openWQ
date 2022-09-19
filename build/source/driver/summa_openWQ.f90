@@ -205,12 +205,13 @@ subroutine run_time_start_go( &
         ! Update layered variables and dependenecies
         ! ############################
 
-        ! Soil
-        do ilay = 1, nSoil_2openwq
+        ! Soil - needs to start after the snow
+        do ilay = nSnow, nSoil_2openwq + nSnow_2openwq
           
           SoilVars: associate(&
+            mLayerDepth      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(ilay)         , &    ! depth of each layer (m)
             Tsoil_summa_K => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay)        ,&
-            Wsoil_summa_m => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerMatricHead)%dat(ilay)   &
+            Wsoil_summa_m => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(ilay)   &
           )
           ! Tsoil
           ! (Summa in K)
@@ -224,7 +225,7 @@ subroutine run_time_start_go( &
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! mLayerMatricHead [m], so needs to  to multiply by hru area [m2]
           if(Wsoil_summa_m /= valueMissing) then
-            soilWatVol_stateVar(openWQArrayIndex, ilay) = Wsoil_summa_m * hru_area_m2
+            soilWatVol_stateVar(openWQArrayIndex, ilay) = Wsoil_summa_m / iden_water * hru_area_m2 * mLayerDepth
           endif
 
           end associate SoilVars
