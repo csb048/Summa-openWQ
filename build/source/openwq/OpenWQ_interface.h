@@ -26,6 +26,7 @@ extern "C" {
         int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
         int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
         int nSoil_2openwq,        // num layers of snoil (variable)
+        int nRunoff_2openwq,      // num layers of runoff (fixed to 1)
         int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
         int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 

@@ -33,6 +33,7 @@ subroutine init_openwq(err, message)
   integer(i4b)                                    :: nCanopy_2openwq
   integer(i4b)                                    :: nSnow_2openwq
   integer(i4b)                                    :: nSoil_2openwq
+  integer(i4b)                                    :: nRunoff_2openwq
   integer(i4b)                                    :: nAquifer_2openwq
   integer(i4b)                                    :: nYdirec_2openwq     ! number of layers in the y-dir (not used in summa)
   integer(i4b)                                    :: iGRU, iHRU          ! indices of GRUs and HRUs
@@ -46,7 +47,8 @@ subroutine init_openwq(err, message)
   nYdirec_2openwq = 1
 
   ! Openwq nz (number of layers)
-  nCanopy_2openwq = 1       ! Cannopy has only 1 layer
+  nCanopy_2openwq = 1       ! Canopy has only 1 layer
+  nRunoff_2openwq = 1       ! Runoff has only 1 layer (not a summa variable - openWQ keeps track of this)
   nAquifer_2openwq = 1      ! GW has only 1 layer
   nSoil_2openwq = 0   ! Soil may have multiple layers, and gru-hrus may have different values
   nSnow_2openwq = 0   ! Snow has multiple layers, and gru-hrus may have different values (up to 5 layers)
@@ -63,6 +65,7 @@ subroutine init_openwq(err, message)
     nCanopy_2openwq,      & ! num layers of canopy (fixed to 1)
     nSnow_2openwq,        & ! num layers of snow (fixed to max of 5 because it varies)
     nSoil_2openwq,        & ! num layers of snoil (variable)
+    nRunoff_2openwq,      & ! num layers of runoff (fixed to 1)
     nAquifer_2openwq,     & ! num layers of aquifer (fixed to 1)
     nYdirec_2openwq)             ! num of layers in y-dir (set to 1 because not used in summa)
   
@@ -150,6 +153,7 @@ subroutine run_time_start_go( &
   real(rkind)                         :: soilWatVol_stateVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   real(rkind)                         :: soilTemp_K_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   real(rkind)                         :: soilMoist_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
+  integer(i4b)                        :: soil_start_index ! starting value of the soil in the mLayerVolFracWat(:) array
   integer(i4b)                        :: err
   real(rkind),parameter              :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
 
@@ -205,11 +209,44 @@ subroutine run_time_start_go( &
         ! Update layered variables and dependenecies
         ! ############################
 
+
+        ! Snow
+        if (nSnow_2openwq .gt. 0)then
+          do ilay = 1, nSnow_2openwq
+            SnowVars: associate(&
+              mLayerDepth      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(ilay)         , &    ! depth of each layer (m)
+              mLayerVolFracIce => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracIce)%dat(ilay)    , &    ! volumetric fraction of ice in each layer  (-)
+              mLayerVolFracLiq => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracLiq)%dat(ilay)      &    ! volumetric fraction of liquid water in each layer (-)
+            )
+            ! Snow
+            ! unit for volume = m3 (summa-to-openwq unit conversions needed)
+            ! mLayerVolFracIce and mLayerVolFracLiq [-], so needs to  to multiply by hru area [m2] and divide by water density
+            ! But needs to account for both ice and liquid, and convert to liquid volumes
+            if(mLayerVolFracIce /= valueMissing .or. &
+              mLayerVolFracLiq /= valueMissing) then
+
+              sweWatVol_stateVar(openWQArrayIndex, ilay) =                                              &
+                (max(mLayerVolFracIce, 0._rkind) * iden_ice + &
+                max(mLayerVolFracLiq, 0._rkind) * iden_water) / iden_water  &
+                * mLayerDepth * hru_area_m2
+              else
+                sweWatVol_stateVar(openWQArrayIndex, ilay) = 0._rkind
+            endif
+            end associate SnowVars
+          enddo
+        end if
+
+        if (nSnow_2openwq == 0)then
+          soil_start_index = 1
+        else
+          soil_start_index = nSnow_2openwq
+        end if
+
         ! Soil - needs to start after the snow
-        do ilay = nSnow, nSoil_2openwq + nSnow_2openwq
+        do ilay = soil_start_index, nSoil_2openwq + nSnow_2openwq
           
           SoilVars: associate(&
-            mLayerDepth      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(ilay)         , &    ! depth of each layer (m)
+            mLayerDepth   => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(ilay)         , &    ! depth of each layer (m)
             Tsoil_summa_K => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay)        ,&
             Wsoil_summa_m => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(ilay)   &
           )
@@ -229,35 +266,6 @@ subroutine run_time_start_go( &
           endif
 
           end associate SoilVars
-
-        enddo
-
-        ! Snow
-        do ilay = 1, nSnow_2openwq
-
-          SnowVars: associate(&
-            mLayerDepth      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(ilay)         , &    ! depth of each layer (m)
-            mLayerVolFracIce => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracIce)%dat(ilay)    , &    ! volumetric fraction of ice in each layer  (-)
-            mLayerVolFracLiq => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracLiq)%dat(ilay)      &    ! volumetric fraction of liquid water in each layer (-)
-          )
-          
-          ! Snow
-          ! unit for volume = m3 (summa-to-openwq unit conversions needed)
-          ! mLayerVolFracIce and mLayerVolFracLiq [-], so needs to  to multiply by hru area [m2] and divide by water density
-          ! But needs to account for both ice and liquid, and convert to liquid volumes
-          if(mLayerVolFracIce /= valueMissing .or. &
-             mLayerVolFracLiq /= valueMissing) then
-
-            sweWatVol_stateVar(openWQArrayIndex, ilay) =                                              &
-              (max(mLayerVolFracIce, 0._rkind) * iden_ice + &
-              max(mLayerVolFracLiq, 0._rkind) * iden_water) / iden_water  &
-              * mLayerDepth * hru_area_m2
-            else
-              sweWatVol_stateVar(openWQArrayIndex, ilay) = 0._rkind
-
-          endif
-
-          end associate SnowVars
 
         enddo
 
