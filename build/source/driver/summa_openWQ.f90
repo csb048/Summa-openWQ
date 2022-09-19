@@ -430,8 +430,9 @@ subroutine run_space_step(  &
         mLayerDepth_summa_m                       => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(:)      ,&
         mLayerVolFracWat_summa_frac               => progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:) ,&
         ! Snow Fluxes
-        scalarSnowSublimation_summa_kg_m2_s1      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarSnowSublimation)%dat(1)         ,& 
+        scalarSnowSublimation_summa_kg_m2_s1      => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarSnowSublimation)%dat(1)           ,& 
         iLayerLiqFluxSnow_summa_m_s               => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%iLayerLiqFluxSnow)%dat(:)               ,&
+        
         ! Soil Fluxes
         scalarGroundEvaporation_summa_kg_m2_s1    => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%scalarGroundEvaporation)%dat(1)         ,&
         iLayerLiqFluxSoil_summa_m_s               => fluxStruct%gru(iGRU)%hru(iHRU)%var(iLookFLUX%iLayerLiqFluxSoil)%dat(:)               &
@@ -642,6 +643,33 @@ subroutine run_space_step(  &
             wmass_source)
 
         end do
+
+      else ! current_snow == 0
+        ! ====================================================
+        ! 2.4 canopy -> snow without a layer/soil upper layer
+        ! scalarSfcMeltPond
+        ! ====================================================
+        ! *Source*
+        ! canopy (only 1 z layer)
+        OpenWQindex_s = snowSoil_index_openwq
+        iz_s          = 1
+        mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(nSnow) * hru_area_m2 * mLayerDepth_summa_m(nSnow)
+        wmass_source = mLayerVolFracWat_summa_m3
+        ! *Recipient*
+        ! snow+soil (upper layer: z = 1)
+        OpenWQindex_r = snowSoil_index_openwq
+        iz_r = nSnow + 1
+        ! *Flux*
+        ! snow uloading + liq drainage
+        wflux_s2r = scalarCanopySnowUnloading_summa_m3 &
+                      + scalarCanopyLiqDrainage_summa_m3
+        ! *Call run_space*
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,  &
+          wmass_source) 
 
       end if
       
