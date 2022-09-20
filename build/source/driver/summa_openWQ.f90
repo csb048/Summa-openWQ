@@ -149,10 +149,10 @@ subroutine run_time_start_go( &
   real(rkind)                         :: airTemp_K_depVar
   real(rkind)                         :: canopyWatVol_stateVar
   real(rkind)                         :: aquiferWatVol_stateVar
-  real(rkind)                         :: sweWatVol_stateVar(sum(gru_struc(:)%hruCount), nSnow_2openwq)
-  real(rkind)                         :: soilWatVol_stateVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
-  real(rkind)                         :: soilTemp_K_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
-  real(rkind)                         :: soilMoist_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
+  real(rkind)                         :: sweWatVol_stateVar(nSnow_2openwq)
+  real(rkind)                         :: soilWatVol_stateVar(nSoil_2openwq)
+  real(rkind)                         :: soilTemp_K_depVar(nSoil_2openwq)
+  real(rkind)                         :: soilMoist_depVar(nSoil_2openwq)
   integer(i4b)                        :: soil_start_index ! starting value of the soil in the mLayerVolFracWat(:) array
   integer(i4b)                        :: err
   real(rkind),parameter               :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
@@ -164,6 +164,7 @@ subroutine run_time_start_go( &
       attrStruct     => summa1_struc%attrStruct               &
   )
 
+  last_hru_flag = .false.
   ! Update dependencies and storage volumes
   ! Assemble the data to send to openWQ
 
@@ -172,6 +173,10 @@ subroutine run_time_start_go( &
   do iGRU = 1, size(gru_struc(:))
       do iHRU = 1, gru_struc(iGRU)%hruCount
 
+        if (iGRU == size(gru_struc) .and. iHRU == gru_struc(iGRU)%hruCount)then
+          last_hru_flag = .true.
+        end if
+
         GeneralVars: associate(&
           hru_area_m2                 => attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)                      ,&
           Tair_summa_K                => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1)      ,&
@@ -179,7 +184,6 @@ subroutine run_time_start_go( &
           AquiferStorWat_summa_m      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1)   &
         )
 
-        openWQArrayIndex = openWQArrayIndex + 1 
 
         ! ############################
         ! Update unlayered variables and dependencies 
@@ -226,12 +230,12 @@ subroutine run_time_start_go( &
             if(mLayerVolFracIce /= valueMissing .or. &
               mLayerVolFracLiq /= valueMissing) then
 
-              sweWatVol_stateVar(openWQArrayIndex, ilay) =                                              &
+              sweWatVol_stateVar(ilay) =                                              &
                 (max(mLayerVolFracIce, 0._rkind) * iden_ice + &
                 max(mLayerVolFracLiq, 0._rkind) * iden_water) / iden_water  &
                 * mLayerDepth * hru_area_m2
               else
-                sweWatVol_stateVar(openWQArrayIndex, ilay) = 0._rkind
+                sweWatVol_stateVar(ilay) = 0._rkind
             endif
             end associate SnowVars
           enddo
@@ -254,16 +258,16 @@ subroutine run_time_start_go( &
           ! Tsoil
           ! (Summa in K)
           if(Tsoil_summa_K /= valueMissing) then
-            soilTemp_K_depVar(openWQArrayIndex, ilay) = Tsoil_summa_K
+            soilTemp_K_depVar(ilay) = Tsoil_summa_K
           endif
 
-          soilMoist_depVar(openWQArrayIndex, ilay) = 0     ! TODO: Find the value for this varaibles
+          soilMoist_depVar(ilay) = 0     ! TODO: Find the value for this varaibles
 
           ! Soil
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! mLayerMatricHead [m], so needs to  to multiply by hru area [m2]
           if(Wsoil_summa_m /= valueMissing) then
-            soilWatVol_stateVar(openWQArrayIndex, ilay) = Wsoil_summa_m / iden_water * hru_area_m2 * mLayerDepth
+            soilWatVol_stateVar(ilay) = Wsoil_summa_m / iden_water * hru_area_m2 * mLayerDepth
           endif
 
           end associate SoilVars
@@ -277,33 +281,33 @@ subroutine run_time_start_go( &
           end do
         end do
 
+        
+          ! add the time values to the array
+        simtime(1) = timeStruct%var(iLookTIME%iyyy)  ! Year
+        simtime(2) = timeStruct%var(iLookTIME%im)    ! month
+        simtime(3) = timeStruct%var(iLookTIME%id)    ! hour
+        simtime(4) = timeStruct%var(iLookTIME%ih)    ! day
+        simtime(5) = timeStruct%var(iLookTIME%imin)  ! minute
+        
+        err=openWQ_obj%run_time_start(&
+              last_hru_flag,                          & 
+              openWQArrayIndex,                       & ! total HRUs
+              nSnow_2openwq,                          &
+              nSoil_2openwq,                          &
+              simtime,                                &
+              soilMoist_depVar,                       &                    
+              soilTemp_K_depVar,                      &
+              airTemp_K_depVar,                       &
+              sweWatVol_stateVar,                     &
+              canopyWatVol_stateVar,                  &
+              soilWatVol_stateVar,                    &
+              aquiferWatVol_stateVar)
+        
+        openWQArrayIndex = openWQArrayIndex + 1 
         end associate GeneralVars
 
       end do ! end HRU
   end do ! end GRU
-
-  ! add the time values to the array
-  simtime(1) = timeStruct%var(iLookTIME%iyyy)  ! Year
-  simtime(2) = timeStruct%var(iLookTIME%im)    ! month
-  simtime(3) = timeStruct%var(iLookTIME%id)    ! hour
-  simtime(4) = timeStruct%var(iLookTIME%ih)    ! day
-  simtime(5) = timeStruct%var(iLookTIME%imin)  ! minute
-  
-  err=openWQ_obj%run_time_start(&
-        last_hru_flag,                          & 
-        openWQArrayIndex,                       & ! total HRUs
-        nSnow_2openwq,                          &
-        nSoil_2openwq,                          &
-        simtime,                                &
-        soilMoist_depVar,                       &                    
-        soilTemp_K_depVar,                      &
-        airTemp_K_depVar,                       &
-        sweWatVol_stateVar,                     &
-        canopyWatVol_stateVar,                  &
-        soilWatVol_stateVar,                    &
-        aquiferWatVol_stateVar)
-
-  ! copy progStruct values to progStruct_timestep_start
 
   end associate summaVars
 

@@ -72,7 +72,7 @@ int ClassWQ_OpenWQ::decl(
         // Compartment names
         // Make sure to use capital letters for compartment names
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(canopy_index_openwq,"SCALARCANOPYWAT",         num_HRU, nYdirec_2openwq, nCanopy_2openwq));  // Canopy
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(snow_index_openwq,"ILAYERVOLFRACWAT_SNOW",   num_HRU, nYdirec_2openwq, nSnow_2openwq));    // now (layerd)
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(snow_index_openwq,"ILAYERVOLFRACWAT_SNOW",   num_HRU, nYdirec_2openwq, max_snow_layers));    // now (layerd)
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(runoff_index_openwq,"RUNOFF",                  num_HRU, nYdirec_2openwq, nRunoff_2openwq));  // Runoff
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(soil_index_openwq,"ILAYERVOLFRACWAT_SOIL",   num_HRU, nYdirec_2openwq, nSoil_2openwq));    // Soil (layerd)
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(aquifer_index_openwq,"SCALARAQUIFER",           num_HRU, nYdirec_2openwq, nAquifer_2openwq)); // Aquifer

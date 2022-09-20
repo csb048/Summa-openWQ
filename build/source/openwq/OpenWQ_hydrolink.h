@@ -35,6 +35,7 @@
   inline int runoff_index_openwq    = 2;
   inline int soil_index_openwq      = 3;
   inline int aquifer_index_openwq   = 4;
+  inline int max_snow_layers        = 5;
 
 class ClassWQ_OpenWQ
 {
