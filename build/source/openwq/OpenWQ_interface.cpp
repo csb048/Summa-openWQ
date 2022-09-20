@@ -38,21 +38,23 @@ int openwq_decl(
 
 
 int openwq_run_time_start(
-    ClassWQ_OpenWQ *openWQ, 
-    int numHRU, 
+    ClassWQ_OpenWQ *openWQ,
+    bool last_hru_flag, 
+    int hru_index, 
     int nSnow_2openwq, 
     int nSoil_2openwq, 
     int simtime_summa[], 
     double soilMoist_depVar[], 
     double soilTemp_K_depVar[], 
-    double airTemp_K_depVar[],
+    double airTemp_K_depVar,
     double sweWatVol_stateVar[], 
-    double canopyWatVol_stateVar[], 
+    double canopyWatVol_stateVar, 
     double soilWatVol_stateVar[], 
-    double aquiferWatVol_stateVar[]) {
+    double aquiferWatVol_stateVar) {
     
     return openWQ->run_time_start(
-        numHRU, 
+        last_hru_flag,
+        hru_index, 
         nSnow_2openwq, 
         nSoil_2openwq, 
         simtime_summa, 

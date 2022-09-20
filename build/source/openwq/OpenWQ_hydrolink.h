@@ -29,6 +29,13 @@
 #include <time.h>
 #include <vector>
 
+// Global Indexes for Compartments
+  inline int canopy_index_openwq    = 0;
+  inline int snow_index_openwq      = 1;
+  inline int runoff_index_openwq    = 2;
+  inline int soil_index_openwq      = 3;
+  inline int aquifer_index_openwq   = 4;
+
 class ClassWQ_OpenWQ
 {
 
@@ -73,17 +80,18 @@ class ClassWQ_OpenWQ
         int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 
     int run_time_start(
-        int numHRU, 
+        bool last_hru_flag,
+        int hru_index, 
         int nSnow_2openwq, 
         int nSoil_2openwq, 
         int simtime_summa[],
         double soilMoist_depVar[], 
         double soilTemp_K_depVar[], 
-        double airTemp_K_depVar[],
+        double airTemp_K_depVar,
         double sweWatVol_stateVar[], 
-        double canopyWat[], 
+        double canopyWat, 
         double soilWatVol_stateVar[], 
-        double aquiferStorage[]);
+        double aquiferStorage);
 
     int run_space(
         int simtime_summa[], 

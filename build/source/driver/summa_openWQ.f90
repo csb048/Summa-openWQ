@@ -146,16 +146,17 @@ subroutine run_time_start_go( &
   integer(i4b)                        :: iDat
   integer(i4b)                        :: openWQArrayIndex
   integer(i4b)                        :: simtime(5) ! 5 time values yy-mm-dd-hh-min
-  real(rkind)                         :: airTemp_K_depVar(sum(gru_struc(:)%hruCount))
-  real(rkind)                         :: canopyWatVol_stateVar(sum(gru_struc(:)%hruCount))
-  real(rkind)                         :: aquiferWatVol_stateVar(sum(gru_struc(:)%hruCount))
+  real(rkind)                         :: airTemp_K_depVar
+  real(rkind)                         :: canopyWatVol_stateVar
+  real(rkind)                         :: aquiferWatVol_stateVar
   real(rkind)                         :: sweWatVol_stateVar(sum(gru_struc(:)%hruCount), nSnow_2openwq)
   real(rkind)                         :: soilWatVol_stateVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   real(rkind)                         :: soilTemp_K_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   real(rkind)                         :: soilMoist_depVar(sum(gru_struc(:)%hruCount), nSoil_2openwq)
   integer(i4b)                        :: soil_start_index ! starting value of the soil in the mLayerVolFracWat(:) array
   integer(i4b)                        :: err
-  real(rkind),parameter              :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
+  real(rkind),parameter               :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
+  logical(1)                          :: last_hru_flag
 
   summaVars: associate(&
       progStruct     => summa1_struc%progStruct             , &
@@ -188,21 +189,21 @@ subroutine run_time_start_go( &
         ! Tair 
         ! (Summa in K)
         if(Tair_summa_K /= valueMissing) then
-          airTemp_K_depVar(openWQArrayIndex) =  Tair_summa_K 
+          airTemp_K_depVar =  Tair_summa_K 
         endif
           
         ! Vegetation
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarCanopyWat [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
         if(scalarCanopyWat_summa_kg_m2 /= valueMissing) then
-          canopyWatVol_stateVar(openWQArrayIndex) = scalarCanopyWat_summa_kg_m2 * hru_area_m2 / iden_water
+          canopyWatVol_stateVar = scalarCanopyWat_summa_kg_m2 * hru_area_m2 / iden_water
         endif
 
         ! Aquifer
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarAquiferStorage [m], so needs to  to multiply by hru area [m2] only
         if(AquiferStorWat_summa_m /= valueMissing) then
-          aquiferWatVol_stateVar(openWQArrayIndex) = AquiferStorWat_summa_m * hru_area_m2
+          aquiferWatVol_stateVar = AquiferStorWat_summa_m * hru_area_m2
         endif 
         
         ! ############################
@@ -278,8 +279,8 @@ subroutine run_time_start_go( &
 
         end associate GeneralVars
 
-      end do
-  end do
+      end do ! end HRU
+  end do ! end GRU
 
   ! add the time values to the array
   simtime(1) = timeStruct%var(iLookTIME%iyyy)  ! Year
@@ -289,7 +290,8 @@ subroutine run_time_start_go( &
   simtime(5) = timeStruct%var(iLookTIME%imin)  ! minute
   
   err=openWQ_obj%run_time_start(&
-        sum(gru_struc(:)%hruCount),             & ! total HRUs
+        last_hru_flag,                          & 
+        openWQArrayIndex,                       & ! total HRUs
         nSnow_2openwq,                          &
         nSoil_2openwq,                          &
         simtime,                                &

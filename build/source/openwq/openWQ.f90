@@ -69,13 +69,14 @@ module openwq
 
    integer function openWQ_run_time_start(   &
       this,                                  &
-      numHRU,                                &
+      last_hru_flag,                         &
+      hru_index,                             &
       nSnow_2openwq,                         &
       nSoil_2openwq,                         &
       simtime,                               &
       soilMoist_depVar,                      &
       soilTemp_depVar,                       &
-      airTemp_K_depVar,                        &
+      airTemp_K_depVar,                      &
       sweWatVol_stateVar,                    &
       canopyWatVol_stateVar,                 &
       soilWatVol_stateVar,                   &
@@ -83,27 +84,29 @@ module openwq
       
       implicit none
       class(ClassWQ_OpenWQ)      :: this
-      integer(i4b), intent(in)   :: numHRU
+      logical(1), intent(in)     :: last_hru_flag
+      integer(i4b), intent(in)   :: hru_index
       integer(i4b), intent(in)   :: nSnow_2openwq
       integer(i4b), intent(in)   :: nSoil_2openwq
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
-      real(rkind),  intent(in)   :: airTemp_K_depVar(numHRU)
-      real(rkind),  intent(in)   :: soilTemp_depVar(numHRU, nSoil_2openwq)
-      real(rkind),  intent(in)   :: soilMoist_depVar(numHRU, nSoil_2openwq)
-      real(rkind),  intent(in)   :: canopyWatVol_stateVar(numHRU)
-      real(rkind),  intent(in)   :: sweWatVol_stateVar(numHRU, nSnow_2openwq)
-      real(rkind),  intent(in)   :: soilWatVol_stateVar(numHRU,nSoil_2openwq)
-      real(rkind),  intent(in)   :: aquiferWatVol_stateVar(numHRU)
+      real(rkind),  intent(in)   :: airTemp_K_depVar
+      real(rkind),  intent(in)   :: soilTemp_depVar(nSoil_2openwq)
+      real(rkind),  intent(in)   :: soilMoist_depVar(nSoil_2openwq)
+      real(rkind),  intent(in)   :: canopyWatVol_stateVar
+      real(rkind),  intent(in)   :: sweWatVol_stateVar(nSnow_2openwq)
+      real(rkind),  intent(in)   :: soilWatVol_stateVar(nSoil_2openwq)
+      real(rkind),  intent(in)   :: aquiferWatVol_stateVar
 
       openWQ_run_time_start = openwq_run_time_start_c( &
          this%ptr,               & 
-         numHRU,                 &
+         last_hru_flag,          &
+         hru_index,              &
          nSnow_2openwq,          &
          nSoil_2openwq,          &
          simtime,                &
          soilMoist_depVar,       &
          soilTemp_depVar,        &
-         airTemp_K_depVar,         &
+         airTemp_K_depVar,       &
          sweWatVol_stateVar,     &
          canopyWatVol_stateVar,  &
          soilWatVol_stateVar,    &

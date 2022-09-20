@@ -31,18 +31,19 @@ extern "C" {
         int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 
     int openwq_run_time_start(
-        CLASSWQ_OPENWQ *openWQ, 
-        int numHRU, 
+        CLASSWQ_OPENWQ *openWQ,
+        bool last_hru_flag, 
+        int index_hru, 
         int nSnow_2openwq, 
         int nSoil_2openwq,
         int simtime_summa[], 
         double soilMoist_depVar[], 
         double soilTemp_K_depVar[], 
-        double airTemp_K_depVar[], 
+        double airTemp_K_depVar, 
         double sweWatVol_stateVar[], 
-        double canopyWat[], 
+        double canopyWat, 
         double soilWatVol_stateVar[], 
-        double aquiferStorage[]);
+        double aquiferStorage);
 
     // OpenWQ run functions, this function decides which C++ code to call
     int openwq_run_space(

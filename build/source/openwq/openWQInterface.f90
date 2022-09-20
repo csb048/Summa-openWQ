@@ -32,34 +32,36 @@ interface
     end function
 
     function openwq_run_time_start_c(&
-        openWQ, &
-        numHRU, &
-        nSnow_2openwq, &
-        nSoil_2openwq, &
-        simtime, &
-        soilMoist_depVar, &
-        soilTemp_K_depVar, &
-        airTemp_K_depVar, &
-        sweWatVol_stateVar, &
+        openWQ,                &
+        last_hru_flag,         &
+        hru_index,             &
+        nSnow_2openwq,         &
+        nSoil_2openwq,         &
+        simtime,               &
+        soilMoist_depVar,      &
+        soilTemp_K_depVar,     &
+        airTemp_K_depVar,      &
+        sweWatVol_stateVar,    &
         canopyWatVol_stateVar, &
-        soilWatVol_stateVar, &
+        soilWatVol_stateVar,   &
         aquiferWatVol_stateVar) bind(C, name="openwq_run_time_start")
 
         use iso_c_binding
         implicit none
         integer(c_int)                       :: openwq_run_time_start_c ! returns 0 (success) or -1 (failure)
         type(c_ptr),    intent(in), value    :: openWQ
-        integer(c_int), intent(in), value    :: numHRU
+        logical(c_bool),   intent(in)        :: last_hru_flag
+        integer(c_int), intent(in), value    :: hru_index
         integer(c_int), intent(in), value    :: nSnow_2openwq
         integer(c_int), intent(in), value    :: nSoil_2openwq
         integer(c_int), intent(in)           :: simtime(5)
-        real(c_double), intent(in)           :: soilMoist_depVar(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: soilTemp_K_depVar(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: airTemp_K_depVar(numHRU)
-        real(c_double), intent(in)           :: sweWatVol_stateVar(numHRU, nSnow_2openwq)
-        real(c_double), intent(in)           :: canopyWatVol_stateVar(numHRU)
-        real(c_double), intent(in)           :: soilWatVol_stateVar(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: aquiferWatVol_stateVar(numHRU)
+        real(c_double), intent(in)           :: soilMoist_depVar(nSoil_2openwq)
+        real(c_double), intent(in)           :: soilTemp_K_depVar(nSoil_2openwq)
+        real(c_double), intent(in)           :: airTemp_K_depVar
+        real(c_double), intent(in)           :: sweWatVol_stateVar(nSnow_2openwq)
+        real(c_double), intent(in)           :: canopyWatVol_stateVar
+        real(c_double), intent(in)           :: soilWatVol_stateVar(nSoil_2openwq)
+        real(c_double), intent(in)           :: aquiferWatVol_stateVar
 
     end function
 
