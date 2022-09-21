@@ -118,14 +118,14 @@ int ClassWQ_OpenWQ::run_time_start(
     int index_hru, 
     int nSnow_2openwq, 
     int nSoil_2openwq,
-    int simtime_summa[], 
-    double soilMoist_depVar[], 
-    double soilTemp_K_depVar[], 
-    double airTemp_K_depVar,
-    double sweWatVol_stateVar[], 
-    double canopyWat, 
-    double soilWatVol_stateVar[], 
-    double aquiferStorage) {
+    int simtime_summa[],
+    double soilMoist_depVar_summa_frac[],                  
+    double soilTemp_depVar_summa_K[],
+    double airTemp_depVar_summa_K,
+    double sweWatVol_stateVar_summa_m3[],
+    double canopyWatVol_stateVar_summa_m3,
+    double soilWatVol_stateVar_summa_m3[],
+    double aquiferWatVol_stateVar_summa_m3) {
 
     time_t simtime = convert_time(simtime_summa[0], 
         simtime_summa[1], 
@@ -138,21 +138,21 @@ int ClassWQ_OpenWQ::run_time_start(
     // Updating Chemistry dependencies and volumes (out of order because of looping)
 
     // Air Temp is only one layer - NEED TO DOUBLE CHECK
-    (*OpenWQ_hostModelconfig_ref->dependVar)[1](index_hru,0,0) = airTemp_K_depVar;
-    (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[canopy_index_openwq](index_hru,0,0) = canopyWat;                   // canopy
+    (*OpenWQ_hostModelconfig_ref->dependVar)[1](index_hru,0,0) = airTemp_depVar_summa_K;
+    (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[canopy_index_openwq](index_hru,0,0) = canopyWatVol_stateVar_summa_m3;                   // canopy
     (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[runoff_index_openwq](index_hru,0,0) = runoff_vol;                  // runoff
-    (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[aquifer_index_openwq](index_hru,0,0) = aquiferStorage;              // aquifer
+    (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[aquifer_index_openwq](index_hru,0,0) = aquiferWatVol_stateVar_summa_m3;              // aquifer
 
     // update Vars that rely on Snow
     for (int z = 0; z < nSnow_2openwq; z++) {
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[snow_index_openwq](index_hru,0,z) = sweWatVol_stateVar[z];   // snow
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[snow_index_openwq](index_hru,0,z) = sweWatVol_stateVar_summa_m3[z];   // snow
     }
     
     // Update Vars that rely on Soil
     for (int z = 0; z < nSoil_2openwq; z++) {
-        (*OpenWQ_hostModelconfig_ref->dependVar)[0](index_hru,0,z) = soilMoist_depVar[z]; 
-        (*OpenWQ_hostModelconfig_ref->dependVar)[2](index_hru,0,z) = soilTemp_K_depVar[z];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[soil_index_openwq](index_hru,0,z) = soilWatVol_stateVar[z];      // soil
+        (*OpenWQ_hostModelconfig_ref->dependVar)[0](index_hru,0,z) = soilMoist_depVar_summa_frac[z]; 
+        (*OpenWQ_hostModelconfig_ref->dependVar)[2](index_hru,0,z) = soilTemp_depVar_summa_K[z];
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[soil_index_openwq](index_hru,0,z) = soilWatVol_stateVar_summa_m3[z];      // soil
 
     }
 

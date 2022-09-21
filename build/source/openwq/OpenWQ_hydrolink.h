@@ -86,13 +86,13 @@ class ClassWQ_OpenWQ
         int nSnow_2openwq, 
         int nSoil_2openwq, 
         int simtime_summa[],
-        double soilMoist_depVar[], 
-        double soilTemp_K_depVar[], 
-        double airTemp_K_depVar,
-        double sweWatVol_stateVar[], 
-        double canopyWat, 
-        double soilWatVol_stateVar[], 
-        double aquiferStorage);
+        double soilMoist_depVar_summa_frac[],                  
+        double soilTemp_depVar_summa_K[],
+        double airTemp_depVar_summa_K,
+        double sweWatVol_stateVar_summa_m3[],
+        double canopyWatVol_stateVar_summa_m3,
+        double soilWatVol_stateVar_summa_m3[],
+        double aquiferWatVol_stateVar_summa_m3);
 
     int run_space(
         int simtime_summa[], 
