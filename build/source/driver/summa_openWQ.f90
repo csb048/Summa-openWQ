@@ -146,7 +146,7 @@ subroutine run_time_start_go( &
   integer(i4b)                        :: iDat
   integer(i4b)                        :: openWQArrayIndex
   integer(i4b)                        :: simtime(5) ! 5 time values yy-mm-dd-hh-min
-  real(rkind)                         :: airTemp_K_depVar
+  real(rkind)                         :: airTemp_depVar_summa_K
   real(rkind)                         :: canopyWatVol_stateVar_summa_m3
   real(rkind)                         :: aquiferWatVol_stateVar_summa_m3
   real(rkind)                         :: sweWatVol_stateVar_summa_m3(nSnow_2openwq)
@@ -193,7 +193,7 @@ subroutine run_time_start_go( &
         ! Tair 
         ! (Summa in K)
         if(Tair_summa_K /= valueMissing) then
-          airTemp_K_depVar =  Tair_summa_K 
+          airTemp_depVar_summa_K =  Tair_summa_K 
         endif
           
         ! Vegetation
@@ -294,7 +294,7 @@ subroutine run_time_start_go( &
               simtime,                                &
               soilMoist_depVar_summa_frac,            &                    
               soilTemp_depVar_summa_K,                &
-              airTemp_K_depVar,                       &
+              airTemp_depVar_summa_K,                 &
               sweWatVol_stateVar_summa_m3,            &
               canopyWatVol_stateVar_summa_m3,         &
               soilWatVol_stateVar_summa_m3,           &

@@ -89,13 +89,13 @@ module openwq
       integer(i4b), intent(in)   :: nSnow_2openwq
       integer(i4b), intent(in)   :: nSoil_2openwq
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
-      real(rkind),  intent(in)   :: airTemp_K_depVar
-      real(rkind),  intent(in)   :: soilTemp_depVar(nSoil_2openwq)
-      real(rkind),  intent(in)   :: soilMoist_depVar(nSoil_2openwq)
-      real(rkind),  intent(in)   :: canopyWatVol_stateVar
-      real(rkind),  intent(in)   :: sweWatVol_stateVar(nSnow_2openwq)
-      real(rkind),  intent(in)   :: soilWatVol_stateVar(nSoil_2openwq)
-      real(rkind),  intent(in)   :: aquiferWatVol_stateVar
+      real(rkind),  intent(in)   :: airTemp_depVar_summa_K
+      real(rkind),  intent(in)   :: soilTemp_depVar_summa_K(nSoil_2openwq)
+      real(rkind),  intent(in)   :: soilMoist_depVar_summa_frac(nSoil_2openwq)
+      real(rkind),  intent(in)   :: canopyWatVol_stateVar_summa_m3
+      real(rkind),  intent(in)   :: sweWatVol_stateVar_summa_m3(nSnow_2openwq)
+      real(rkind),  intent(in)   :: soilWatVol_stateVar_summa_m3(nSoil_2openwq)
+      real(rkind),  intent(in)   :: aquiferWatVol_stateVar_summa_m3
 
       openWQ_run_time_start = openwq_run_time_start_c( &
          this%ptr,               & 
@@ -104,13 +104,13 @@ module openwq
          nSnow_2openwq,          &
          nSoil_2openwq,          &
          simtime,                &
-         soilMoist_depVar,       &
-         soilTemp_depVar,        &
-         airTemp_K_depVar,       &
-         sweWatVol_stateVar,     &
-         canopyWatVol_stateVar,  &
-         soilWatVol_stateVar,    &
-         aquiferWatVol_stateVar)
+         soilMoist_depVar_summa_frac,            &                    
+         soilTemp_depVar_summa_K,                &
+         airTemp_depVar_summa_K,                 &
+         sweWatVol_stateVar_summa_m3,            &
+         canopyWatVol_stateVar_summa_m3,         &
+         soilWatVol_stateVar_summa_m3,           &
+         aquiferWatVol_stateVar_summa_m3)
    
       end function
 

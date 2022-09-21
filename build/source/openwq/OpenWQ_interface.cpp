@@ -44,13 +44,13 @@ int openwq_run_time_start(
     int nSnow_2openwq, 
     int nSoil_2openwq, 
     int simtime_summa[], 
-    double soilMoist_depVar[], 
-    double soilTemp_K_depVar[], 
-    double airTemp_K_depVar,
-    double sweWatVol_stateVar[], 
-    double canopyWatVol_stateVar, 
-    double soilWatVol_stateVar[], 
-    double aquiferWatVol_stateVar) {
+    double soilMoist_depVar_summa_frac[],                  
+    double soilTemp_depVar_summa_K[],
+    double airTemp_depVar_summa_K,
+    double sweWatVol_stateVar_summa_m3[],
+    double canopyWatVol_stateVar_summa_m3[],
+    double soilWatVol_stateVar_summa_m3[],
+    double aquiferWatVol_stateVar_summa_m3[]) {
     
     return openWQ->run_time_start(
         last_hru_flag,
@@ -58,13 +58,13 @@ int openwq_run_time_start(
         nSnow_2openwq, 
         nSoil_2openwq, 
         simtime_summa, 
-        soilMoist_depVar, 
-        soilTemp_K_depVar, 
-        airTemp_K_depVar, 
-        sweWatVol_stateVar, 
-        canopyWatVol_stateVar, 
-        soilWatVol_stateVar, 
-        aquiferWatVol_stateVar);
+        soilMoist_depVar_summa_frac,                  
+        soilTemp_depVar_summa_K,
+        airTemp_depVar_summa_K,
+        sweWatVol_stateVar_summa_m3,
+        canopyWatVol_stateVar_summa_m3,
+        soilWatVol_stateVar_summa_m3,
+        aquiferWatVol_stateVar_summa_m3);
 }
 
 
