@@ -74,13 +74,13 @@ module openwq
       nSnow_2openwq,                         &
       nSoil_2openwq,                         &
       simtime,                               &
-      soilMoist_depVar,                      &
-      soilTemp_depVar,                       &
-      airTemp_K_depVar,                      &
-      sweWatVol_stateVar,                    &
-      canopyWatVol_stateVar,                 &
-      soilWatVol_stateVar,                   &
-      aquiferWatVol_stateVar)
+      soilMoist_depVar_summa_frac,           &                    
+      soilTemp_depVar_summa_K,               &
+      airTemp_depVar_summa_K,                &
+      sweWatVol_stateVar_summa_m3,           &
+      canopyWatVol_stateVar_summa_m3,        &
+      soilWatVol_stateVar_summa_m3,          &
+      aquiferWatVol_stateVar_summa_m3)
       
       implicit none
       class(ClassWQ_OpenWQ)      :: this

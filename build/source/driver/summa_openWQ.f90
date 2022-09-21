@@ -230,8 +230,8 @@ subroutine run_time_start_go( &
 
               sweWatVol_stateVar_summa_m3(ilay) =                             &
                 mLayerVolFracWat_summa_frac  * mLayerDepth_summa_m * hru_area_m2
-              else
-                sweWatVol_stateVar_summa_m3(ilay) = 0._rkind
+            else
+              sweWatVol_stateVar_summa_m3(ilay) = 0._rkind
             endif
 
             end associate SnowVars

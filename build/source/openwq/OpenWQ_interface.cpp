@@ -48,9 +48,9 @@ int openwq_run_time_start(
     double soilTemp_depVar_summa_K[],
     double airTemp_depVar_summa_K,
     double sweWatVol_stateVar_summa_m3[],
-    double canopyWatVol_stateVar_summa_m3[],
+    double canopyWatVol_stateVar_summa_m3,
     double soilWatVol_stateVar_summa_m3[],
-    double aquiferWatVol_stateVar_summa_m3[]) {
+    double aquiferWatVol_stateVar_summa_m3) {
     
     return openWQ->run_time_start(
         last_hru_flag,
