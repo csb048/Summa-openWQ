@@ -147,12 +147,12 @@ subroutine run_time_start_go( &
   integer(i4b)                        :: openWQArrayIndex
   integer(i4b)                        :: simtime(5) ! 5 time values yy-mm-dd-hh-min
   real(rkind)                         :: airTemp_K_depVar
-  real(rkind)                         :: canopyWatVol_stateVar
-  real(rkind)                         :: aquiferWatVol_stateVar
-  real(rkind)                         :: sweWatVol_stateVar(nSnow_2openwq)
-  real(rkind)                         :: soilWatVol_stateVar(nSoil_2openwq)
-  real(rkind)                         :: soilTemp_K_depVar(nSoil_2openwq)
-  real(rkind)                         :: soilMoist_depVar(nSoil_2openwq)
+  real(rkind)                         :: canopyWatVol_stateVar_summa_m3
+  real(rkind)                         :: aquiferWatVol_stateVar_summa_m3
+  real(rkind)                         :: sweWatVol_stateVar_summa_m3(nSnow_2openwq)
+  real(rkind)                         :: soilWatVol_stateVar_summa_m3(nSoil_2openwq)
+  real(rkind)                         :: soilTemp_depVar_summa_K(nSoil_2openwq)
+  real(rkind)                         :: soilMoist_depVar_summa_frac(nSoil_2openwq)
   integer(i4b)                        :: soil_start_index ! starting value of the soil in the mLayerVolFracWat(:) array
   integer(i4b)                        :: err
   real(rkind),parameter               :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
@@ -200,14 +200,14 @@ subroutine run_time_start_go( &
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarCanopyWat [kg m-2], so needs to  to multiply by hru area [m2] and divide by water density
         if(scalarCanopyWat_summa_kg_m2 /= valueMissing) then
-          canopyWatVol_stateVar = scalarCanopyWat_summa_kg_m2 * hru_area_m2 / iden_water
+          canopyWatVol_stateVar_summa_m3 = scalarCanopyWat_summa_kg_m2 * hru_area_m2 / iden_water
         endif
 
         ! Aquifer
         ! unit for volume = m3 (summa-to-openwq unit conversions needed)
         ! scalarAquiferStorage [m], so needs to  to multiply by hru area [m2] only
         if(AquiferStorWat_summa_m /= valueMissing) then
-          aquiferWatVol_stateVar = AquiferStorWat_summa_m * hru_area_m2
+          aquiferWatVol_stateVar_summa_m3 = AquiferStorWat_summa_m * hru_area_m2
         endif 
         
         ! ############################
@@ -230,12 +230,13 @@ subroutine run_time_start_go( &
             if(mLayerVolFracIce /= valueMissing .or. &
               mLayerVolFracLiq /= valueMissing) then
 
-              sweWatVol_stateVar(ilay) =                                              &
-                (max(mLayerVolFracIce, 0._rkind) * iden_ice + &
-                max(mLayerVolFracLiq, 0._rkind) * iden_water) / iden_water  &
-                * mLayerDepth * hru_area_m2
+              sweWatVol_stateVar_summa_m3(ilay) =                             &
+                (                                                             &
+                  max(mLayerVolFracIce, 0._rkind) * iden_ice +                &
+                  max(mLayerVolFracLiq, 0._rkind) * iden_water                &
+                ) / iden_water * mLayerDepth * hru_area_m2
               else
-                sweWatVol_stateVar(ilay) = 0._rkind
+                sweWatVol_stateVar_summa_m3(ilay) = 0._rkind
             endif
             end associate SnowVars
           enddo
@@ -258,16 +259,16 @@ subroutine run_time_start_go( &
           ! Tsoil
           ! (Summa in K)
           if(Tsoil_summa_K /= valueMissing) then
-            soilTemp_K_depVar(ilay) = Tsoil_summa_K
+            soilTemp_depVar_summa_K(ilay) = Tsoil_summa_K
           endif
 
-          soilMoist_depVar(ilay) = 0     ! TODO: Find the value for this varaibles
+          soilMoist_depVar_summa_frac(ilay) = 0     ! TODO: Find the value for this varaibles
 
           ! Soil
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! mLayerMatricHead [m], so needs to  to multiply by hru area [m2]
           if(Wsoil_summa_m /= valueMissing) then
-            soilWatVol_stateVar(ilay) = Wsoil_summa_m / iden_water * hru_area_m2 * mLayerDepth
+            soilWatVol_stateVar_summa_m3(ilay) = Wsoil_summa_m / iden_water * hru_area_m2 * mLayerDepth
           endif
 
           end associate SoilVars
@@ -295,13 +296,13 @@ subroutine run_time_start_go( &
               nSnow_2openwq,                          &
               nSoil_2openwq,                          &
               simtime,                                &
-              soilMoist_depVar,                       &                    
-              soilTemp_K_depVar,                      &
+              soilMoist_depVar_summa_frac,                       &                    
+              soilTemp_depVar_summa_K,                      &
               airTemp_K_depVar,                       &
-              sweWatVol_stateVar,                     &
-              canopyWatVol_stateVar,                  &
-              soilWatVol_stateVar,                    &
-              aquiferWatVol_stateVar)
+              sweWatVol_stateVar_summa_m3,                     &
+              canopyWatVol_stateVar_summa_m3,                  &
+              soilWatVol_stateVar_summa_m3,                    &
+              aquiferWatVol_stateVar_summa_m3)
         
         openWQArrayIndex = openWQArrayIndex + 1 
         end associate GeneralVars
