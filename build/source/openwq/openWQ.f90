@@ -98,18 +98,18 @@ module openwq
       real(rkind),  intent(in)   :: aquiferWatVol_stateVar_summa_m3
 
       openWQ_run_time_start = openwq_run_time_start_c( &
-         this%ptr,               & 
-         last_hru_flag,          &
-         hru_index,              &
-         nSnow_2openwq,          &
-         nSoil_2openwq,          &
-         simtime,                &
-         soilMoist_depVar_summa_frac,            &                    
-         soilTemp_depVar_summa_K,                &
-         airTemp_depVar_summa_K,                 &
-         sweWatVol_stateVar_summa_m3,            &
-         canopyWatVol_stateVar_summa_m3,         &
-         soilWatVol_stateVar_summa_m3,           &
+         this%ptr,                              & 
+         last_hru_flag,                         &
+         hru_index,                             &
+         nSnow_2openwq,                         &
+         nSoil_2openwq,                         &
+         simtime,                               &
+         soilMoist_depVar_summa_frac,           &                    
+         soilTemp_depVar_summa_K,               &
+         airTemp_depVar_summa_K,                &
+         sweWatVol_stateVar_summa_m3,           &
+         canopyWatVol_stateVar_summa_m3,        &
+         soilWatVol_stateVar_summa_m3,          &
          aquiferWatVol_stateVar_summa_m3)
    
       end function
