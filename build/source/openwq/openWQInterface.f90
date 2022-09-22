@@ -57,11 +57,11 @@ interface
         integer(c_int), intent(in)           :: simtime_summa(5)
         real(c_double), intent(in)           :: soilMoist_depVar_summa_frac(nSoil_2openwq)
         real(c_double), intent(in)           :: soilTemp_depVar_summa_K(nSoil_2openwq)
-        real(c_double), intent(in)           :: airTemp_depVar_summa_K
+        real(c_double), intent(in), value    :: airTemp_depVar_summa_K
         real(c_double), intent(in)           :: sweWatVol_stateVar_summa_m3(nSnow_2openwq)
-        real(c_double), intent(in)           :: canopyWatVol_stateVar_summa_m3
+        real(c_double), intent(in), value    :: canopyWatVol_stateVar_summa_m3
         real(c_double), intent(in)           :: soilWatVol_stateVar_summa_m3(nSoil_2openwq)
-        real(c_double), intent(in)           :: aquiferWatVol_stateVar_summa_m3
+        real(c_double), intent(in), value    :: aquiferWatVol_stateVar_summa_m3
 
     end function
 

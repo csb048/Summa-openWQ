@@ -91,7 +91,7 @@ int ClassWQ_OpenWQ::decl(
         OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil_K",   num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq));
 
         // Master Json
-        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
+        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/Summa-OpenWQ/synthetic_tests/1_conserv_instant_SW/summa/openWQ_master.json";
 
 
         OpenWQ_couplercalls_ref->InitialConfig(

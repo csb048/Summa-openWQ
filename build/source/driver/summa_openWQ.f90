@@ -274,7 +274,7 @@ subroutine run_time_start_go( &
         ! Copy the prog structure
         do iVar = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var)
           do iDat = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat)
-            progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(iDat) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(iDat)
+            progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)
           end do
         end do
 
@@ -725,25 +725,30 @@ subroutine run_space_step(  &
       ! ====================================================
       ! *Source*
       ! snow (this is the case of snow without layer)
-      OpenWQindex_s = snow_index_openwq
-      iz_s          = 1
-      mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(nSnow) * hru_area_m2 * mLayerDepth_summa_m(nSnow)
-      wmass_source              = mLayerVolFracWat_summa_m3
-      ! *Recipient*
-      ! runoff (has one layer only)
-      OpenWQindex_r = runoff_index_openwq
-      iz_r          = 1
-      ! *Flux*
-      ! snow uloading + liq drainage
-      wflux_s2r = scalarSfcMeltPond_summa_m3
-      ! *Call run_space*
-      err=openwq_obj%run_space(                       &
-        simtime,                                      &
-        OpenWQindex_s, hru_index, iy_s, iz_s,         &
-        OpenWQindex_r, hru_index, iy_r, iz_r,         &
-        wflux_s2r,                                    &
-        wmass_source)
 
+      ! need the if condition to protect from invalid read
+      ! if the size of mLayerVolFracWat_summa_frac matches the number of soil layers
+      ! then summa is expecting no snow for this HRU over the simulation of the model
+      if (size(mLayerVolFracWat_summa_frac) .gt. nSoil) then
+        OpenWQindex_s = snow_index_openwq
+        iz_s          = 1
+        mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(nSnow) * hru_area_m2 * mLayerDepth_summa_m(nSnow)
+        wmass_source              = mLayerVolFracWat_summa_m3
+        ! *Recipient*
+        ! runoff (has one layer only)
+        OpenWQindex_r = runoff_index_openwq
+        iz_r          = 1
+        ! *Flux*
+        ! snow uloading + liq drainage
+        wflux_s2r = scalarSfcMeltPond_summa_m3
+        ! *Call run_space*
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
+          wmass_source)
+      endif
       ! --------------------------------------------------------------------
       ! %%%%%%%%%%%%%%%%%%%%%%%%%%%
       ! 3. runoff
