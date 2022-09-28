@@ -521,6 +521,9 @@ subroutine run_space_step(  &
       scalarAquiferBaseflow_summa_m3 = scalarAquiferBaseflow_summa_m_s    * hru_area_m2 * data_step
       scalarAquiferTranspire_summa_m3 = scalarAquiferTranspire_summa_m_s  * hru_area_m2 * data_step
       
+      ! Reset Runoff (it's not tracked by SUMMA, so need to track it here)
+      scalarRunoffVol_m3 = 0._rkind
+
       ! ####################################################################
       ! Apply Fluxes
       ! Call RunSpaceStep
@@ -556,6 +559,10 @@ subroutine run_space_step(  &
         ! 1.2 canopy -> upper snow layer or runoff pool
         ! scalarCanopySnowUnloading + scalarCanopyLiqDrainage
         ! ====================================================
+        ! *Flux*
+        ! snow uloading + liq drainage
+        wflux_s2r = scalarCanopySnowUnloading_summa_m3 &
+                    + scalarCanopyLiqDrainage_summa_m3
         ! *Source*
         ! canopy (only 1 z layer)
         OpenWQindex_s = canopy_index_openwq
@@ -568,11 +575,9 @@ subroutine run_space_step(  &
         else
           OpenWQindex_r = runoff_index_openwq
           iz_r = 1 ! (has only 1 layer)
+          scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
         end if
-        ! *Flux*
-        ! snow uloading + liq drainage
-        wflux_s2r = scalarCanopySnowUnloading_summa_m3 &
-                      + scalarCanopyLiqDrainage_summa_m3
+        
         ! *Call run_space*
         err=openwq_obj%run_space(                       &
           simtime,                                      &
@@ -618,6 +623,10 @@ subroutine run_space_step(  &
       ! 2.1 precicipitation -> upper snow/runoff layer
       ! scalarThroughfallRain + scalarThroughfallSnow
       ! ====================================================
+      ! *Flux*
+      ! throughfall rain and snow
+      wflux_s2r = scalarThroughfallRain_summa_m3 &
+                  + scalarThroughfallSnow_summa_m3
       if (current_nSnow .gt. 0)then
         ! *Source*:
         ! PRECIP (external flux, so need call run_space_in)
@@ -628,11 +637,8 @@ subroutine run_space_step(  &
       else
         OpenWQindex_r = runoff_index_openwq
         iz_r          = 1
+        scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r ! Needed because runoff volume is not tracked
       end if
-      ! *Flux*
-      ! throughfall rain and snow
-      wflux_s2r = scalarThroughfallRain_summa_m3 &
-                  + scalarThroughfallSnow_summa_m3
       ! *Call run_space_in*
       err=openwq_obj%run_space_in(                &
         simtime,                                  &
@@ -697,6 +703,9 @@ subroutine run_space_step(  &
         ! ====================================================
         ! 2.4 snow drainage from the last soil layer -> runoff
         ! ====================================================
+        ! *Flux*
+        mLayerLiqFluxSnow_summa_m3  = iLayerLiqFluxSnow_summa_m_s(nSnow) * hru_area_m2 * data_step
+        wflux_s2r                   = mLayerLiqFluxSnow_summa_m3 
         ! *Source*: 
         ! snow(nSnow)
         OpenWQindex_s = snow_index_openwq
@@ -707,9 +716,7 @@ subroutine run_space_step(  &
         ! runoff (has one layer only)
         OpenWQindex_r = runoff_index_openwq
         iz_r          = 1
-        ! *Flux*
-        mLayerLiqFluxSnow_summa_m3  = iLayerLiqFluxSnow_summa_m_s(nSnow) * hru_area_m2 * data_step
-        wflux_s2r                   = mLayerLiqFluxSnow_summa_m3 
+        scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
         ! *Call run_space*
         err=openwq_obj%run_space(                       &
           simtime,                                      &
@@ -730,6 +737,10 @@ subroutine run_space_step(  &
       ! if the size of mLayerVolFracWat_summa_frac matches the number of soil layers
       ! then summa is expecting no snow for this HRU over the simulation of the model
       if (size(mLayerVolFracWat_summa_frac) .gt. nSoil) then
+        ! *Flux*
+        ! snow uloading + liq drainage
+        wflux_s2r = scalarSfcMeltPond_summa_m3
+        ! *Source*
         OpenWQindex_s = snow_index_openwq
         iz_s          = 1
         mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(nSnow) * hru_area_m2 * mLayerDepth_summa_m(nSnow)
@@ -738,9 +749,7 @@ subroutine run_space_step(  &
         ! runoff (has one layer only)
         OpenWQindex_r = runoff_index_openwq
         iz_r          = 1
-        ! *Flux*
-        ! snow uloading + liq drainage
-        wflux_s2r = scalarSfcMeltPond_summa_m3
+        scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
         ! *Call run_space*
         err=openwq_obj%run_space(                       &
           simtime,                                      &
@@ -759,18 +768,18 @@ subroutine run_space_step(  &
       ! 3.1 infiltration
       ! runoff -> top layer of the soil
       ! ====================================================
+      ! *Flux*
+      wflux_s2r = scalarInfiltration_summa_m3
       ! *Source*: 
       ! runoff (has 1 layer only)
       OpenWQindex_s = runoff_index_openwq
       iz_s          = 1
-      scalarRunoffVol_m3  = 0  ! CHECK THIS !!!ATENTTION!=>!!!! I don't know how to hanlde the volume of the runoff
-      wmass_source        = scalarRunoffVol_m3
+      wmass_source  = scalarRunoffVol_m3
       ! *Recipient*: 
       ! soil upper layer
       OpenWQindex_r = soil_index_openwq
       iz_r          = 1
-      ! *Flux*
-      wflux_s2r = scalarInfiltration_summa_m3
+      scalarRunoffVol_m3 = scalarRunoffVol_m3 - wflux_s2r;
       ! *Call run_space*
       err=openwq_obj%run_space(                       &
         simtime,                                      &
@@ -787,7 +796,6 @@ subroutine run_space_step(  &
       ! runoff (has only 1 layer)
       OpenWQindex_s = runoff_index_openwq
       iz_s          = 1
-      scalarRunoffVol_m3  = 0  ! ! CHECK THIS !!!ATENTTION!=>!!!!I don't know how to hanlde the volume of the runoff
       wmass_source        = scalarRunoffVol_m3
       ! *Recipient*: 
       ! lost from system
@@ -842,7 +850,7 @@ subroutine run_space_step(  &
       OpenWQindex_s = soil_index_openwq
       iz_s          = 1
       mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(nSnow+1) * hru_area_m2 * mLayerDepth_summa_m(nSnow+1)
-    wmass_source                = mLayerVolFracWat_summa_m3
+      wmass_source              = mLayerVolFracWat_summa_m3
       ! *Recipient*: 
       ! lost from system
       OpenWQindex_r = -1
