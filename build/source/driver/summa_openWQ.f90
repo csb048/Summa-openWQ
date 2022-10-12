@@ -549,13 +549,11 @@ subroutine run_space_step(  &
         wflux_s2r = (scalarRainfall_summa_m3 - scalarThroughfallRain_summa_m3) &
                     + (scalarSnowfall_summa_m3 - scalarThroughfallSnow_summa_m3)
         ! *Call run_space_in* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space_in(                    &
-            simtime,                                      &
-            'PRECIP',                                     &
-            OpenWQindex_r, hru_index, iy_r, iz_r,   &
-            wflux_s2r)
-        endif
+        err=openwq_obj%run_space_in(                    &
+          simtime,                                      &
+          'PRECIP',                                     &
+          OpenWQindex_r, hru_index, iy_r, iz_r,   &
+          wflux_s2r)
 
         ! ====================================================
         ! 1.2 canopy -> upper snow layer or runoff pool
@@ -580,14 +578,12 @@ subroutine run_space_step(  &
           scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
         end if
         ! *Call run_space* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space(                       &
-            simtime,                                      &
-            OpenWQindex_s, hru_index, iy_s, iz_s,         &
-            OpenWQindex_r, hru_index, iy_r, iz_r,         &
-            wflux_s2r,  &
-            wmass_source)
-        endif
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,  &
+          wmass_source)
         
         ! ====================================================
         ! 1.3 canopy -> OUT (lost from model) (Evap + Subl)
@@ -606,14 +602,12 @@ subroutine run_space_step(  &
         wflux_s2r =  scalarCanopyEvaporation_summa_m3  &
                       + scalarCanopySublimation_summa_m3
         ! *Call run_space* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space(                       &
-            simtime,                                      &
-            OpenWQindex_s, hru_index, iy_s, iz_s,         &
-            OpenWQindex_r, hru_index, iy_r, iz_r,         &
-            wflux_s2r,  &
-            wmass_source)
-        endif
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,  &
+          wmass_source)
 
       endif
 
@@ -645,14 +639,12 @@ subroutine run_space_step(  &
         scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r ! Needed because runoff volume is not tracked
       end if
       ! *Call run_space* if wflux_s2r not 0
-      if (wflux_s2r .ne. 0._rkind) then
-        err=openwq_obj%run_space_in(                &
-          simtime,                                  &
-          'PRECIP',                                 &
-          OpenWQindex_r, hru_index, iy_r, iz_r,     &
-          wflux_s2r                                 &
-          )
-      endif
+      err=openwq_obj%run_space_in(                &
+        simtime,                                  &
+        'PRECIP',                                 &
+        OpenWQindex_r, hru_index, iy_r, iz_r,     &
+        wflux_s2r                                 &
+        )
 
       ! Below fluxes only occur when there is no snow
       if (current_nSnow .gt. 0)then
@@ -674,14 +666,12 @@ subroutine run_space_step(  &
         ! snow sublimation
         wflux_s2r = scalarSnowSublimation_summa_m3
         ! *Call run_space* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space(                       &
-            simtime,                                      &
-            OpenWQindex_s, hru_index, iy_s, iz_s,         &
-            OpenWQindex_r, hru_index, iy_r, iz_r,         &
-            wflux_s2r,                                    &
-            wmass_source)
-        endif
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
+          wmass_source)
 
         ! ====================================================
         ! 2.3 snow internal fluxes
@@ -701,14 +691,12 @@ subroutine run_space_step(  &
           mLayerLiqFluxSnow_summa_m3  = iLayerLiqFluxSnow_summa_m_s(iLayer) * hru_area_m2 * data_step
           wflux_s2r                   = mLayerLiqFluxSnow_summa_m3 
           ! *Call run_space* if wflux_s2r not 0
-          if (wflux_s2r .ne. 0._rkind) then
-            err=openwq_obj%run_space(                       &
-              simtime,                                      &
-              OpenWQindex_s, hru_index, iy_s, iz_s,         &
-              OpenWQindex_r, hru_index, iy_r, iz_r,         &
-              wflux_s2r,                                    &
-              wmass_source)
-          endif
+          err=openwq_obj%run_space(                       &
+            simtime,                                      &
+            OpenWQindex_s, hru_index, iy_s, iz_s,         &
+            OpenWQindex_r, hru_index, iy_r, iz_r,         &
+            wflux_s2r,                                    &
+            wmass_source)
         end do
 
         ! ====================================================
@@ -729,14 +717,12 @@ subroutine run_space_step(  &
         iz_r          = 1
         scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
         ! *Call run_space* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space(                       &
-            simtime,                                      &
-            OpenWQindex_s, hru_index, iy_s, iz_s,         &
-            OpenWQindex_r, hru_index, iy_r, iz_r,         &
-            wflux_s2r,                                    &
-            wmass_source)
-        endif
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
+          wmass_source)
       end if
   
       ! ====================================================
@@ -764,14 +750,12 @@ subroutine run_space_step(  &
         iz_r          = 1
         scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
         ! *Call run_space* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space(                       &
-            simtime,                                      &
-            OpenWQindex_s, hru_index, iy_s, iz_s,         &
-            OpenWQindex_r, hru_index, iy_r, iz_r,         &
-            wflux_s2r,                                    &
-            wmass_source)
-        endif
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
+          wmass_source)
       endif
       ! --------------------------------------------------------------------
       ! %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -796,14 +780,12 @@ subroutine run_space_step(  &
       iz_r          = 1
       scalarRunoffVol_m3 = scalarRunoffVol_m3 - wflux_s2r;
       ! *Call run_space* if wflux_s2r not 0
-      if (wflux_s2r .ne. 0._rkind) then
-        err=openwq_obj%run_space(                       &
-          simtime,                                      &
-          OpenWQindex_s, hru_index, iy_s, iz_s,         &
-          OpenWQindex_r, hru_index, iy_r, iz_r,         &
-          wflux_s2r,                                    &
-          wmass_source)
-      endif
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
+        wmass_source)
 
       ! ====================================================
       ! 3.2 surface runoff
@@ -822,14 +804,12 @@ subroutine run_space_step(  &
       !wflux_s2r = scalarSurfaceRunoff_summa_m3 ! NEEDS TO BE REVISED WHEN COUPLING WITH MIZROUTE
       wflux_s2r = scalarRunoffVol_m3            ! NEEDS TO BE REVISED WHEN COUPLING WITH MIZROUTE
       ! *Call run_space* if wflux_s2r not 0
-      if (wflux_s2r .ne. 0._rkind) then
-        err=openwq_obj%run_space(                       &
-          simtime,                                      &
-          OpenWQindex_s, hru_index, iy_s, iz_s,         &
-          OpenWQindex_r, hru_index, iy_r, iz_r,         &
-          wflux_s2r,                                    &
-          wmass_source)
-      endif
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
+        wmass_source)
       
       ! --------------------------------------------------------------------
       ! %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -854,14 +834,12 @@ subroutine run_space_step(  &
       ! *Flux*
       wflux_s2r = scalarGroundEvaporation_summa_m3
       ! *Call run_space* if wflux_s2r not 0
-      if (wflux_s2r .ne. 0._rkind) then
-        err=openwq_obj%run_space(                       &
-          simtime,                                      &
-          OpenWQindex_s, hru_index, iy_s, iz_s,         &
-          OpenWQindex_r, hru_index, iy_r, iz_r,         &
-          wflux_s2r,                                    &
-          wmass_source)
-      endif
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
+        wmass_source)
 
       ! ====================================================
       ! 4.2 exfiltration
@@ -880,14 +858,12 @@ subroutine run_space_step(  &
       ! *Flux*
       wflux_s2r = scalarExfiltration_summa_m3
       ! *Call run_space* if wflux_s2r not 0
-      if (wflux_s2r .ne. 0._rkind) then
-        err=openwq_obj%run_space(                       &
-          simtime,                                      &
-          OpenWQindex_s, hru_index, iy_s, iz_s,         &
-          OpenWQindex_r, hru_index, iy_r, iz_r,         &
-          wflux_s2r,                                    &
-          wmass_source)
-      endif
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
+        wmass_source)
 
       ! ====================================================
       ! 4.3 mLayerBaseflow
@@ -912,14 +888,12 @@ subroutine run_space_step(  &
         endif
         wflux_s2r = mLayerBaseflow_summa_m3
         ! *Call run_space* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space(                       &
-            simtime,                                      &
-            OpenWQindex_s, hru_index, iy_s, iz_s,         &
-            OpenWQindex_r, hru_index, iy_r, iz_r,         &
-            wflux_s2r,                                    &
-            wmass_source)
-        endif
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
+          wmass_source)
       end do
 
       ! ====================================================
@@ -941,14 +915,12 @@ subroutine run_space_step(  &
         ! *Flux*
         wflux_s2r = mLayerTranspire_summa_m3
         ! *Call run_space* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space(                       &
-            simtime,                                      &
-            OpenWQindex_s, hru_index, iy_s, iz_s,         &
-            OpenWQindex_r, hru_index, iy_r, iz_r,         &
-            wflux_s2r,                                    &
-            wmass_source)
-        endif
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
+          wmass_source)
       end do
       
       ! ====================================================
@@ -970,14 +942,12 @@ subroutine run_space_step(  &
         iLayerLiqFluxSoil_summa_m3  = iLayerLiqFluxSoil_summa_m_s(iLayer) * hru_area_m2 * data_step
         wflux_s2r                   = iLayerLiqFluxSoil_summa_m3 
         ! *Call run_space* if wflux_s2r not 0
-        if (wflux_s2r .ne. 0._rkind) then
-          err=openwq_obj%run_space(                       &
-            simtime,                                      &
-            OpenWQindex_s, hru_index, iy_s, iz_s,         &
-            OpenWQindex_r, hru_index, iy_r, iz_r,         &
-            wflux_s2r,                                    &
-            wmass_source)
-        endif
+        err=openwq_obj%run_space(                       &
+          simtime,                                      &
+          OpenWQindex_s, hru_index, iy_s, iz_s,         &
+          OpenWQindex_r, hru_index, iy_r, iz_r,         &
+          wflux_s2r,                                    &
+          wmass_source)
       end do
     
       ! ====================================================
@@ -997,15 +967,12 @@ subroutine run_space_step(  &
       ! flux between soil layer (it's -1 because the first layer gets)
       wflux_s2r = scalarSoilDrainage_summa_m3 
       ! *Call run_space* if wflux_s2r not 0
-      if (wflux_s2r .ne. 0._rkind) then
-        err=openwq_obj%run_space(                       &
-          simtime,                                      &
-          OpenWQindex_s, hru_index, iy_s, iz_s,         &
-          OpenWQindex_r, hru_index, iy_r, iz_r,         &
-          wflux_s2r,                                    &
-          wmass_source)
-      endif
-
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
+        wmass_source)
 
       ! --------------------------------------------------------------------
       ! %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1028,14 +995,12 @@ subroutine run_space_step(  &
       ! *Flux*
       wflux_s2r = scalarAquiferBaseflow_summa_m3
       ! *Call run_space* if wflux_s2r not 0
-      if (wflux_s2r .ne. 0._rkind) then
-        err=openwq_obj%run_space(                       &
-          simtime,                                      &
-          OpenWQindex_s, hru_index, iy_s, iz_s,         &
-          OpenWQindex_r, hru_index, iy_r, iz_r,         &
-          wflux_s2r,                                    &
-          wmass_source)
-      endif
+      err=openwq_obj%run_space(                       &
+        simtime,                                      &
+        OpenWQindex_s, hru_index, iy_s, iz_s,         &
+        OpenWQindex_r, hru_index, iy_r, iz_r,         &
+        wflux_s2r,                                    &
+        wmass_source)
 
       ! ====================================================
       ! 5.2 Aquifer -> OUT (lost from model) (transpiration) 
@@ -1052,14 +1017,12 @@ subroutine run_space_step(  &
       ! *Flux*
       wflux_s2r = scalarAquiferTranspire_summa_m3
       ! *Call run_space* if wflux_s2r not 0
-      if (wflux_s2r .ne. 0._rkind) then
-        err=openwq_obj%run_space(                         &
-          simtime,                                        &
-          OpenWQindex_s, hru_index, iy_s, iz_s,           &
-          OpenWQindex_r, hru_index, iy_r, iz_r,           &
-          wflux_s2r,                                      & 
-          wmass_source)
-      endif
+      err=openwq_obj%run_space(                         &
+        simtime,                                        &
+        OpenWQindex_s, hru_index, iy_s, iz_s,           &
+        OpenWQindex_r, hru_index, iy_r, iz_r,           &
+        wflux_s2r,                                      & 
+        wmass_source)
 
       end associate AquiferVars
       end associate Snow_SoilVars
