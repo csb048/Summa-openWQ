@@ -37,7 +37,7 @@ int openwq_decl(
 }
 
 
-int openwq_run_time_start(
+int openwq_openwq_run_time_start(
     ClassWQ_OpenWQ *openWQ,
     bool last_hru_flag, 
     int hru_index, 
@@ -52,7 +52,7 @@ int openwq_run_time_start(
     double soilWatVol_stateVar_summa_m3[],
     double aquiferWatVol_stateVar_summa_m3) {
     
-    return openWQ->run_time_start(
+    return openWQ->openwq_run_time_start(
         last_hru_flag,
         hru_index, 
         nSnow_2openwq, 
@@ -68,21 +68,21 @@ int openwq_run_time_start(
 }
 
 
-int openwq_run_space(
+int openwq_openwq_run_space(
     ClassWQ_OpenWQ *openWQ, 
     int simtime_summa[], 
     int source, int ix_s, int iy_s, int iz_s,
     int recipient, int ix_r, int iy_r, int iz_r, 
     double wflux_s2r, double wmass_source) {
 
-    return openWQ->run_space(
+    return openWQ->openwq_run_space(
         simtime_summa, 
         source, ix_s, iy_s, iz_s,
         recipient, ix_r, iy_r, iz_r, 
         wflux_s2r, wmass_source);
 }
 
-int openwq_run_space_in(
+int openwq_openwq_run_space_in(
     ClassWQ_OpenWQ *openWQ, 
     int simtime_summa[],
     char* source_EWF_name,
@@ -92,7 +92,7 @@ int openwq_run_space_in(
     // convert source_EWF_name to string
     std::string source_EWF_name_str(source_EWF_name);
 
-    return openWQ->run_space_in(
+    return openWQ->openwq_run_space_in(
         simtime_summa,
         source_EWF_name_str,
         recipient, ix_r, iy_r, iz_r, 
@@ -100,10 +100,10 @@ int openwq_run_space_in(
 }
 
 
-int openwq_run_time_end(
+int openwq_openwq_run_time_end(
     ClassWQ_OpenWQ *openWQ, 
     int simtime_summa[]) {
 
-    return openWQ->run_time_end(
+    return openWQ->openwq_run_time_end(
         simtime_summa);
 }

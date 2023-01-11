@@ -15,10 +15,10 @@ the summa source code. There are two files openWQ.f90 and openWQInterface.f90.
 
 The location of calls to openWQ are located in the folllowing:
     - OpenWQ::decl is called from summa_init.f90 (near the bottom of the file)
-    - OpenWQ::run_time_start is called in summa_driver.f90 before summa_runPhysics
+    - OpenWQ::openwq_run_time_start is called in summa_driver.f90 before summa_runPhysics
     around lines 95-100.
-    - OpenWQ::run_space will be called within the model simulation, TBD
-    - OpenWQ::run_time_start will be called in summa_driver.f90 after 
+    - OpenWQ::openwq_run_space will be called within the model simulation, TBD
+    - OpenWQ::openwq_run_time_start will be called in summa_driver.f90 after 
     summa_runPhysics, around lines 95-105;
 
 

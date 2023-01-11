@@ -80,7 +80,7 @@ class ClassWQ_OpenWQ
         int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
         int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 
-    int run_time_start(
+    int openwq_run_time_start(
         bool last_hru_flag,
         int hru_index, 
         int nSnow_2openwq, 
@@ -94,19 +94,19 @@ class ClassWQ_OpenWQ
         double soilWatVol_stateVar_summa_m3[],
         double aquiferWatVol_stateVar_summa_m3);
 
-    int run_space(
+    int openwq_run_space(
         int simtime_summa[], 
         int source, int ix_s, int iy_s, int iz_s,
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r, double wmass_source);
 
-    int run_space_in(
+    int openwq_run_space_in(
         int simtime_summa[],
         std::string source_EWF_name,
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r);
 
-    int run_time_end(
+    int openwq_run_time_end(
         int simtime_summa[]);
 
     time_t convert_time(

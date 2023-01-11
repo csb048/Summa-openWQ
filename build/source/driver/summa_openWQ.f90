@@ -6,10 +6,10 @@ module summa_openWQ
   private
   ! Subroutines
   public :: openwq_init
-  public :: run_time_start
-  public :: run_time_start_go
-  public :: run_space_step
-  public :: run_time_end
+  public :: openwq_run_time_start
+  public :: openwq_run_time_start_go
+  public :: openwq_run_space_step
+  public :: openwq_run_time_end
 
   ! Global Data for prognostic Variables of HRUs
   type(gru_hru_doubleVec),save,public   :: progStruct_timestep_start ! copy of progStruct at the start of timestep for passing fluxes
@@ -77,7 +77,7 @@ end subroutine openwq_init
   
 ! Subroutine that SUMMA calls to pass varialbes that need to go to
 ! openWQ - the copy of progStruct is done in here
-subroutine run_time_start(  &
+subroutine openwq_run_time_start(  &
     openWQ_obj,             & ! passing openwq object
     summa1_struc)
 
@@ -108,7 +108,7 @@ subroutine run_time_start(  &
     enddo
   enddo
 
-  call run_time_start_go( &
+  call openwq_run_time_start_go( &
     openwq_obj,           &
     summa1_struc,         &
     nSnow_2openwq,        &
@@ -116,7 +116,7 @@ subroutine run_time_start(  &
 
 end subroutine
 
-subroutine run_time_start_go( &
+subroutine openwq_run_time_start_go( &
     openWQ_obj,               &
     summa1_struc,             &
     nSnow_2openwq,            &
@@ -286,7 +286,7 @@ subroutine run_time_start_go( &
         simtime(4) = timeStruct%var(iLookTIME%ih)    ! day
         simtime(5) = timeStruct%var(iLookTIME%imin)  ! minute
         
-        err=openWQ_obj%run_time_start(&
+        err=openWQ_obj%openwq_run_time_start(&
               last_hru_flag,                          & 
               openWQArrayIndex,                       & ! total HRUs
               nSnow_2openwq,                          &
@@ -311,7 +311,7 @@ subroutine run_time_start_go( &
 end subroutine
 
 
-subroutine run_space_step(  &
+subroutine openwq_run_space_step(  &
     timeStruct,             &
     summa1_struc,           &
     fluxStruct,             &
@@ -541,15 +541,15 @@ subroutine run_space_step(  &
         ! 1.1 precipitation -> canopy 
         ! ====================================================
         ! *Source*:
-        ! PRECIP (external flux, so need call run_space_in) 
+        ! PRECIP (external flux, so need call openwq_run_space_in) 
         ! *Recipient*: canopy (only 1 z layer)
         OpenWQindex_r = canopy_index_openwq
         iz_r          = 1 
         ! *Flux*: the portion of rainfall and snowfall not throughfall
         wflux_s2r = (scalarRainfall_summa_m3 - scalarThroughfallRain_summa_m3) &
                     + (scalarSnowfall_summa_m3 - scalarThroughfallSnow_summa_m3)
-        ! *Call run_space_in* if wflux_s2r not 0
-        err=openwq_obj%run_space_in(                    &
+        ! *Call openwq_run_space_in* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space_in(                    &
           simtime,                                      &
           'PRECIP',                                     &
           OpenWQindex_r, hru_index, iy_r, iz_r,   &
@@ -577,8 +577,8 @@ subroutine run_space_step(  &
           iz_r = 1 ! (has only 1 layer)
           scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
         end if
-        ! *Call run_space* if wflux_s2r not 0
-        err=openwq_obj%run_space(                       &
+        ! *Call openwq_run_space* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space(                       &
           simtime,                                      &
           OpenWQindex_s, hru_index, iy_s, iz_s,         &
           OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -601,8 +601,8 @@ subroutine run_space_step(  &
         ! transpiration + evaporation + sublimation
         wflux_s2r =  scalarCanopyEvaporation_summa_m3  &
                       + scalarCanopySublimation_summa_m3
-        ! *Call run_space* if wflux_s2r not 0
-        err=openwq_obj%run_space(                       &
+        ! *Call openwq_run_space* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space(                       &
           simtime,                                      &
           OpenWQindex_s, hru_index, iy_s, iz_s,         &
           OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -628,7 +628,7 @@ subroutine run_space_step(  &
                   + scalarThroughfallSnow_summa_m3
       if (current_nSnow .gt. 0)then
         ! *Source*:
-        ! PRECIP (external flux, so need call run_space_in)
+        ! PRECIP (external flux, so need call openwq_run_space_in)
         ! *Recipient*: 
         ! snow+soil (upper layer)
         OpenWQindex_r = snow_index_openwq
@@ -638,8 +638,8 @@ subroutine run_space_step(  &
         iz_r          = 1
         scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r ! Needed because runoff volume is not tracked
       end if
-      ! *Call run_space* if wflux_s2r not 0
-      err=openwq_obj%run_space_in(                &
+      ! *Call openwq_run_space* if wflux_s2r not 0
+      err=openwq_obj%openwq_run_space_in(                &
         simtime,                                  &
         'PRECIP',                                 &
         OpenWQindex_r, hru_index, iy_r, iz_r,     &
@@ -665,8 +665,8 @@ subroutine run_space_step(  &
         ! *Flux*
         ! snow sublimation
         wflux_s2r = scalarSnowSublimation_summa_m3
-        ! *Call run_space* if wflux_s2r not 0
-        err=openwq_obj%run_space(                       &
+        ! *Call openwq_run_space* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space(                       &
           simtime,                                      &
           OpenWQindex_s, hru_index, iy_s, iz_s,         &
           OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -690,8 +690,8 @@ subroutine run_space_step(  &
           ! *Flux*
           mLayerLiqFluxSnow_summa_m3  = iLayerLiqFluxSnow_summa_m_s(iLayer) * hru_area_m2 * data_step
           wflux_s2r                   = mLayerLiqFluxSnow_summa_m3 
-          ! *Call run_space* if wflux_s2r not 0
-          err=openwq_obj%run_space(                       &
+          ! *Call openwq_run_space* if wflux_s2r not 0
+          err=openwq_obj%openwq_run_space(                       &
             simtime,                                      &
             OpenWQindex_s, hru_index, iy_s, iz_s,         &
             OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -716,8 +716,8 @@ subroutine run_space_step(  &
         OpenWQindex_r = runoff_index_openwq
         iz_r          = 1
         scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
-        ! *Call run_space* if wflux_s2r not 0
-        err=openwq_obj%run_space(                       &
+        ! *Call openwq_run_space* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space(                       &
           simtime,                                      &
           OpenWQindex_s, hru_index, iy_s, iz_s,         &
           OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -749,8 +749,8 @@ subroutine run_space_step(  &
         OpenWQindex_r = runoff_index_openwq
         iz_r          = 1
         scalarRunoffVol_m3 = scalarRunoffVol_m3 + wflux_s2r;
-        ! *Call run_space* if wflux_s2r not 0
-        err=openwq_obj%run_space(                       &
+        ! *Call openwq_run_space* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space(                       &
           simtime,                                      &
           OpenWQindex_s, hru_index, iy_s, iz_s,         &
           OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -779,8 +779,8 @@ subroutine run_space_step(  &
       OpenWQindex_r = soil_index_openwq
       iz_r          = 1
       scalarRunoffVol_m3 = scalarRunoffVol_m3 - wflux_s2r;
-      ! *Call run_space* if wflux_s2r not 0
-      err=openwq_obj%run_space(                       &
+      ! *Call openwq_run_space* if wflux_s2r not 0
+      err=openwq_obj%openwq_run_space(                       &
         simtime,                                      &
         OpenWQindex_s, hru_index, iy_s, iz_s,         &
         OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -803,8 +803,8 @@ subroutine run_space_step(  &
       ! *Flux*
       !wflux_s2r = scalarSurfaceRunoff_summa_m3 ! NEEDS TO BE REVISED WHEN COUPLING WITH MIZROUTE
       wflux_s2r = scalarRunoffVol_m3            ! NEEDS TO BE REVISED WHEN COUPLING WITH MIZROUTE
-      ! *Call run_space* if wflux_s2r not 0
-      err=openwq_obj%run_space(                       &
+      ! *Call openwq_run_space* if wflux_s2r not 0
+      err=openwq_obj%openwq_run_space(                       &
         simtime,                                      &
         OpenWQindex_s, hru_index, iy_s, iz_s,         &
         OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -833,8 +833,8 @@ subroutine run_space_step(  &
       iz_r           = -1
       ! *Flux*
       wflux_s2r = scalarGroundEvaporation_summa_m3
-      ! *Call run_space* if wflux_s2r not 0
-      err=openwq_obj%run_space(                       &
+      ! *Call openwq_run_space* if wflux_s2r not 0
+      err=openwq_obj%openwq_run_space(                       &
         simtime,                                      &
         OpenWQindex_s, hru_index, iy_s, iz_s,         &
         OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -857,8 +857,8 @@ subroutine run_space_step(  &
       iz_r          = -1
       ! *Flux*
       wflux_s2r = scalarExfiltration_summa_m3
-      ! *Call run_space* if wflux_s2r not 0
-      err=openwq_obj%run_space(                       &
+      ! *Call openwq_run_space* if wflux_s2r not 0
+      err=openwq_obj%openwq_run_space(                       &
         simtime,                                      &
         OpenWQindex_s, hru_index, iy_s, iz_s,         &
         OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -887,8 +887,8 @@ subroutine run_space_step(  &
           mLayerBaseflow_summa_m3 = mLayerBaseflow_summa_m3 - scalarExfiltration_summa_m3
         endif
         wflux_s2r = mLayerBaseflow_summa_m3
-        ! *Call run_space* if wflux_s2r not 0
-        err=openwq_obj%run_space(                       &
+        ! *Call openwq_run_space* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space(                       &
           simtime,                                      &
           OpenWQindex_s, hru_index, iy_s, iz_s,         &
           OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -914,8 +914,8 @@ subroutine run_space_step(  &
         mLayerTranspire_summa_m3 = mLayerTranspire_summa_m_s(iLayer) * hru_area_m2 * data_step
         ! *Flux*
         wflux_s2r = mLayerTranspire_summa_m3
-        ! *Call run_space* if wflux_s2r not 0
-        err=openwq_obj%run_space(                       &
+        ! *Call openwq_run_space* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space(                       &
           simtime,                                      &
           OpenWQindex_s, hru_index, iy_s, iz_s,         &
           OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -941,8 +941,8 @@ subroutine run_space_step(  &
         ! flux between soil layer
         iLayerLiqFluxSoil_summa_m3  = iLayerLiqFluxSoil_summa_m_s(iLayer) * hru_area_m2 * data_step
         wflux_s2r                   = iLayerLiqFluxSoil_summa_m3 
-        ! *Call run_space* if wflux_s2r not 0
-        err=openwq_obj%run_space(                       &
+        ! *Call openwq_run_space* if wflux_s2r not 0
+        err=openwq_obj%openwq_run_space(                       &
           simtime,                                      &
           OpenWQindex_s, hru_index, iy_s, iz_s,         &
           OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -966,8 +966,8 @@ subroutine run_space_step(  &
       ! *Flux*
       ! flux between soil layer (it's -1 because the first layer gets)
       wflux_s2r = scalarSoilDrainage_summa_m3 
-      ! *Call run_space* if wflux_s2r not 0
-      err=openwq_obj%run_space(                       &
+      ! *Call openwq_run_space* if wflux_s2r not 0
+      err=openwq_obj%openwq_run_space(                       &
         simtime,                                      &
         OpenWQindex_s, hru_index, iy_s, iz_s,         &
         OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -994,8 +994,8 @@ subroutine run_space_step(  &
       iz_r          = -1
       ! *Flux*
       wflux_s2r = scalarAquiferBaseflow_summa_m3
-      ! *Call run_space* if wflux_s2r not 0
-      err=openwq_obj%run_space(                       &
+      ! *Call openwq_run_space* if wflux_s2r not 0
+      err=openwq_obj%openwq_run_space(                       &
         simtime,                                      &
         OpenWQindex_s, hru_index, iy_s, iz_s,         &
         OpenWQindex_r, hru_index, iy_r, iz_r,         &
@@ -1016,8 +1016,8 @@ subroutine run_space_step(  &
       iz_r          = -1
       ! *Flux*
       wflux_s2r = scalarAquiferTranspire_summa_m3
-      ! *Call run_space* if wflux_s2r not 0
-      err=openwq_obj%run_space(                         &
+      ! *Call openwq_run_space* if wflux_s2r not 0
+      err=openwq_obj%openwq_run_space(                         &
         simtime,                                        &
         OpenWQindex_s, hru_index, iy_s, iz_s,           &
         OpenWQindex_r, hru_index, iy_r, iz_r,           &
@@ -1034,10 +1034,10 @@ subroutine run_space_step(  &
     end do
   end do
 
-end subroutine run_space_step
+end subroutine openwq_run_space_step
 
 
-subroutine run_time_end( &
+subroutine openwq_run_time_end( &
   openWQ_obj, &
   summa1_struc)
 
@@ -1065,7 +1065,7 @@ subroutine run_time_end( &
   simtime(4) = timeStruct%var(iLookTIME%ih)    ! day
   simtime(5) = timeStruct%var(iLookTIME%imin)  ! minute
 
-  err=openwq_obj%run_time_end(simtime)           ! minute
+  err=openwq_obj%openwq_run_time_end(simtime)           ! minute
 
   end associate summaVars
 end subroutine
