@@ -109,12 +109,5 @@ class CLASSWQ_openwq
     int openwq_run_time_end(
         int simtime_summa[]);
 
-    time_t convert_time(
-        int year, 
-        int month, 
-        int day, 
-        int hour, 
-        int minute);
-
 };
 #endif
