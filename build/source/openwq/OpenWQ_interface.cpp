@@ -37,7 +37,7 @@ int openwq_decl(
 }
 
 
-int openwq_openwq_run_time_start(
+int openwq_run_time_start(
     ClassWQ_OpenWQ *openWQ,
     bool last_hru_flag, 
     int hru_index, 

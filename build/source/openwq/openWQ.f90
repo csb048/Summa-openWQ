@@ -14,7 +14,7 @@ module openwq
  contains
    !  procedure :: get_num => openWQ_get_num
     procedure :: decl => openWQ_init
-    procedure :: openwq_run_time_start => openWQ_openwq_run_time_start
+    procedure :: openwq_run_time_start => openwq_run_time_start
     procedure :: openwq_run_space => openWQ_openwq_run_space
     procedure :: openwq_run_space_in => openWQ_openwq_run_space_in
     procedure :: openwq_run_time_end => openWQ_openwq_run_time_end
@@ -67,7 +67,7 @@ module openwq
     end function
 !  ! Globaly accessible variable
 
-   integer function openWQ_openwq_run_time_start(   &
+   integer function openwq_run_time_start(   &
       this,                                  &
       last_hru_flag,                         &
       hru_index,                             &
@@ -97,7 +97,7 @@ module openwq
       real(rkind),  intent(in)   :: soilWatVol_stateVar_summa_m3(nSoil_2openwq)
       real(rkind),  intent(in)   :: aquiferWatVol_stateVar_summa_m3
 
-      openWQ_openwq_run_time_start = openwq_openwq_run_time_start_c( &
+      openwq_run_time_start = openwq_run_time_start_c( &
          this%ptr,                              & 
          last_hru_flag,                         &
          hru_index,                             &

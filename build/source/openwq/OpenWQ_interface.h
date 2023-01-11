@@ -30,7 +30,7 @@ extern "C" {
         int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
         int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 
-    int openwq_openwq_run_time_start(
+    int openwq_run_time_start(
         CLASSWQ_OPENWQ *openWQ,
         bool last_hru_flag, 
         int index_hru, 

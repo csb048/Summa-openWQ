@@ -31,7 +31,7 @@ interface
 
     end function
 
-    function openwq_openwq_run_time_start_c(&
+    function openwq_run_time_start_c(&
         openWQ,                             &
         last_hru_flag,                      &
         hru_index,                          &
@@ -44,11 +44,11 @@ interface
         sweWatVol_stateVar_summa_m3,        &
         canopyWatVol_stateVar_summa_m3,     &
         soilWatVol_stateVar_summa_m3,       &
-        aquiferWatVol_stateVar_summa_m3) bind(C, name="openwq_openwq_run_time_start")
+        aquiferWatVol_stateVar_summa_m3) bind(C, name="openwq_run_time_start")
 
         use iso_c_binding
         implicit none
-        integer(c_int)                       :: openwq_openwq_run_time_start_c ! returns 0 (success) or -1 (failure)
+        integer(c_int)                       :: openwq_run_time_start_c ! returns 0 (success) or -1 (failure)
         type(c_ptr),    intent(in), value    :: openWQ
         logical(c_bool),   intent(in)        :: last_hru_flag
         integer(c_int), intent(in), value    :: hru_index

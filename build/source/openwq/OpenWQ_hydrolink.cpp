@@ -16,32 +16,12 @@
 #include "OpenWQ_hydrolink.h"
 #include "OpenWQ_interface.h"
 
-
 // Constructor
 // initalize numHRUs value
 ClassWQ_OpenWQ::ClassWQ_OpenWQ() {}
 
 // Deconstructor
 ClassWQ_OpenWQ::~ClassWQ_OpenWQ() {}
-
-time_t ClassWQ_OpenWQ::convert_time(
-    int year, 
-    int month, 
-    int day, 
-    int hour, 
-    int minute) {
-
-    std::time_t sim_time;
-    std::tm tm{};
-    tm.tm_year = year - 1900; // -1900 is needed to get the conversion to produce the correct output
-    tm.tm_mon = month - 1;
-    tm.tm_hour = hour;
-    tm.tm_mday = day;
-    tm.tm_min = minute;
-    sim_time = timegm(&tm);
-
-    return sim_time;
-}
 
 int ClassWQ_OpenWQ::decl(
     int num_HRU,                // num HRU
@@ -127,11 +107,12 @@ int ClassWQ_OpenWQ::openwq_run_time_start(
     double soilWatVol_stateVar_summa_m3[],
     double aquiferWatVol_stateVar_summa_m3) {
 
-    time_t simtime = convert_time(simtime_summa[0], 
+    time_t simtime = OpenWQ_units_ref->convert_time(simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
         simtime_summa[3], 
-        simtime_summa[4]);
+        simtime_summa[4],
+        0);
     
     int runoff_vol = 0;
     
@@ -191,12 +172,13 @@ int ClassWQ_OpenWQ::openwq_run_space(
     ix_r -= 1; iy_r -= 1; iz_r -= 1;
 
    
-    time_t simtime = convert_time(
+    time_t simtime = OpenWQ_units_ref->convert_time(
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
         simtime_summa[3], 
-        simtime_summa[4]);
+        simtime_summa[4],
+        0);
     
     OpenWQ_couplercalls_ref->RunSpaceStep(
         *OpenWQ_hostModelconfig_ref,
@@ -229,12 +211,13 @@ int ClassWQ_OpenWQ::openwq_run_space_in(
     // Convert Fortran Index to C++ index
     ix_r -= 1; iy_r -= 1; iz_r -= 1;
     
-    time_t simtime = convert_time(
+    time_t simtime = OpenWQ_units_ref->convert_time(
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
         simtime_summa[3], 
-        simtime_summa[4]);
+        simtime_summa[4],
+        0);
 
      OpenWQ_couplercalls_ref->RunSpaceStep_IN(
         *OpenWQ_hostModelconfig_ref,
@@ -261,12 +244,13 @@ int ClassWQ_OpenWQ::openwq_run_space_in(
 int ClassWQ_OpenWQ::openwq_run_time_end(
     int simtime_summa[]) {
     
-    time_t simtime = convert_time(
+    time_t simtime = OpenWQ_units_ref->convert_time(
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
         simtime_summa[3], 
-        simtime_summa[4]);
+        simtime_summa[4],
+        0);
 
 
     OpenWQ_couplercalls_ref->RunTimeLoopEnd(
