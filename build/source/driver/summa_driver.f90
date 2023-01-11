@@ -46,7 +46,7 @@ USE globalData,only:gru_struc                               ! gru-hru mapping st
 
 
 ! OpenWQ coupling 
-USE globalData,only:openWQ_obj
+USE globalData,only:openwq_obj
 USE summa_openWQ,only:openwq_init
 USE summa_openWQ,only:openwq_run_time_start
 USE summa_openWQ,only:openwq_run_time_end

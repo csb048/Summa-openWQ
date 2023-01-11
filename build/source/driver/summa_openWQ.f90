@@ -20,7 +20,7 @@ module summa_openWQ
   ! putting it here to keep the SUMMA_Driver clean
 subroutine openwq_init(err, message)
 
-  USE globalData,only:openWQ_obj
+  USE globalData,only:openwq_obj
   USE globalData,only:gru_struc                               ! gru-hru mapping structures
   USE globalData,only:prog_meta
   USE allocspace_module,only:allocGlobal                      ! module to allocate space for global data structures
@@ -78,7 +78,7 @@ end subroutine openwq_init
 ! Subroutine that SUMMA calls to pass varialbes that need to go to
 ! openWQ - the copy of progStruct is done in here
 subroutine openwq_run_time_start(  &
-    openWQ_obj,             & ! passing openwq object
+    openwq_obj,             & ! passing openwq object
     summa1_struc)
 
   USE summa_type, only: summa1_type_dec            ! master summa data type
@@ -87,7 +87,7 @@ subroutine openwq_run_time_start(  &
   implicit none
 
   ! Dummy Varialbes
-  class(CLASSWQ_openwq), intent(in)  :: openWQ_obj
+  class(CLASSWQ_openwq), intent(in)  :: openwq_obj
   type(summa1_type_dec), intent(in)  :: summa1_struc
   ! local variables
   integer(i4b)                       :: iGRU
@@ -117,7 +117,7 @@ subroutine openwq_run_time_start(  &
 end subroutine
 
 subroutine openwq_run_time_start_go( &
-    openWQ_obj,               &
+    openwq_obj,               &
     summa1_struc,             &
     nSnow_2openwq,            &
     nSoil_2openwq)
@@ -134,7 +134,7 @@ subroutine openwq_run_time_start_go( &
   implicit none
 
   ! Dummy Varialbes
-  class(CLASSWQ_openwq), intent(in)   :: openWQ_obj
+  class(CLASSWQ_openwq), intent(in)   :: openwq_obj
   type(summa1_type_dec), intent(in)   :: summa1_struc
   ! local variables
   integer(i4b), intent(in)            :: nSnow_2openwq
@@ -286,7 +286,7 @@ subroutine openwq_run_time_start_go( &
         simtime(4) = timeStruct%var(iLookTIME%ih)    ! day
         simtime(5) = timeStruct%var(iLookTIME%imin)  ! minute
         
-        err=openWQ_obj%openwq_run_time_start(&
+        err=openwq_obj%openwq_run_time_start(&
               last_hru_flag,                          & 
               openWQArrayIndex,                       & ! total HRUs
               nSnow_2openwq,                          &
@@ -323,7 +323,7 @@ subroutine openwq_run_space_step(  &
   USE var_lookup,   only: iLookATTR  ! named variables for real valued attribute data structure
   USE var_lookup,   only: iLookINDEX 
   USE summa_type,   only: summa1_type_dec            ! master summa data type
-  USE globalData,   only: openWQ_obj
+  USE globalData,   only: openwq_obj
   USE data_types,   only: var_dlength,var_i
   USE globalData,   only: gru_struc
   USE globalData,   only: data_step   ! time step of forcing data (s)
@@ -1038,7 +1038,7 @@ end subroutine openwq_run_space_step
 
 
 subroutine openwq_run_time_end( &
-  openWQ_obj, &
+  openwq_obj, &
   summa1_struc)
 
   USE summa_type, only:summa1_type_dec            ! master summa data type
@@ -1048,7 +1048,7 @@ subroutine openwq_run_time_end( &
   implicit none
 
   ! Dummy Varialbes
-  class(CLASSWQ_openwq), intent(in)  :: openWQ_obj
+  class(CLASSWQ_openwq), intent(in)  :: openwq_obj
   type(summa1_type_dec), intent(in)  :: summa1_struc
 
   ! Local Variables

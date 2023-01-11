@@ -344,7 +344,7 @@ MODULE globalData
  integer(i4b),parameter,public               :: nTimeDelay=2000  ! number of hours in the time delay histogram (default: ~1 season = 24*365/4)
 
  ! OpenWQ variable
- type(CLASSWQ_openwq),save,public            :: openWQ_obj
+ type(CLASSWQ_openwq),save,public            :: openwq_obj
 
 
 END MODULE globalData
