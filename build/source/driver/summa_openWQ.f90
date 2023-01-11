@@ -1,4 +1,4 @@
-module summa_openWQ
+module summa_openwq
   USE nrtype
   USE openWQ, only:CLASSWQ_openwq
   USE data_types, only:gru_hru_doubleVec
@@ -1072,4 +1072,4 @@ end subroutine
 
 
 
-end module summa_openWQ
+end module summa_openwq

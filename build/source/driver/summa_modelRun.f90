@@ -33,7 +33,7 @@ USE var_lookup,only:iLookINDEX       ! look-up values for local column index var
 USE summa_util,only:handle_err
 
 ! OpenWQ
-USE summa_openWQ,only:openwq_run_space_step
+USE summa_openwq,only:openwq_run_space_step
 
 ! safety: set private unless specified otherwise
 implicit none
