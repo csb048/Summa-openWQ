@@ -18,12 +18,12 @@
 
 // Constructor
 // initalize numHRUs value
-ClassWQ_OpenWQ::ClassWQ_OpenWQ() {}
+CLASSWQ_openwq::CLASSWQ_openwq() {}
 
 // Deconstructor
-ClassWQ_OpenWQ::~ClassWQ_OpenWQ() {}
+CLASSWQ_openwq::~CLASSWQ_openwq() {}
 
-int ClassWQ_OpenWQ::decl(
+int CLASSWQ_openwq::decl(
     int num_HRU,                // num HRU
     int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
     int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
@@ -93,7 +93,7 @@ int ClassWQ_OpenWQ::decl(
 }
 
 // soilMoist_depVar does not have a value - it is passed as 0
-int ClassWQ_OpenWQ::openwq_run_time_start(
+int CLASSWQ_openwq::openwq_run_time_start(
     bool last_hru_flag,
     int index_hru, 
     int nSnow_2openwq, 
@@ -161,7 +161,7 @@ int ClassWQ_OpenWQ::openwq_run_time_start(
     return 0;
 }
 
-int ClassWQ_OpenWQ::openwq_run_space(
+int CLASSWQ_openwq::openwq_run_space(
     int simtime_summa[], 
     int source, int ix_s, int iy_s, int iz_s,
     int recipient, int ix_r, int iy_r, int iz_r, 
@@ -202,7 +202,7 @@ int ClassWQ_OpenWQ::openwq_run_space(
     return 0;
 }
 
-int ClassWQ_OpenWQ::openwq_run_space_in(
+int CLASSWQ_openwq::openwq_run_space_in(
     int simtime_summa[],
     std::string source_EWF_name,
     int recipient, int ix_r, int iy_r, int iz_r, 
@@ -241,7 +241,7 @@ int ClassWQ_OpenWQ::openwq_run_space_in(
     return 0;
 }
 
-int ClassWQ_OpenWQ::openwq_run_time_end(
+int CLASSWQ_openwq::openwq_run_time_end(
     int simtime_summa[]) {
     
     time_t simtime = OpenWQ_units_ref->convert_time(

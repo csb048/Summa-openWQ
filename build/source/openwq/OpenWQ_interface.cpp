@@ -7,16 +7,16 @@
  * can be called. The openWQ object methods are defined above.
  */
 // Interface functions to create Object
-CLASSWQ_OPENWQ* create_openwq() {
-    return new ClassWQ_OpenWQ();
+CLASSWQ_openwq* create_openwq() {
+    return new CLASSWQ_openwq();
 }
 
-void delete_openwq(CLASSWQ_OPENWQ* openWQ) {
+void delete_openwq(CLASSWQ_openwq* openWQ) {
     delete openWQ;
 }
 
 int openwq_decl(
-    ClassWQ_OpenWQ *openWQ, 
+    CLASSWQ_openwq *openWQ, 
     int hruCount,              // num HRU
     int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
     int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
@@ -38,7 +38,7 @@ int openwq_decl(
 
 
 int openwq_run_time_start(
-    ClassWQ_OpenWQ *openWQ,
+    CLASSWQ_openwq *openWQ,
     bool last_hru_flag, 
     int hru_index, 
     int nSnow_2openwq, 
@@ -69,7 +69,7 @@ int openwq_run_time_start(
 
 
 int openwq_openwq_run_space(
-    ClassWQ_OpenWQ *openWQ, 
+    CLASSWQ_openwq *openWQ, 
     int simtime_summa[], 
     int source, int ix_s, int iy_s, int iz_s,
     int recipient, int ix_r, int iy_r, int iz_r, 
@@ -83,7 +83,7 @@ int openwq_openwq_run_space(
 }
 
 int openwq_openwq_run_space_in(
-    ClassWQ_OpenWQ *openWQ, 
+    CLASSWQ_openwq *openWQ, 
     int simtime_summa[],
     char* source_EWF_name,
     int recipient, int ix_r, int iy_r, int iz_r, 
@@ -101,7 +101,7 @@ int openwq_openwq_run_space_in(
 
 
 int openwq_openwq_run_time_end(
-    ClassWQ_OpenWQ *openWQ, 
+    CLASSWQ_openwq *openWQ, 
     int simtime_summa[]) {
 
     return openWQ->openwq_run_time_end(

@@ -7,21 +7,21 @@
 
 #ifdef __cplusplus
 extern "C" { 
-    class ClassWQ_OpenWQ;
-    typedef ClassWQ_OpenWQ CLASSWQ_OPENWQ;
+    class CLASSWQ_openwq;
+    typedef CLASSWQ_openwq CLASSWQ_openwq;
     #else
-    typedef struct CLASSWQ_OPENWQ CLASSWQ_OPENWQ;
+    typedef struct CLASSWQ_openwq CLASSWQ_openwq;
     #endif
 
     // Create OpenWQ Object
-    CLASSWQ_OPENWQ* create_openwq();
+    CLASSWQ_openwq* create_openwq();
 
     // Delete OpenWQ Object
-    void delete_openwq(CLASSWQ_OPENWQ* openWQ);
+    void delete_openwq(CLASSWQ_openwq* openWQ);
 
     // OpenWQ initalization method
     int openwq_decl(
-        ClassWQ_OpenWQ *openWQ, 
+        CLASSWQ_openwq *openWQ, 
         int hruCount,               // num HRU
         int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
         int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
@@ -31,7 +31,7 @@ extern "C" {
         int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 
     int openwq_run_time_start(
-        CLASSWQ_OPENWQ *openWQ,
+        CLASSWQ_openwq *openWQ,
         bool last_hru_flag, 
         int index_hru, 
         int nSnow_2openwq, 
@@ -47,21 +47,21 @@ extern "C" {
 
     // OpenWQ run functions, this function decides which C++ code to call
     int openwq_openwq_run_space(
-        CLASSWQ_OPENWQ *openWQ, 
+        CLASSWQ_openwq *openWQ, 
         int simtime_summa[], 
         int source, int ix_s, int iy_s, int iz_s,
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r, double wmass_source);
 
     int openwq_openwq_run_space_in(
-        CLASSWQ_OPENWQ *openWQ, 
+        CLASSWQ_openwq *openWQ, 
         int simtime_summa[],
         char* source_EWF_name,
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r);
 
     int openwq_openwq_run_time_end(
-        CLASSWQ_OPENWQ *openWQ, 
+        CLASSWQ_openwq *openWQ, 
         int simtime_summa[]);
 
     #ifdef __cplusplus

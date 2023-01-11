@@ -37,7 +37,7 @@
   inline int aquifer_index_openwq   = 4;
   inline int max_snow_layers        = 5;
 
-class ClassWQ_OpenWQ
+class CLASSWQ_openwq
 {
 
     // Instance Variables
@@ -63,8 +63,8 @@ class ClassWQ_OpenWQ
 
     // Constructor
     public:
-        ClassWQ_OpenWQ();
-        ~ClassWQ_OpenWQ();
+        CLASSWQ_openwq();
+        ~CLASSWQ_openwq();
     
     // Methods
     void printNum() {

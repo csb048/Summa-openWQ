@@ -1,6 +1,6 @@
 module summa_openWQ
   USE nrtype
-  USE openWQ, only:ClassWQ_OpenWQ
+  USE openWQ, only:CLASSWQ_openwq
   USE data_types, only:gru_hru_doubleVec
   implicit none
   private
@@ -38,7 +38,7 @@ subroutine openwq_init(err, message)
   integer(i4b)                                    :: nYdirec_2openwq     ! number of layers in the y-dir (not used in summa)
   integer(i4b)                                    :: iGRU, iHRU          ! indices of GRUs and HRUs
 
-  openwq_obj = ClassWQ_OpenWQ() ! initalize openWQ object
+  openwq_obj = CLASSWQ_openwq() ! initalize openWQ object
 
   ! nx -> num of HRUs)
   hruCount = sum( gru_struc(:)%hruCount )
@@ -87,7 +87,7 @@ subroutine openwq_run_time_start(  &
   implicit none
 
   ! Dummy Varialbes
-  class(ClassWQ_OpenWQ), intent(in)  :: openWQ_obj
+  class(CLASSWQ_openwq), intent(in)  :: openWQ_obj
   type(summa1_type_dec), intent(in)  :: summa1_struc
   ! local variables
   integer(i4b)                       :: iGRU
@@ -134,7 +134,7 @@ subroutine openwq_run_time_start_go( &
   implicit none
 
   ! Dummy Varialbes
-  class(ClassWQ_OpenWQ), intent(in)   :: openWQ_obj
+  class(CLASSWQ_openwq), intent(in)   :: openWQ_obj
   type(summa1_type_dec), intent(in)   :: summa1_struc
   ! local variables
   integer(i4b), intent(in)            :: nSnow_2openwq
@@ -1048,7 +1048,7 @@ subroutine openwq_run_time_end( &
   implicit none
 
   ! Dummy Varialbes
-  class(ClassWQ_OpenWQ), intent(in)  :: openWQ_obj
+  class(CLASSWQ_openwq), intent(in)  :: openWQ_obj
   type(summa1_type_dec), intent(in)  :: summa1_struc
 
   ! Local Variables

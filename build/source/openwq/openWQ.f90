@@ -3,11 +3,11 @@ module openwq
  USE, intrinsic :: iso_c_binding
  USE nrtype
  private
- public :: ClassWQ_OpenWQ
+ public :: CLASSWQ_openwq
 
  include "openWQInterface.f90"
 
- type ClassWQ_OpenWQ
+ type CLASSWQ_openwq
     private
     type(c_ptr) :: ptr ! pointer to openWQ class
 
@@ -21,13 +21,13 @@ module openwq
 
  end type
 
- interface ClassWQ_OpenWQ
+ interface CLASSWQ_openwq
     procedure create_openwq
  end interface
  contains
     function create_openwq()
         implicit none
-        type(ClassWQ_OpenWQ) :: create_openwq
+        type(CLASSWQ_openwq) :: create_openwq
         create_openwq%ptr = create_openwq_c()
     end function
 
@@ -44,7 +44,7 @@ module openwq
       nYdirec_2openwq)                 ! num of layers in y-dir (set to 1 because not used in summa)
       
       implicit none
-      class(ClassWQ_OpenWQ) :: this
+      class(CLASSWQ_openwq) :: this
       integer(i4b), intent(in) :: num_hru
       integer(i4b), intent(in) :: nCanopy_2openwq
       integer(i4b), intent(in) :: nSnow_2openwq
@@ -83,7 +83,7 @@ module openwq
       aquiferWatVol_stateVar_summa_m3)
       
       implicit none
-      class(ClassWQ_OpenWQ)      :: this
+      class(CLASSWQ_openwq)      :: this
       logical(1), intent(in)     :: last_hru_flag
       integer(i4b), intent(in)   :: hru_index
       integer(i4b), intent(in)   :: nSnow_2openwq
@@ -122,7 +122,7 @@ module openwq
       wflux_s2r,wmass_source)
 
       implicit none
-      class(ClassWQ_OpenWQ)      :: this
+      class(CLASSWQ_openwq)      :: this
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
       integer(i4b), intent(in)   :: source
       integer(i4b), intent(in)   :: ix_s
@@ -152,7 +152,7 @@ module openwq
       wflux_s2r)
 
       implicit none
-      class(ClassWQ_OpenWQ)      :: this
+      class(CLASSWQ_openwq)      :: this
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
       integer(i4b), intent(in)   :: recipient
       integer(i4b), intent(in)   :: ix_r
@@ -176,7 +176,7 @@ module openwq
       simtime)
 
       implicit none
-      class(ClassWQ_OpenWQ)      :: this
+      class(CLASSWQ_openwq)      :: this
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
 
       openWQ_openwq_run_time_end = openWQ_openwq_run_time_end_c( &
