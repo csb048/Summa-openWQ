@@ -47,7 +47,7 @@ USE globalData,only:gru_struc                               ! gru-hru mapping st
 
 ! OpenWQ coupling 
 USE globalData,only:openWQ_obj
-USE summa_openWQ,only:init_openwq
+USE summa_openWQ,only:openwq_init
 USE summa_openWQ,only:run_time_start
 USE summa_openWQ,only:run_time_end
 
@@ -91,7 +91,7 @@ call summa_readRestart(summa1_struc(n), err, message)
 call handle_err(err, message)
 
 ! Init openWQ object
-call init_openwq(err, message)
+call openwq_init(err, message)
 if(err/=0) call stop_program(1, 'problem allocating openWQ progStruct for saving state information')
 
 

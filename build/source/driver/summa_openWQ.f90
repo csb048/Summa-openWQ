@@ -5,7 +5,7 @@ module summa_openWQ
   implicit none
   private
   ! Subroutines
-  public :: init_openwq
+  public :: openwq_init
   public :: run_time_start
   public :: run_time_start_go
   public :: run_space_step
@@ -18,7 +18,7 @@ module summa_openWQ
 
   ! Subroutine to initalize the openWQ object
   ! putting it here to keep the SUMMA_Driver clean
-subroutine init_openwq(err, message)
+subroutine openwq_init(err, message)
 
   USE globalData,only:openWQ_obj
   USE globalData,only:gru_struc                               ! gru-hru mapping structures
@@ -73,7 +73,7 @@ subroutine init_openwq(err, message)
   ! the previous time_steps volume
   call allocGlobal(prog_meta, progStruct_timestep_start, err, message) 
 
-end subroutine init_openwq
+end subroutine openwq_init
   
 ! Subroutine that SUMMA calls to pass varialbes that need to go to
 ! openWQ - the copy of progStruct is done in here
