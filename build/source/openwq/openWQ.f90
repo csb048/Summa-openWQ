@@ -15,9 +15,9 @@ module openwq
    !  procedure :: get_num => openWQ_get_num
     procedure :: decl => openWQ_init
     procedure :: openwq_run_time_start => openwq_run_time_start
-    procedure :: openwq_run_space => openWQ_openwq_run_space
-    procedure :: openwq_run_space_in => openWQ_openwq_run_space_in
-    procedure :: openwq_run_time_end => openWQ_openwq_run_time_end
+    procedure :: openwq_run_space => openwq_run_space
+    procedure :: openwq_run_space_in => openwq_run_space_in
+    procedure :: openwq_run_time_end => openwq_run_time_end
 
  end type
 
@@ -114,7 +114,7 @@ module openwq
    
       end function
 
-   integer function openWQ_openwq_run_space(  &
+   integer function openwq_run_space(  &
       this,                            &
       simtime,                         &
       source,ix_s,iy_s,iz_s,           &
@@ -135,7 +135,7 @@ module openwq
       real(rkind),  intent(in)   :: wflux_s2r
       real(rkind),  intent(in)   :: wmass_source
 
-      openWQ_openwq_run_space = openwq_openwq_run_space_c( &
+      openwq_run_space = openwq_run_space_c( &
          this%ptr,                           &
          simtime,                            &
          source,ix_s,iy_s,iz_s,              &
@@ -144,7 +144,7 @@ module openwq
    
    end function
 
-   integer function openWQ_openwq_run_space_in(  &
+   integer function openwq_run_space_in(  &
       this,                               &
       simtime,                            &
       source_EWF_name,                    &
@@ -161,7 +161,7 @@ module openwq
       real(rkind),  intent(in)   :: wflux_s2r
       character(*), intent(in)   :: source_EWF_name
 
-      openWQ_openwq_run_space_in = openwq_openwq_run_space_in_c( &
+      openwq_run_space_in = openwq_run_space_in_c( &
          this%ptr,                                 &
          simtime,                                  &
          source_EWF_name,                          &
@@ -171,7 +171,7 @@ module openwq
    end function
 
 
-   integer function openWQ_openwq_run_time_end(  &
+   integer function openwq_run_time_end(  &
       this,                               &
       simtime)
 
@@ -179,7 +179,7 @@ module openwq
       class(CLASSWQ_openwq)      :: this
       integer(i4b), intent(in)   :: simtime(5) ! 5 is the number of timevars
 
-      openWQ_openwq_run_time_end = openWQ_openwq_run_time_end_c( &
+      openwq_run_time_end = openwq_run_time_end_c( &
          this%ptr,                                 &
          simtime)
 

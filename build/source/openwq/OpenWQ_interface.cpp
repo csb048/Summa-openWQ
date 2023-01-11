@@ -68,7 +68,7 @@ int openwq_run_time_start(
 }
 
 
-int openwq_openwq_run_space(
+int openwq_run_space(
     CLASSWQ_openwq *openWQ, 
     int simtime_summa[], 
     int source, int ix_s, int iy_s, int iz_s,
@@ -82,7 +82,7 @@ int openwq_openwq_run_space(
         wflux_s2r, wmass_source);
 }
 
-int openwq_openwq_run_space_in(
+int openwq_run_space_in(
     CLASSWQ_openwq *openWQ, 
     int simtime_summa[],
     char* source_EWF_name,
@@ -100,7 +100,7 @@ int openwq_openwq_run_space_in(
 }
 
 
-int openwq_openwq_run_time_end(
+int openwq_run_time_end(
     CLASSWQ_openwq *openWQ, 
     int simtime_summa[]) {
 

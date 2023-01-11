@@ -65,17 +65,17 @@ interface
 
     end function
 
-    function openwq_openwq_run_space_c(&
+    function openwq_run_space_c(&
         openWQ, &
         simtime, &
         source,ix_s,iy_s,iz_s, &
         recipient,ix_r,iy_r,iz_r, &
         wflux_s2r, &
-        wmass_source) bind(C, name="openwq_openwq_run_space")
+        wmass_source) bind(C, name="openwq_run_space")
 
         use iso_c_binding
         implicit none
-        integer(c_int) :: openwq_openwq_run_space_c ! returns 0 (success) or -1 (failure)
+        integer(c_int) :: openwq_run_space_c ! returns 0 (success) or -1 (failure)
         type(c_ptr),    intent(in), value      :: openWQ
         integer(c_int), intent(in)             :: simtime(5)
         integer(c_int), intent(in), value      :: source
@@ -91,16 +91,16 @@ interface
 
     end function
 
-    function openwq_openwq_run_space_in_c( &
+    function openwq_run_space_in_c( &
         openWQ, &
         simtime, &
         source_EWF_name, &
         recipient,ix_r,iy_r,iz_r, &
-        wflux_s2r) bind(C, name="openwq_openwq_run_space_in")
+        wflux_s2r) bind(C, name="openwq_run_space_in")
 
         USE iso_c_binding
         implicit none
-        integer(c_int) :: openwq_openwq_run_space_in_c
+        integer(c_int) :: openwq_run_space_in_c
         type(c_ptr), intent(in), value         :: openWQ
         integer(c_int), intent(in)             :: simtime(5)
         integer(c_int), intent(in), value      :: recipient
@@ -112,13 +112,13 @@ interface
 
     end function
 
-    function openwq_openwq_run_time_end_c( &
+    function openwq_run_time_end_c( &
         openWQ, &
-        simtime) bind(C, name="openwq_openwq_run_time_end")
+        simtime) bind(C, name="openwq_run_time_end")
 
         USE iso_c_binding
         implicit none
-        integer(c_int) :: openwq_openwq_run_time_end_c ! returns 0 (success) or -1 (failure)
+        integer(c_int) :: openwq_run_time_end_c ! returns 0 (success) or -1 (failure)
         type(c_ptr),    intent(in), value   :: openWQ
         integer(c_int), intent(in)          :: simtime(5)
 
