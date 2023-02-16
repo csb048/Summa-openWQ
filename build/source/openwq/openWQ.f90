@@ -165,7 +165,7 @@ module openwq
          this%ptr,                                 &
          simtime,                                  &
          source_EWF_name,                          &
-         recipient,ix_r,iy_r,ix_r,                 &
+         recipient,ix_r,iy_r,iz_r,                 &
          wflux_s2r)
 
    end function

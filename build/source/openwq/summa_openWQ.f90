@@ -94,7 +94,6 @@ subroutine openwq_run_time_start(  &
   integer(i4b)                       :: iHRU
   integer(i4b)                       :: nSoil_2openwq ! maximum number of layers for soil
   integer(i4b)                       :: nSnow_2openwq ! maximum number of layers for snow)
-  integer(i4b)                       :: err
 
   ! Get number of soil and snow layers
   ! Needs to be isolated because explicit-shaped arrays can only be defined with parameters 
@@ -180,8 +179,8 @@ subroutine openwq_run_time_start_go( &
         GeneralVars: associate(&
           hru_area_m2                 => attrStruct%gru(iGRU)%hru(iHRU)%var(iLookATTR%HRUarea)                      ,&
           Tair_summa_K                => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanairTemp)%dat(1)      ,&
-          scalarCanopyWat_summa_kg_m2 => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1)        ,&
-          AquiferStorWat_summa_m      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1)   &
+          scalarCanopyWat_summa_kg_m2 => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarCanopyWat)%dat(1)       ,&
+          AquiferStorWat_summa_m      => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%scalarAquiferStorage)%dat(1)  &
         )
 
 
@@ -227,7 +226,6 @@ subroutine openwq_run_time_start_go( &
             ! mLayerVolFracIce and mLayerVolFracLiq [-], so needs to  to multiply by hru area [m2] and divide by water density
             ! But needs to account for both ice and liquid, and convert to liquid volumes
             if(mLayerVolFracWat_summa_frac /= valueMissing) then
-
               sweWatVol_stateVar_summa_m3(ilay) =                             &
                 mLayerVolFracWat_summa_frac  * mLayerDepth_summa_m * hru_area_m2
             else
@@ -364,8 +362,6 @@ subroutine openwq_run_space_step(  &
   real(rkind)                            :: wmass_source
 
   ! Summa to OpenWQ units
-  ! DomainVars
-  real(rkind)                            :: hru_area_m2
   ! PrecipVars
   real(rkind)                            :: scalarRainfall_summa_m3
   real(rkind)                            :: scalarSnowfall_summa_m3

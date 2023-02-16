@@ -62,7 +62,7 @@ int CLASSWQ_openwq::decl(
 
         // External fluxes
         // Make sure to use capital letters for external fluxes
-        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP",   num_HRU,nYdirec_2openwq,1));
+        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP", num_HRU,nYdirec_2openwq,1));
 
         // Dependencies
         // to expand BGC modelling options
@@ -107,7 +107,9 @@ int CLASSWQ_openwq::openwq_run_time_start(
     double soilWatVol_stateVar_summa_m3[],
     double aquiferWatVol_stateVar_summa_m3) {
 
-    time_t simtime = OpenWQ_units_ref->convert_time(simtime_summa[0], 
+    time_t simtime = OpenWQ_units_ref->convertTime_ints2time_t(
+        *OpenWQ_wqconfig_ref,
+        simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
         simtime_summa[3], 
@@ -172,7 +174,8 @@ int CLASSWQ_openwq::openwq_run_space(
     ix_r -= 1; iy_r -= 1; iz_r -= 1;
 
    
-    time_t simtime = OpenWQ_units_ref->convert_time(
+    time_t simtime = OpenWQ_units_ref->convertTime_ints2time_t(
+        *OpenWQ_wqconfig_ref,
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
@@ -211,7 +214,8 @@ int CLASSWQ_openwq::openwq_run_space_in(
     // Convert Fortran Index to C++ index
     ix_r -= 1; iy_r -= 1; iz_r -= 1;
     
-    time_t simtime = OpenWQ_units_ref->convert_time(
+    time_t simtime = OpenWQ_units_ref->convertTime_ints2time_t(
+        *OpenWQ_wqconfig_ref,
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
@@ -244,7 +248,8 @@ int CLASSWQ_openwq::openwq_run_space_in(
 int CLASSWQ_openwq::openwq_run_time_end(
     int simtime_summa[]) {
     
-    time_t simtime = OpenWQ_units_ref->convert_time(
+    time_t simtime = OpenWQ_units_ref->convertTime_ints2time_t(
+        *OpenWQ_wqconfig_ref,
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 

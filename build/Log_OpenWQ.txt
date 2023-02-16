@@ -1,3 +1,0 @@
-<OpenWQ> INFO: Number of threads requested and used: 4
-<OpenWQ> WARNING: BOUNDMIX module - unkown 'DIRECTION' = Zin entry = 0
-<OpenWQ> WARNING: BOUNDMIX module - unkown 'DIRECTION' = Zin entry = 1
