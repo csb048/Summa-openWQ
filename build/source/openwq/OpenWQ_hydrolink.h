@@ -29,7 +29,15 @@
 #include <time.h>
 #include <vector>
 
-class ClassWQ_OpenWQ
+// Global Indexes for Compartments
+  inline int canopy_index_openwq    = 0;
+  inline int snow_index_openwq      = 1;
+  inline int runoff_index_openwq    = 2;
+  inline int soil_index_openwq      = 3;
+  inline int aquifer_index_openwq   = 4;
+  inline int max_snow_layers        = 5;
+
+class CLASSWQ_openwq
 {
 
     // Instance Variables
@@ -55,8 +63,8 @@ class ClassWQ_OpenWQ
 
     // Constructor
     public:
-        ClassWQ_OpenWQ();
-        ~ClassWQ_OpenWQ();
+        CLASSWQ_openwq();
+        ~CLASSWQ_openwq();
     
     // Methods
     void printNum() {
@@ -68,43 +76,38 @@ class ClassWQ_OpenWQ
         int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
         int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
         int nSoil_2openwq,        // num layers of snoil (variable)
+        int nRunoff_2openwq,      // num layers of runoff (fixed to 1)
         int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
         int nYdirec_2openwq);           // num of layers in y-dir (set to 1 because not used in summa)
 
-    int run_time_start(
-        int numHRU, 
+    int openwq_run_time_start(
+        bool last_hru_flag,
+        int hru_index, 
         int nSnow_2openwq, 
         int nSoil_2openwq, 
         int simtime_summa[],
-        double soilMoist_depVar[], 
-        double soilTemp_K_depVar[], 
-        double airTemp_K_depVar[],
-        double sweWatVol_stateVar[], 
-        double canopyWat[], 
-        double soilWatVol_stateVar[], 
-        double aquiferStorage[]);
+        double soilMoist_depVar_summa_frac[],                  
+        double soilTemp_depVar_summa_K[],
+        double airTemp_depVar_summa_K,
+        double sweWatVol_stateVar_summa_m3[],
+        double canopyWatVol_stateVar_summa_m3,
+        double soilWatVol_stateVar_summa_m3[],
+        double aquiferWatVol_stateVar_summa_m3);
 
-    int run_space(
+    int openwq_run_space(
         int simtime_summa[], 
         int source, int ix_s, int iy_s, int iz_s,
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r, double wmass_source);
 
-    int run_space_in(
+    int openwq_run_space_in(
         int simtime_summa[],
         std::string source_EWF_name,
         int recipient, int ix_r, int iy_r, int iz_r, 
         double wflux_s2r);
 
-    int run_time_end(
+    int openwq_run_time_end(
         int simtime_summa[]);
-
-    time_t convert_time(
-        int year, 
-        int month, 
-        int day, 
-        int hour, 
-        int minute);
 
 };
 #endif

@@ -7,13 +7,14 @@ interface
 
     end function
 
-    function openwq_decl_c( &
-        openWQ, &
-        num_hru, &
-        nCanopy_2openwq, &
-        num_layers_matricHead, &
-        nAquifer_2openwq, &
-        num_layers_volFracWat, &
+    function openwq_decl_c(     &
+        openWQ,                 &
+        num_hru,                &
+        nCanopy_2openwq,        &
+        nSnow_2openwq,          &
+        nSoil_2openwq,          &
+        nRunoff_2openwq,        &
+        nAquifer_2openwq,       &
         y_direction) bind(C, name="openwq_decl")
 
         use iso_c_binding
@@ -22,42 +23,45 @@ interface
         type(c_ptr), intent(in), value :: openWQ
         integer(c_int), intent(in), value  :: num_hru
         integer(c_int), intent(in), value  :: nCanopy_2openwq
-        integer(c_int), intent(in), value  :: num_layers_matricHead
+        integer(c_int), intent(in), value  :: nSnow_2openwq
+        integer(c_int), intent(in), value  :: nSoil_2openwq
         integer(c_int), intent(in), value  :: nAquifer_2openwq
-        integer(c_int), intent(in), value  :: num_layers_volFracWat
+        integer(c_int), intent(in), value  :: nRunoff_2openwq
         integer(c_int), intent(in), value  :: y_direction
 
     end function
 
     function openwq_run_time_start_c(&
-        openWQ, &
-        numHRU, &
-        nSnow_2openwq, &
-        nSoil_2openwq, &
-        simtime, &
-        soilMoist_depVar, &
-        soilTemp_K_depVar, &
-        airTemp_K_depVar, &
-        sweWatVol_stateVar, &
-        canopyWatVol_stateVar, &
-        soilWatVol_stateVar, &
-        aquiferWatVol_stateVar) bind(C, name="openwq_run_time_start")
+        openWQ,                             &
+        last_hru_flag,                      &
+        hru_index,                          &
+        nSnow_2openwq,                      &
+        nSoil_2openwq,                      &
+        simtime_summa,                      &
+        soilMoist_depVar_summa_frac,        &                
+        soilTemp_depVar_summa_K,            &
+        airTemp_depVar_summa_K,             &
+        sweWatVol_stateVar_summa_m3,        &
+        canopyWatVol_stateVar_summa_m3,     &
+        soilWatVol_stateVar_summa_m3,       &
+        aquiferWatVol_stateVar_summa_m3) bind(C, name="openwq_run_time_start")
 
         use iso_c_binding
         implicit none
         integer(c_int)                       :: openwq_run_time_start_c ! returns 0 (success) or -1 (failure)
         type(c_ptr),    intent(in), value    :: openWQ
-        integer(c_int), intent(in), value    :: numHRU
+        logical(c_bool),   intent(in)        :: last_hru_flag
+        integer(c_int), intent(in), value    :: hru_index
         integer(c_int), intent(in), value    :: nSnow_2openwq
         integer(c_int), intent(in), value    :: nSoil_2openwq
-        integer(c_int), intent(in)           :: simtime(5)
-        real(c_double), intent(in)           :: soilMoist_depVar(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: soilTemp_K_depVar(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: airTemp_K_depVar(numHRU)
-        real(c_double), intent(in)           :: sweWatVol_stateVar(numHRU, nSnow_2openwq)
-        real(c_double), intent(in)           :: canopyWatVol_stateVar(numHRU)
-        real(c_double), intent(in)           :: soilWatVol_stateVar(numHRU, nSoil_2openwq)
-        real(c_double), intent(in)           :: aquiferWatVol_stateVar(numHRU)
+        integer(c_int), intent(in)           :: simtime_summa(5)
+        real(c_double), intent(in)           :: soilMoist_depVar_summa_frac(nSoil_2openwq)
+        real(c_double), intent(in)           :: soilTemp_depVar_summa_K(nSoil_2openwq)
+        real(c_double), intent(in), value    :: airTemp_depVar_summa_K
+        real(c_double), intent(in)           :: sweWatVol_stateVar_summa_m3(nSnow_2openwq)
+        real(c_double), intent(in), value    :: canopyWatVol_stateVar_summa_m3
+        real(c_double), intent(in)           :: soilWatVol_stateVar_summa_m3(nSoil_2openwq)
+        real(c_double), intent(in), value    :: aquiferWatVol_stateVar_summa_m3
 
     end function
 

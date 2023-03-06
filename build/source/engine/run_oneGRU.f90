@@ -59,7 +59,7 @@ USE mDecisions_module,only:&           ! look-up values for the choice of method
  bigBucket                             ! a big bucket (lumped aquifer model)
 
 ! OpenWQ Coupling
-USE globalData,only:openWQ_obj
+USE globalData,only:openwq_obj
 
 ! -----------------------------------------------------------------------------------------------------------------------------------
 ! -----------------------------------------------------------------------------------------------------------------------------------

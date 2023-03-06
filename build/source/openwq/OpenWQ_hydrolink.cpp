@@ -16,38 +16,19 @@
 #include "OpenWQ_hydrolink.h"
 #include "OpenWQ_interface.h"
 
-
 // Constructor
 // initalize numHRUs value
-ClassWQ_OpenWQ::ClassWQ_OpenWQ() {}
+CLASSWQ_openwq::CLASSWQ_openwq() {}
 
 // Deconstructor
-ClassWQ_OpenWQ::~ClassWQ_OpenWQ() {}
+CLASSWQ_openwq::~CLASSWQ_openwq() {}
 
-time_t ClassWQ_OpenWQ::convert_time(
-    int year, 
-    int month, 
-    int day, 
-    int hour, 
-    int minute) {
-
-    std::time_t sim_time;
-    std::tm tm{};
-    tm.tm_year = year - 1900; // -1900 is needed to get the conversion to produce the correct output
-    tm.tm_mon = month - 1;
-    tm.tm_hour = hour;
-    tm.tm_mday = day;
-    tm.tm_min = minute;
-    sim_time = timegm(&tm);
-
-    return sim_time;
-}
-
-int ClassWQ_OpenWQ::decl(
+int CLASSWQ_openwq::decl(
     int num_HRU,                // num HRU
     int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
     int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
     int nSoil_2openwq,        // num layers of snoil (variable)
+    int nRunoff_2openwq,      // num layers in the runoff of SUMMA
     int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
     int nYdirec_2openwq){           // num of layers in y-dir (set to 1 because not used in summa)
     
@@ -70,26 +51,29 @@ int ClassWQ_OpenWQ::decl(
 
         // Compartment names
         // Make sure to use capital letters for compartment names
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SCALARCANOPYWAT",num_HRU,nYdirec_2openwq,nCanopy_2openwq));      // Canopy
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"MLAYERVOLFRACWAT",num_HRU,nYdirec_2openwq,nSnow_2openwq)); // SWE
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"MLAYERMATRICHEAD",num_HRU,nYdirec_2openwq,nSoil_2openwq)); // Soil
-        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(3,"SCALARAQUIFER",num_HRU,nYdirec_2openwq,nAquifer_2openwq));       // GW
-        
-
-        OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(canopy_index_openwq,"SCALARCANOPYWAT", num_HRU, nYdirec_2openwq, nCanopy_2openwq));      // Canopy
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(snow_index_openwq,"ILAYERVOLFRACWAT_SNOW", num_HRU, nYdirec_2openwq, max_snow_layers));  // snow (layerd)
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(runoff_index_openwq,"RUNOFF", num_HRU, nYdirec_2openwq, nRunoff_2openwq));               // Runoff
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(soil_index_openwq,"ILAYERVOLFRACWAT_SOIL", num_HRU, nYdirec_2openwq, nSoil_2openwq));    // Soil (layerd)
+        OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(aquifer_index_openwq,"SCALARAQUIFER", num_HRU, nYdirec_2openwq, nAquifer_2openwq));      // Aquifer
 
         // External fluxes
         // Make sure to use capital letters for external fluxes
-        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP",num_HRU,nYdirec_2openwq,1));
+        OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP", num_HRU,nYdirec_2openwq,1));
 
+
+        OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size(),
+                                          OpenWQ_hostModelconfig_ref->HydroExtFlux.size());
+
+        
         // Dependencies
         // to expand BGC modelling options
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",num_HRU,nYdirec_2openwq,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair_K",num_HRU,nYdirec_2openwq,1));
-        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil_K",num_HRU,nYdirec_2openwq,1));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",        num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(1,"Tair_K",    num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq));
+        OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(2,"Tsoil_K",   num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq));
 
         // Master Json
-        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "/code/Summa-OpenWQ/synthetic_tests/1_conserv_instant_SW/summa/openWQ_master.json";
+        OpenWQ_wqconfig_ref->OpenWQ_masterjson = "openWQ_master.json";
 
 
         OpenWQ_couplercalls_ref->InitialConfig(
@@ -111,70 +95,95 @@ int ClassWQ_OpenWQ::decl(
 }
 
 // soilMoist_depVar does not have a value - it is passed as 0
-int ClassWQ_OpenWQ::run_time_start(
-    int numHRU, 
+int CLASSWQ_openwq::openwq_run_time_start(
+    bool last_hru_flag,
+    int index_hru, 
     int nSnow_2openwq, 
     int nSoil_2openwq,
-    int simtime_summa[], 
-    double soilMoist_depVar[], 
-    double soilTemp_K_depVar[], 
-    double airTemp_K_depVar[],
-    double sweWatVol_stateVar[], 
-    double canopyWat[], 
-    double soilWatVol_stateVar[], 
-    double aquiferStorage[]) {
+    int simtime_summa[],
+    double soilMoist_depVar_summa_frac[],                  
+    double soilTemp_depVar_summa_K[],
+    double airTemp_depVar_summa_K,
+    double sweWatVol_stateVar_summa_m3[],
+    double canopyWatVol_stateVar_summa_m3,
+    double soilWatVol_stateVar_summa_m3[],
+    double aquiferWatVol_stateVar_summa_m3) {
 
-    time_t simtime = convert_time(simtime_summa[0], 
-        simtime_summa[1], 
-        simtime_summa[2], 
-        simtime_summa[3], 
-        simtime_summa[4]);
-
-    for (int i = 0; i < numHRU; i++) {
-        // Updating Chemistry dependencies
-        (*OpenWQ_hostModelconfig_ref->dependVar)[0](i,0,0) = soilMoist_depVar[i]; 
-        (*OpenWQ_hostModelconfig_ref->dependVar)[1](i,0,0) = airTemp_K_depVar[i];
-        (*OpenWQ_hostModelconfig_ref->dependVar)[2](i,0,0) = soilTemp_K_depVar[i];
-        // Updating water volumes
-        //(*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = sweWatVol_stateVar[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[0](i,0,0) = canopyWat[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[1](i,0,0) = soilWatVol_stateVar[i];
-        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[2](i,0,0) = aquiferStorage[i];
-    }
-
-    // *OpenWQ_hostModelconfig_ref.time_step = 5;
-
-    OpenWQ_couplercalls_ref->RunTimeLoopStart(
-        *OpenWQ_hostModelconfig_ref,
-        *OpenWQ_json_ref,
-        *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
-        *OpenWQ_units_ref,               // functions for unit conversion
-        *OpenWQ_utils_ref,                // utility methods/functions
-        *OpenWQ_readjson_ref,            // read json files
-        *OpenWQ_vars_ref,
-        *OpenWQ_initiate_ref,            // initiate modules
-        *OpenWQ_watertransp_ref,         // transport modules
-        *OpenWQ_chem_ref,                // biochemistry modules
-        *OpenWQ_extwatflux_ss_ref,          // sink and source modules)
-        *OpenWQ_solver_ref,
-        *OpenWQ_output_ref,
-        simtime);
-
-    return 0;
-}
-
-int ClassWQ_OpenWQ::run_space(
-    int simtime_summa[], 
-    int source, int ix_s, int iy_s, int iz_s,
-    int recipient, int ix_r, int iy_r, int iz_r, 
-    double wflux_s2r, double wmass_source) {
-   
-    time_t simtime = convert_time(
+    time_t simtime = OpenWQ_units_ref->convertTime_ints2time_t(
+        *OpenWQ_wqconfig_ref,
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
         simtime_summa[3], 
-        simtime_summa[4]);
+        simtime_summa[4],
+        0);
+    
+    int runoff_vol = 0;
+    
+    // Updating Chemistry dependencies and volumes (out of order because of looping)
+
+    // Air Temp is only one layer - NEED TO DOUBLE CHECK
+    (*OpenWQ_hostModelconfig_ref->dependVar)[1](index_hru,0,0) = airTemp_depVar_summa_K;
+    (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[canopy_index_openwq](index_hru,0,0) = canopyWatVol_stateVar_summa_m3;                   // canopy
+    (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[runoff_index_openwq](index_hru,0,0) = runoff_vol;                  // runoff
+    (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[aquifer_index_openwq](index_hru,0,0) = aquiferWatVol_stateVar_summa_m3;              // aquifer
+
+    // update Vars that rely on Snow
+    for (int z = 0; z < nSnow_2openwq; z++) {
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[snow_index_openwq](index_hru,0,z) = sweWatVol_stateVar_summa_m3[z];   // snow
+    }
+    
+    // Update Vars that rely on Soil
+    for (int z = 0; z < nSoil_2openwq; z++) {
+        (*OpenWQ_hostModelconfig_ref->dependVar)[0](index_hru,0,z) = soilMoist_depVar_summa_frac[z]; 
+        (*OpenWQ_hostModelconfig_ref->dependVar)[2](index_hru,0,z) = soilTemp_depVar_summa_K[z];
+        (*OpenWQ_hostModelconfig_ref->waterVol_hydromodel)[soil_index_openwq](index_hru,0,z) = soilWatVol_stateVar_summa_m3[z];      // soil
+
+    }
+
+
+    // *OpenWQ_hostModelconfig_ref.time_step = 5;
+
+    if (last_hru_flag) {
+        OpenWQ_couplercalls_ref->RunTimeLoopStart(
+            *OpenWQ_hostModelconfig_ref,
+            *OpenWQ_json_ref,
+            *OpenWQ_wqconfig_ref,            // create OpenWQ_wqconfig object
+            *OpenWQ_units_ref,               // functions for unit conversion
+            *OpenWQ_utils_ref,                // utility methods/functions
+            *OpenWQ_readjson_ref,            // read json files
+            *OpenWQ_vars_ref,
+            *OpenWQ_initiate_ref,            // initiate modules
+            *OpenWQ_watertransp_ref,         // transport modules
+            *OpenWQ_chem_ref,                // biochemistry modules
+            *OpenWQ_extwatflux_ss_ref,          // sink and source modules)
+            *OpenWQ_solver_ref,
+            *OpenWQ_output_ref,
+            simtime);
+    }
+
+    return 0;
+}
+
+int CLASSWQ_openwq::openwq_run_space(
+    int simtime_summa[], 
+    int source, int ix_s, int iy_s, int iz_s,
+    int recipient, int ix_r, int iy_r, int iz_r, 
+    double wflux_s2r, double wmass_source) {
+
+    // Convert Fortran Index to C++ index
+    ix_s -= 1; iy_s -= 1; iz_s -= 1;
+    ix_r -= 1; iy_r -= 1; iz_r -= 1;
+
+   
+    time_t simtime = OpenWQ_units_ref->convertTime_ints2time_t(
+        *OpenWQ_wqconfig_ref,
+        simtime_summa[0], 
+        simtime_summa[1], 
+        simtime_summa[2], 
+        simtime_summa[3], 
+        simtime_summa[4],
+        0);
     
     OpenWQ_couplercalls_ref->RunSpaceStep(
         *OpenWQ_hostModelconfig_ref,
@@ -198,7 +207,7 @@ int ClassWQ_OpenWQ::run_space(
     return 0;
 }
 
-int ClassWQ_OpenWQ::run_space_in(
+int CLASSWQ_openwq::openwq_run_space_in(
     int simtime_summa[],
     std::string source_EWF_name,
     int recipient, int ix_r, int iy_r, int iz_r, 
@@ -207,12 +216,14 @@ int ClassWQ_OpenWQ::run_space_in(
     // Convert Fortran Index to C++ index
     ix_r -= 1; iy_r -= 1; iz_r -= 1;
     
-    time_t simtime = convert_time(
+    time_t simtime = OpenWQ_units_ref->convertTime_ints2time_t(
+        *OpenWQ_wqconfig_ref,
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
         simtime_summa[3], 
-        simtime_summa[4]);
+        simtime_summa[4],
+        0);
 
      OpenWQ_couplercalls_ref->RunSpaceStep_IN(
         *OpenWQ_hostModelconfig_ref,
@@ -232,17 +243,21 @@ int ClassWQ_OpenWQ::run_space_in(
         source_EWF_name,
         recipient, ix_r, iy_r, iz_r,
         wflux_s2r);
+
+    return 0;
 }
 
-int ClassWQ_OpenWQ::run_time_end(
+int CLASSWQ_openwq::openwq_run_time_end(
     int simtime_summa[]) {
     
-    time_t simtime = convert_time(
+    time_t simtime = OpenWQ_units_ref->convertTime_ints2time_t(
+        *OpenWQ_wqconfig_ref,
         simtime_summa[0], 
         simtime_summa[1], 
         simtime_summa[2], 
         simtime_summa[3], 
-        simtime_summa[4]);
+        simtime_summa[4],
+        0);
 
 
     OpenWQ_couplercalls_ref->RunTimeLoopEnd(
