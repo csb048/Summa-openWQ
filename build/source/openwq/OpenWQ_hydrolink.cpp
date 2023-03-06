@@ -57,13 +57,15 @@ int CLASSWQ_openwq::decl(
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(soil_index_openwq,"ILAYERVOLFRACWAT_SOIL", num_HRU, nYdirec_2openwq, nSoil_2openwq));    // Soil (layerd)
         OpenWQ_hostModelconfig_ref->HydroComp.push_back(OpenWQ_hostModelconfig::hydroTuple(aquifer_index_openwq,"SCALARAQUIFER", num_HRU, nYdirec_2openwq, nAquifer_2openwq));      // Aquifer
 
-
-        OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size());
-
         // External fluxes
         // Make sure to use capital letters for external fluxes
         OpenWQ_hostModelconfig_ref->HydroExtFlux.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"PRECIP", num_HRU,nYdirec_2openwq,1));
 
+
+        OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->HydroComp.size(),
+                                          OpenWQ_hostModelconfig_ref->HydroExtFlux.size());
+
+        
         // Dependencies
         // to expand BGC modelling options
         OpenWQ_hostModelconfig_ref->HydroDepend.push_back(OpenWQ_hostModelconfig::hydroTuple(0,"SM",        num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq));
