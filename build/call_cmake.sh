@@ -1,3 +1,3 @@
 #! /bin/bash
 
-cmake ../build/source/openwq/openwq/
+cmake ../source/openwq/openwq/

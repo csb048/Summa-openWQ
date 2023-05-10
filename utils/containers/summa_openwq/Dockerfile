@@ -43,3 +43,5 @@ RUN apt-get update && \
     libnetcdff-dev \
     liblapack-dev \
     gfortran
+
+EXPOSE 22
