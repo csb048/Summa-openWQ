@@ -871,7 +871,7 @@ subroutine openwq_run_space_step(  &
         ! each soil layer
         OpenWQindex_s = soil_index_openwq
         iz_s          = nSnow + iLayer
-        mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer+nSnow) * hru_area_m2 * mLayerDepth_summa_m(iLayer+nSnow)
+        mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer) * hru_area_m2 * mLayerDepth_summa_m(iLayer)
         wmass_source              = mLayerVolFracWat_summa_m3
         ! *Recipient*: 
         ! lost from system
@@ -901,7 +901,7 @@ subroutine openwq_run_space_step(  &
         ! all soil layers
         OpenWQindex_s = soil_index_openwq
         iz_s          = nSnow + iLayer
-        mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer+nSnow) * hru_area_m2 * mLayerDepth_summa_m(iLayer+nSnow)
+        mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer) * hru_area_m2 * mLayerDepth_summa_m(iLayer)
         wmass_source              = mLayerVolFracWat_summa_m3
         ! *Recipient*: 
         ! lost from system
@@ -927,7 +927,7 @@ subroutine openwq_run_space_step(  &
         ! soil layer iLayer
         OpenWQindex_s = soil_index_openwq
         iz_s          = nSnow + iLayer
-        mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer+nSnow) * hru_area_m2 * mLayerDepth_summa_m(iLayer+nSnow)
+        mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer) * hru_area_m2 * mLayerDepth_summa_m(iLayer)
         wmass_source              = mLayerVolFracWat_summa_m3
         ! *Recipient*: 
         ! soi layer iLayer+1
