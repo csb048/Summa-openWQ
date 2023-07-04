@@ -73,7 +73,7 @@ int CLASSWQ_openwq::decl(
         OpenWQ_hostModelconfig_ref->add_HydroDepend(2,"Tsoil_K",   num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq);
 
         // Master Json
-        OpenWQ_wqconfig_ref->set_OpenWQ_masterjson("/code/synthetic_tests/13_batch_oxygenBODcycle/summa/openWQ_master.json"); 
+        OpenWQ_wqconfig_ref->set_OpenWQ_masterjson("/code/synthetic_tests/1_Athabasca_River_remapped/summa/openWQ_master.json"); 
 
 
         OpenWQ_couplercalls_ref->InitialConfig(
