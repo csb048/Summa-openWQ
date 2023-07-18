@@ -102,7 +102,7 @@ subroutine openwq_run_time_start(  &
   nSnow_2openwq = 0
   do iGRU = 1, size(gru_struc(:))
     do iHRU = 1, gru_struc(iGRU)%hruCount
-      ! nSnow_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSnow, nSnow_2openwq )
+      nSnow_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSnow, nSnow_2openwq )
       nSoil_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, nSoil_2openwq )
     enddo
   enddo
@@ -269,14 +269,12 @@ subroutine openwq_run_time_start_go( &
 
         enddo
 
-        ! Examine the prog structures. for debuging
-        
-
         ! Copy the prog structure
-        ! print *, size(progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(1)%dat(:)) , size(progStruct%gru(iGRU)%hru(iHRU)%var(1)%dat(:))
         do iVar = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var)
           do iDat = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat)
-            ! print *, "iVar=", iVar ,"iDat", idat
+            if (size(progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)) .ne. size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:))) then
+              write(*,*) "progstruct and progstruct_tinestep_start are not the same size"
+            endif
             progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)
           end do
         end do
