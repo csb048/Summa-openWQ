@@ -925,7 +925,7 @@ subroutine openwq_run_space_step(  &
         ! *Source*:  
         ! all soil layers
         OpenWQindex_s = soil_index_openwq
-        iz_s          = nSnow + iLayer
+        iz_s          = iLayer
         mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer+nSnow) * hru_area_m2 * mLayerDepth_summa_m(iLayer+nSnow)
         wmass_source              = mLayerVolFracWat_summa_m3
         ! *Recipient*: 
