@@ -23,7 +23,7 @@ subroutine openwq_init(err, message)
   USE globalData,only:openwq_obj
   USE globalData,only:gru_struc                               ! gru-hru mapping structures
   USE globalData,only:prog_meta
-  USE allocspace_module,only:allocGlobal                      ! module to allocate space for global data structures
+  USE allocspace_module,only:allocGlobal,allocGlobal_porgStruct                      ! module to allocate space for global data structures
 
   implicit none
 
@@ -71,7 +71,8 @@ subroutine openwq_init(err, message)
   
   ! Create copy of state information, needed for passing to openWQ with fluxes that require
   ! the previous time_steps volume
-  call allocGlobal(prog_meta, progStruct_timestep_start, err, message) 
+  ! call allocGlobal(prog_meta, progStruct_timestep_start, err, message)
+    call allocGlobal_porgStruct(prog_meta,progStruct_timestep_start,5,err,message) 
 
 end subroutine openwq_init
   
@@ -126,9 +127,12 @@ subroutine openwq_run_time_start_go( &
   USE var_lookup, only: iLookPROG  ! named variables for state variables
   USE var_lookup, only: iLookTIME  ! named variables for time data structure
   USE var_lookup, only: iLookATTR  ! named variables for real valued attribute data structure
+  USE var_lookup, only: iLookVarType  ! named variables for real valued attribute data structure
+
   USE multiconst,only:&
                         iden_ice,       & ! intrinsic density of ice             (kg m-3)
                         iden_water        ! intrinsic density of liquid water    (kg m-3)
+  USE globalData,only:prog_meta
 
   implicit none
 
@@ -156,6 +160,8 @@ subroutine openwq_run_time_start_go( &
   integer(i4b)                        :: err
   real(rkind),parameter               :: valueMissing=-9999._rkind   ! seems to be SUMMA's default value for missing data
   logical(1)                          :: last_hru_flag
+  integer(i4b)                        :: index
+  integer(i4b)                        :: offset
 
   summaVars: associate(&
       progStruct     => summa1_struc%progStruct             , &
@@ -243,21 +249,21 @@ subroutine openwq_run_time_start_go( &
         end if
 
         ! Soil - needs to start after the snow
-        do ilay = soil_start_index, nSoil_2openwq + nSnow_2openwq
+        do ilay = soil_start_index, nSoil_2openwq
           
           SoilVars: associate(&
             mLayerDepth_summa_m         => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(ilay)       ,&    ! depth of each layer (m)
             Tsoil_summa_K               => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay)        ,&
-            mLayerVolFracWat_summa_frac => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(ilay)   &
+            mLayerVolFracWat_summa_frac => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(ilay+nSnow_2openwq)   &
           )
           ! Tsoil
           ! (Summa in K)
-          if(Tsoil_summa_K /= valueMissing) then
+          if((Tsoil_summa_K /= valueMissing) ) then
             soilTemp_depVar_summa_K(ilay) = Tsoil_summa_K
+            ! find way to properly index soil layers, add offset
           endif
 
           soilMoist_depVar_summa_frac(ilay) = 0     ! TODO: Find the value for this varaibles
-
           ! Soil
           ! unit for volume = m3 (summa-to-openwq unit conversions needed)
           ! mLayerMatricHead [m], so needs to  to multiply by hru area [m2]
@@ -272,10 +278,26 @@ subroutine openwq_run_time_start_go( &
         ! Copy the prog structure
         do iVar = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var)
           do iDat = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat)
-            if (size(progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)) .ne. size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:))) then
-              write(*,*) "progstruct and progstruct_tinestep_start are not the same size"
-            endif
-            progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)
+            ! print *, size(progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)), size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:))
+            ! if (size(progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)) .ne. size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:))) then
+            !   write(*,*) "ERROR: progstruct and progstruct_tinestep_start are not the same size"
+            !   ! stop
+            ! endif
+            ! if (progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(0) .ne.  ) then
+
+            select case(prog_meta(iVar)%vartype)
+              case(iLookVarType%ifcSoil);
+                offset = 0
+              case(iLookVarType%ifcToto);
+                offset = 0
+              case default
+                offset = 1
+            end select         
+            ! print *, "offset = ", offset
+            do index = offset , size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat) - 1 + offset
+              progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(index) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(index)
+            enddo
+            ! progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)
           end do
         end do
 
@@ -734,7 +756,7 @@ subroutine openwq_run_space_step(  &
       ! need the if condition to protect from invalid read
       ! if the size of mLayerVolFracWat_summa_frac matches the number of soil layers
       ! then summa is expecting no snow for this HRU over the simulation of the model
-      if (size(mLayerVolFracWat_summa_frac) .gt. nSoil) then
+      if ((nSnow .gt. 0)) then
         ! *Flux*
         ! snow uloading + liq drainage
         wflux_s2r = scalarSfcMeltPond_summa_m3
@@ -929,13 +951,13 @@ subroutine openwq_run_space_step(  &
         ! *Source*:
         ! soil layer iLayer
         OpenWQindex_s = soil_index_openwq
-        iz_s          = nSnow + iLayer
+        iz_s          = iLayer
         mLayerVolFracWat_summa_m3 = mLayerVolFracWat_summa_frac(iLayer+nSnow) * hru_area_m2 * mLayerDepth_summa_m(iLayer+nSnow)
         wmass_source              = mLayerVolFracWat_summa_m3
         ! *Recipient*: 
         ! soi layer iLayer+1
         OpenWQindex_r = soil_index_openwq
-        iz_r          = nSnow + iLayer + 1
+        iz_r          = iLayer + 1
         ! *Flux*
         ! flux between soil layer
         iLayerLiqFluxSoil_summa_m3  = iLayerLiqFluxSoil_summa_m_s(iLayer) * hru_area_m2 * data_step
