@@ -11,8 +11,6 @@ module summa_openwq
   public :: openwq_run_space_step
   public :: openwq_run_time_end
 
-  ! include "summa_openWQ_allocspace.f90"
-
   ! Global Data for prognostic Variables of HRUs
   type(gru_hru_doubleVec),save,public   :: progStruct_timestep_start ! copy of progStruct at the start of timestep for passing fluxes
 
@@ -73,7 +71,6 @@ subroutine openwq_init(err, message)
   
   ! Create copy of state information, needed for passing to openWQ with fluxes that require
   ! the previous time_steps volume
-  ! call allocGlobal(prog_meta, progStruct_timestep_start, err, message)
   call allocGlobal_porgStruct(prog_meta,progStruct_timestep_start,nSnow_2openwq,err,message) 
 
 end subroutine openwq_init
@@ -260,9 +257,8 @@ subroutine openwq_run_time_start_go( &
           )
           ! Tsoil
           ! (Summa in K)
-          if((Tsoil_summa_K /= valueMissing) ) then
+          if(Tsoil_summa_K /= valueMissing) then
             soilTemp_depVar_summa_K(ilay) = Tsoil_summa_K
-            ! find way to properly index soil layers, add offset
           endif
 
           soilMoist_depVar_summa_frac(ilay) = 0     ! TODO: Find the value for this varaibles
@@ -280,13 +276,6 @@ subroutine openwq_run_time_start_go( &
         ! Copy the prog structure
         do iVar = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var)
           do iDat = 1, size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat)
-            ! print *, size(progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)), size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:))
-            ! if (size(progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)) .ne. size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:))) then
-            !   write(*,*) "ERROR: progstruct and progstruct_tinestep_start are not the same size"
-            !   ! stop
-            ! endif
-            ! if (progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(0) .ne.  ) then
-
             select case(prog_meta(iVar)%vartype)
               case(iLookVarType%ifcSoil);
                 offset = 0
@@ -295,11 +284,9 @@ subroutine openwq_run_time_start_go( &
               case default
                 offset = 1
             end select         
-            ! print *, "offset = ", offset
             do index = offset , size(progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat) - 1 + offset
               progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(index) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(index)
             enddo
-            ! progStruct_timestep_start%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:) = progStruct%gru(iGRU)%hru(iHRU)%var(iVar)%dat(:)
           end do
         end do
 
