@@ -11,6 +11,8 @@ module summa_openwq
   public :: openwq_run_space_step
   public :: openwq_run_time_end
 
+  ! include "summa_openWQ_allocspace.f90"
+
   ! Global Data for prognostic Variables of HRUs
   type(gru_hru_doubleVec),save,public   :: progStruct_timestep_start ! copy of progStruct at the start of timestep for passing fluxes
 
@@ -23,7 +25,7 @@ subroutine openwq_init(err, message)
   USE globalData,only:openwq_obj
   USE globalData,only:gru_struc                               ! gru-hru mapping structures
   USE globalData,only:prog_meta
-  USE allocspace_module,only:allocGlobal,allocGlobal_porgStruct                      ! module to allocate space for global data structures
+  USE allocspace_progStuct_module,only:allocGlobal_porgStruct ! module to allocate space for global data structures
 
   implicit none
 
@@ -51,7 +53,7 @@ subroutine openwq_init(err, message)
   nRunoff_2openwq = 1       ! Runoff has only 1 layer (not a summa variable - openWQ keeps track of this)
   nAquifer_2openwq = 1      ! GW has only 1 layer
   nSoil_2openwq = 0         ! Soil may have multiple layers, and gru-hrus may have different values
-  nSnow_2openwq = 0         ! Snow has multiple layers, and gru-hrus may have different values (up to 5 layers)
+  nSnow_2openwq = 5         ! Snow has multiple layers, and gru-hrus may have different values (up to 5 layers)
   do iGRU = 1, size(gru_struc(:))
     do iHRU = 1, gru_struc(iGRU)%hruCount
       nSoil_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, nSoil_2openwq )
@@ -72,7 +74,7 @@ subroutine openwq_init(err, message)
   ! Create copy of state information, needed for passing to openWQ with fluxes that require
   ! the previous time_steps volume
   ! call allocGlobal(prog_meta, progStruct_timestep_start, err, message)
-    call allocGlobal_porgStruct(prog_meta,progStruct_timestep_start,5,err,message) 
+  call allocGlobal_porgStruct(prog_meta,progStruct_timestep_start,nSnow_2openwq,err,message) 
 
 end subroutine openwq_init
   
