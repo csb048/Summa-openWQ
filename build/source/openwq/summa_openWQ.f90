@@ -37,6 +37,7 @@ subroutine openwq_init(err, message)
   integer(i4b)                                    :: nAquifer_2openwq
   integer(i4b)                                    :: nYdirec_2openwq     ! number of layers in the y-dir (not used in summa)
   integer(i4b)                                    :: iGRU, iHRU          ! indices of GRUs and HRUs
+  integer(i4b)                                    :: max_snow_layers     ! maximum now layers (up to 5)
 
   openwq_obj = CLASSWQ_openwq() ! initalize openWQ object
 
@@ -51,7 +52,7 @@ subroutine openwq_init(err, message)
   nRunoff_2openwq = 1       ! Runoff has only 1 layer (not a summa variable - openWQ keeps track of this)
   nAquifer_2openwq = 1      ! GW has only 1 layer
   nSoil_2openwq = 0         ! Soil may have multiple layers, and gru-hrus may have different values
-  nSnow_2openwq = 5         ! Snow has multiple layers, and gru-hrus may have different values (up to 5 layers)
+  nSnow_2openwq = 0         ! Snow has multiple layers, and gru-hrus may have different values (up to 5 layers)
   do iGRU = 1, size(gru_struc(:))
     do iHRU = 1, gru_struc(iGRU)%hruCount
       nSoil_2openwq = max( gru_struc(iGRU)%hruInfo(iHRU)%nSoil, nSoil_2openwq )
@@ -68,10 +69,12 @@ subroutine openwq_init(err, message)
     nRunoff_2openwq,      & ! num layers of runoff (fixed to 1)
     nAquifer_2openwq,     & ! num layers of aquifer (fixed to 1)
     nYdirec_2openwq)             ! num of layers in y-dir (set to 1 because not used in summa)
+
+    max_snow_layers = 5
   
   ! Create copy of state information, needed for passing to openWQ with fluxes that require
   ! the previous time_steps volume
-  call allocGlobal_porgStruct(prog_meta,progStruct_timestep_start,nSnow_2openwq,err,message) 
+  call allocGlobal_porgStruct(prog_meta,progStruct_timestep_start,max_snow_layers,err,message) 
 
 end subroutine openwq_init
   
