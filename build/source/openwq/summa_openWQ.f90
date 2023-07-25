@@ -164,6 +164,7 @@ subroutine openwq_run_time_start_go( &
   logical(1)                          :: last_hru_flag
   integer(i4b)                        :: index
   integer(i4b)                        :: offset
+  integer(i4b)                        :: nSnow
 
   summaVars: associate(&
       progStruct     => summa1_struc%progStruct             , &
@@ -179,6 +180,8 @@ subroutine openwq_run_time_start_go( &
 
   do iGRU = 1, size(gru_struc(:))
       do iHRU = 1, gru_struc(iGRU)%hruCount
+
+        nSnow = gru_struc(iGRU)%hruInfo(iHRU)%nSnow
 
         if (iGRU == size(gru_struc) .and. iHRU == gru_struc(iGRU)%hruCount)then
           last_hru_flag = .true.
@@ -250,13 +253,17 @@ subroutine openwq_run_time_start_go( &
           soil_start_index = nSnow_2openwq
         end if
 
+        ! print *, iGRU,iHRU,size(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:))
+        ! if (size(progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:)) .ne. nSnow_2openwq+nSoil_2openwq) then
+        !   print *, progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(:),"nsnow = ",gru_struc(iGRU)%hruInfo(iHRU)%nSnow
+        ! end if
         ! Soil - needs to start after the snow
         do ilay = soil_start_index, nSoil_2openwq
-          
+          ! print *, ilay+nSnow_2openwq
           SoilVars: associate(&
             mLayerDepth_summa_m         => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerDepth)%dat(ilay)       ,&    ! depth of each layer (m)
             Tsoil_summa_K               => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerTemp)%dat(ilay)        ,&
-            mLayerVolFracWat_summa_frac => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(ilay+nSnow_2openwq)   &
+            mLayerVolFracWat_summa_frac => progStruct%gru(iGRU)%hru(iHRU)%var(iLookPROG%mLayerVolFracWat)%dat(ilay+nSnow)   &
           )
           ! Tsoil
           ! (Summa in K)
