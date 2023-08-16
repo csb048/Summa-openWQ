@@ -114,6 +114,5 @@ class CLASSWQ_openwq
         
     int get_numHRU();
         
-    
 };
 #endif

@@ -74,9 +74,7 @@ int CLASSWQ_openwq::decl(
 
         // Master Json
         OpenWQ_wqconfig_ref->set_OpenWQ_masterjson("/code/synthetic_tests/1_Athabasca_River_remapped/summa/openWQ_master.json"); 
-        // OpenWQ_wqconfig_ref->set_OpenWQ_masterjson("/code/synthetic_tests/9_batch_singleSp_1storder/summa/openWQ_master.json");
-        // OpenWQ_wqconfig_ref->set_OpenWQ_masterjson("/code/synthetic_tests/12_batch_nitrogencycle/summa/openWQ_master.json");
-
+        
         OpenWQ_couplercalls_ref->InitialConfig(
             *OpenWQ_hostModelconfig_ref,
             *OpenWQ_json_ref,                // create OpenWQ_json object
@@ -142,11 +140,7 @@ int CLASSWQ_openwq::openwq_run_time_start(
 
     }
 
-    std::cout << "BEFORE IF RUNTIMELOOPSTART\n";
-    std::cout << (*OpenWQ_vars_ref->d_chemass_ic)(aquifer_index_openwq) << "\n";
     if (get_numHRU() -1 == index_hru ) {
-        std::cout << "BEFORE RUNTIMELOOPSTART\n";
-        std::cout << (*OpenWQ_vars_ref->d_chemass_ic)(aquifer_index_openwq) << "\n";
         OpenWQ_couplercalls_ref->RunTimeLoopStart(
             *OpenWQ_hostModelconfig_ref,
             *OpenWQ_json_ref,
@@ -162,11 +156,7 @@ int CLASSWQ_openwq::openwq_run_time_start(
             *OpenWQ_solver_ref,
             *OpenWQ_output_ref,
             simtime);
-        std::cout << "AFTER RUNTIMELOOPSTART\n";
-        std::cout << (*OpenWQ_vars_ref->d_chemass_ic)(aquifer_index_openwq) << "\n";
-    }
-    std::cout << "AFTER IF RUNTIMELOOPSTART\n";
-    std::cout << (*OpenWQ_vars_ref->d_chemass_ic)(aquifer_index_openwq) << "\n";
+     }
 
     return 0;
 }
@@ -190,9 +180,6 @@ int CLASSWQ_openwq::openwq_run_space(
         simtime_summa[3], 
         simtime_summa[4],
         0);
-    
-    // std::cout << "BEFORE RUNTIMESTART\n";
-    // std::cout << (*OpenWQ_vars_ref->d_chemass_ic)(aquifer_index_openwq) << "\n";
 
     OpenWQ_couplercalls_ref->RunSpaceStep(
         *OpenWQ_hostModelconfig_ref,
@@ -212,9 +199,6 @@ int CLASSWQ_openwq::openwq_run_space(
         source, ix_s, iy_s, iz_s,
         recipient, ix_r, iy_r, iz_r,
         wflux_s2r, wmass_source);
-
-    // std::cout << "AFTER RUNTIMESTART\n";
-    // std::cout << (*OpenWQ_vars_ref->d_chemass_ic)(aquifer_index_openwq) << "\n";
 
     return 0;
 }
