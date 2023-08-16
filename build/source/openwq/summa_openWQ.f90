@@ -179,11 +179,12 @@ subroutine openwq_run_time_start_go( &
   openWQArrayIndex = 0 ! index into the arrays that are being passed to openWQ
 
   do iGRU = 1, size(gru_struc(:))
+    ! print *, iGRU
       do iHRU = 1, gru_struc(iGRU)%hruCount
 
         nSnow = gru_struc(iGRU)%hruInfo(iHRU)%nSnow
 
-        if (iGRU == size(gru_struc) .and. iHRU == gru_struc(iGRU)%hruCount)then
+        if (iGRU == size(gru_struc(:)) .and. iHRU == gru_struc(iGRU)%hruCount)then
           last_hru_flag = .true.
         end if
 
