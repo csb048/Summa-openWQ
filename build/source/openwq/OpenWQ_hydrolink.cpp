@@ -74,8 +74,7 @@ int CLASSWQ_openwq::decl(
 
         // Master Json
         OpenWQ_wqconfig_ref->set_OpenWQ_masterjson("/code/synthetic_tests/1_Athabasca_River_remapped/summa/openWQ_master.json"); 
-
-
+        
         OpenWQ_couplercalls_ref->InitialConfig(
             *OpenWQ_hostModelconfig_ref,
             *OpenWQ_json_ref,                // create OpenWQ_json object
@@ -141,8 +140,7 @@ int CLASSWQ_openwq::openwq_run_time_start(
 
     }
 
-
-    if (last_hru_flag) {
+    if (get_numHRU() -1 == index_hru ) {
         OpenWQ_couplercalls_ref->RunTimeLoopStart(
             *OpenWQ_hostModelconfig_ref,
             *OpenWQ_json_ref,
@@ -158,7 +156,7 @@ int CLASSWQ_openwq::openwq_run_time_start(
             *OpenWQ_solver_ref,
             *OpenWQ_output_ref,
             simtime);
-    }
+     }
 
     return 0;
 }
@@ -182,7 +180,7 @@ int CLASSWQ_openwq::openwq_run_space(
         simtime_summa[3], 
         simtime_summa[4],
         0);
-    
+
     OpenWQ_couplercalls_ref->RunSpaceStep(
         *OpenWQ_hostModelconfig_ref,
         *OpenWQ_json_ref,
@@ -277,3 +275,6 @@ int CLASSWQ_openwq::openwq_run_time_end(
     return 0;
 }
 
+int CLASSWQ_openwq::get_numHRU(){
+    return this->num_HRU;
+}
