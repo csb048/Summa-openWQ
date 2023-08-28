@@ -47,6 +47,9 @@ int CLASSWQ_openwq::decl(
     
     this->num_HRU = num_HRU;
 
+    // setting the number of output dimentions to be num_HRU to be used in annother scope
+    OpenWQ_output_ref->setNumDimensions(num_HRU);
+
     if (OpenWQ_hostModelconfig_ref->get_num_HydroComp()==0) {
 
         // Compartment names
