@@ -48,7 +48,7 @@ int CLASSWQ_openwq::decl(
     this->num_HRU = num_HRU;
 
     // setting the number of output dimentions to be num_HRU to be used in annother scope
-    OpenWQ_output_ref->setNumDimensions(num_HRU);
+    // OpenWQ_output_ref->setNumDimensions(num_HRU);
 
     if (OpenWQ_hostModelconfig_ref->get_num_HydroComp()==0) {
 
@@ -76,8 +76,20 @@ int CLASSWQ_openwq::decl(
         OpenWQ_hostModelconfig_ref->add_HydroDepend(2,"Tsoil_K",   num_HRU,nYdirec_2openwq, nSnow_2openwq + nSoil_2openwq);
 
         // Master Json
-        OpenWQ_wqconfig_ref->set_OpenWQ_masterjson("/code/synthetic_tests/1_Athabasca_River_remapped/summa/openWQ_master.json"); 
-        
+        try {
+            if (!std::getenv("master_json")){   // check if the 'master_json' envirpment variable exists
+                throw std::runtime_error("ERROR: The OpenWQ Masterfile path must be set as a enviroment variable called 'master_json'.  This variable has not been set.");
+                // export master_json="/code/synthetic_tests/1_Athabasca_River_remapped/summa/openWQ_master.json" 
+            }
+            else {
+                OpenWQ_wqconfig_ref->set_OpenWQ_masterjson(std::getenv("master_json"));
+            }
+        }
+        catch(std::runtime_error& e){
+            std::cerr << e.what() << std::endl;
+            exit(1);
+        }
+
         OpenWQ_couplercalls_ref->InitialConfig(
             *OpenWQ_hostModelconfig_ref,
             *OpenWQ_json_ref,                // create OpenWQ_json object
