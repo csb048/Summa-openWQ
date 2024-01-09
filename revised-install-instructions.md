@@ -55,7 +55,11 @@ In `Summa-openWQ/utils/containers/summa_openwq/` are the files needed for creati
 * Once you ace attached to the container cd into `/code`, there you will see the two dirrectories we mapped ealier, `Summa-OpenWQ/` and `data/`.
 
 ### Compiling Summa-OpenWQ
-
+* We are going to make some modifications to opwnwq's `CMakeLists.txt` found at `/code/Summa-openWQ/build/source/openwq/openwq/CMakeLists.txt`. Open `CMakeLists.txt` with a text editor.
+    * Ensure that `COMPILE_TARGET` is set to `summa_openwq`.
+    * Set `COMPILE_MODE` to `debug` or `fast` depending on your needs.
+        * `degug` is good for developing and making changes to the softwear
+        * `fast` is for if you want to just use the program.          
 * cd into `/code/Summa-OpenWQ/build/`
 * Create a new directory called `cmake_build`
 * cd into `cmake_build/`
@@ -64,6 +68,8 @@ In `Summa-openWQ/utils/containers/summa_openwq/` are the files needed for creati
 
 * run `make -j 2`
     * This should create a summa_openwq executable in `/code/case_studies`
+
+If you come across Issues with compiling try deleting everything in `cmake_build/` and try running `../call_cmake.sh` again, Make sure you are in the correct directory and the directory in `call_cmake.sh` leads to `../source/openwq/openwq/.
 
 ### Setup Synthetic Tests
 Before any simulation is ran we have to mofify the configuration files to match docker enviroment. For any simulation you have to modify the Summa and OpenWQ config files.  As an example We will be configuring a synthetic test. Clone the `synthetic_tests` repo -> LINK HERE into `data/`.  **USE ABSOLUTE PATHS** 
