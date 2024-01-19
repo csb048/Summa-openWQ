@@ -101,7 +101,7 @@ This example only applies for Synthetic test #13.  Modifiying config for other d
 # Common Issues
 * When Running Docker commands (Including the scripts for building and launching docker containers) you may get an error stating **"ERROR: permissions denied ..."**.  To fix this run the problematic command with **sudo**,  `sudo <rest of command>`. or add youself to the docker group on your local machine.
 
-*  When building the container some of the apt-gets will fail for whatever reason with error code 100.  to fix this, cry about it ;_;  (no solution yet).  Ive only came accros this issue on my personal laptop.  I've tried used the updated Dockerfile that kyle made Late Dec 2023 but it still tries to install the problematic dependancies.
+*  When building the container some of the apt-gets will fail for whatever reason with error code 100 (no solution yet).  Ive only came accros this issue on my personal laptop.  I've tried used the updated Dockerfile that kyle made Late Dec 2023 but it still tries to install the problematic dependancies.
 
 
 
